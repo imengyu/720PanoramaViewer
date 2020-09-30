@@ -115,6 +115,30 @@ void LoggerInternal::SetLogOutPutCallback(LogCallBack callback, LPARAM lparam)
 	callBackData = lparam;
 }
 
+void LoggerInternal::InitLogConsoleStdHandle() {
+	hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+}
+void LoggerInternal::LogOutputToStdHandle(LogLevel level, const wchar_t* str, size_t len) {
+	switch (level)
+	{
+	case LogLevelInfo: 
+		SetConsoleTextAttribute(hOutput, FOREGROUND_INTENSITY | FOREGROUND_BLUE);
+		break;
+	case LogLevelWarn: 
+		SetConsoleTextAttribute(hOutput, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);
+		break;
+	case LogLevelError:
+		SetConsoleTextAttribute(hOutput, FOREGROUND_INTENSITY | FOREGROUND_RED);
+		break;
+	case LogLevelText: 
+		SetConsoleTextAttribute(hOutput, FOREGROUND_INTENSITY | FOREGROUND_RED |
+			FOREGROUND_GREEN |
+			FOREGROUND_BLUE);
+		break;
+	}
+	WriteConsoleW(hOutput, str, len, NULL, NULL);
+}
+
 void LoggerInternal::ResentNotCaputureLog()
 {
 	if (outPut == LogOutPutCallback && callBack) {
@@ -164,8 +188,10 @@ void LoggerInternal::LogOutput(LogLevel level, const wchar_t * str, size_t len)
 #endif
 	if (outPut == LogOutPutFile && logFile)
 		fwprintf_s(logFile, L"%s", str);
-	else if (outPut == LogOutPutConsolne)
-		wprintf_s(L"%s", str);
+	else if (outPut == LogOutPutConsolne) {
+		if (hOutput != NULL) LogOutputToStdHandle(level, str, len);
+		else wprintf_s(L"%s", str);
+	}
 	else if (outPut == LogOutPutCallback && callBack)
 		callBack(str, level, callBackData);
 	else

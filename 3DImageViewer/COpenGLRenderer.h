@@ -14,6 +14,7 @@ public:
 	virtual bool Init();
 	virtual void Render(float FrameTime);
 	virtual void RenderUI();
+	virtual void Update();
 	virtual void Resize(int Width, int Height);
 	virtual void Destroy();
 

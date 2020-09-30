@@ -19,6 +19,10 @@ void COpenGLRenderer::Render(float FrameTime)
 void COpenGLRenderer::RenderUI()
 {
 }
+void COpenGLRenderer::Update()
+{
+
+}
 void COpenGLRenderer::Resize(int Width, int Height)
 {
 	this->Width = Width;

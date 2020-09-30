@@ -1,83 +1,133 @@
 #include "CCamera.h"
 
-// 含标量的构造器
-
-
-// 向量构造器
-
-CCamera::CCamera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+CCamera::CCamera(glm::vec3 position, glm::vec3 up, glm::vec3 rotate)
 {
 	Position = position;
 	WorldUp = up;
-	Yaw = yaw;
-	Pitch = pitch;
-	updateCameraVectors();
-}
-
-CCamera::CCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
-{
-	Position = glm::vec3(posX, posY, posZ);
-	WorldUp = glm::vec3(upX, upY, upZ);
-	Yaw = yaw;
-	Pitch = pitch;
+	Rotate = rotate;
 	updateCameraVectors();
 }
 
 // 返回使用欧拉角和LookAt矩阵计算的view矩阵
-
 glm::mat4 CCamera::GetViewMatrix()
 {
 	return glm::lookAt(Position, Position + Front, Up);
 }
 
 // 处理从任何类似键盘的输入系统接收的输入，以摄像机定义的ENUM形式接受输入参数（从窗口系统中抽象出来）
-
 void CCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
 {
 	float velocity = MovementSpeed * deltaTime;
-	if (direction == FORWARD)
-		Position += Front * velocity;
-	if (direction == BACKWARD)
-		Position -= Front * velocity;
-	if (direction == LEFT)
-		Position -= Right * velocity;
-	if (direction == RIGHT)
-		Position += Right * velocity;
-}
 
-// 处理从鼠标输入系统接收的输入，预测x和y方向的偏移值
-
-void CCamera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
-{
-	xoffset *= MouseSensitivity;
-	yoffset *= MouseSensitivity;
-
-	Yaw += xoffset;
-	Pitch += yoffset;
-
-	// 确保当pitch超出范围时，屏幕不会翻转
-	if (constrainPitch)
+	switch (direction)
 	{
-		if (Pitch > 89.0f)
-			Pitch = 89.0f;
-		if (Pitch < -89.0f)
-			Pitch = -89.0f;
+	case FORWARD:
+		Position += Front * velocity;
+
+		break;
+	case BACKWARD:
+		Position -= Front * velocity;
+
+		break;
+	case LEFT:
+		Position -= Right * velocity;
+
+		break;
+	case RIGHT:
+		Position += Right * velocity;
+
+		break;
+	case ROATE_UP:
+		Rotate.y += RoateSpeed * deltaTime;
+		break;
+	case ROATE_DOWN:
+		Rotate.y -= RoateSpeed * deltaTime;
+		break;
+	case ROATE_LEFT:
+		Rotate.x -= RoateSpeed * 1.3f * deltaTime;
+		break;
+	case ROATE_RIGHT:
+		Rotate.x += RoateSpeed * 1.3f * deltaTime;
+		break;
+	default:
+		break;
 	}
 
-	// 使用更新的欧拉角更新3个向量
 	updateCameraVectors();
 }
 
-// 处理从鼠标滚轮事件接收的输入
+// 处理从鼠标输入系统接收的输入，预测x和y方向的偏移值
+void CCamera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
+{
+	switch (Mode)
+	{
+	case CenterRoate: {
+		xoffset *= MouseSensitivity;
+		yoffset *= MouseSensitivity;
 
+		Rotate.x += xoffset;
+		Rotate.y += yoffset;
+
+		// 确保当pitch超出范围时，屏幕不会翻转
+		if (constrainPitch)
+		{
+			if (Rotate.y > 89.0f)
+				Rotate.y = 89.0f;
+			if (Rotate.y < -89.0f)
+				Rotate.y = -89.0f;
+		}
+
+		// 使用更新的欧拉角更新3个向量
+		updateCameraVectors();
+		break;
+	}
+	case OutRoataround: {
+		xoffset *= MouseSensitivity;
+		yoffset *= MouseSensitivity;
+
+		RoateXForWorld += xoffset;
+		RoateYForWorld += yoffset;
+
+		//计算摄像机在这个球上的坐标
+		float distance = glm::distance(Position, glm::vec3(0.0f));
+
+		float w = distance * glm::cos(glm::radians(RoateYForWorld));
+		Position.x = w * glm::cos(glm::radians(RoateXForWorld));
+		Position.y = distance * glm::sin(glm::radians(RoateYForWorld));
+		Position.z = w * glm::sin(glm::radians(RoateXForWorld));
+
+		if (Position.y < 0) Rotate.x = 180.0f - Rotate.x;
+		if (Position.z < 0) Rotate.y = 180.0f - Rotate.y;
+
+		updateCameraVectors();
+		break;
+	}
+	case Static:
+		break;
+	}
+}
+
+// 处理从鼠标滚轮事件接收的输入
 void CCamera::ProcessMouseScroll(float yoffset)
 {
-	if (Zoom >= 1.0f && Zoom <= 45.0f)
-		Zoom -= yoffset;
-	if (Zoom <= 1.0f)
-		Zoom = 1.0f;
-	if (Zoom >= 45.0f)
-		Zoom = 45.0f;
+	switch (Mode)
+	{
+	case CenterRoate: {
+		if (Zoom >= ZoomMin && Zoom <= ZoomMax)
+			Zoom -= yoffset * ZoomSpeed;
+		if (Zoom <= ZoomMin) Zoom = ZoomMin;
+		if (Zoom >= ZoomMax) Zoom = ZoomMax;
+		break;
+	}
+	case OutRoataround: {
+		Position.z -= yoffset * ZoomSpeed * 0.1f;
+		if (Position.z < RoateNearMax) Position.z = RoateNearMax;
+		if (Position.z > RoateFarMax) Position.z = RoateFarMax;
+		break;
+	}
+	case Static:
+		break;
+	}
 }
 
 void CCamera::SetPosItion(glm::vec3 position)
@@ -88,8 +138,45 @@ void CCamera::SetPosItion(glm::vec3 position)
 
 void CCamera::SetRotation(glm::vec3 rotation)
 {
-	Pitch = rotation.x;
-	Yaw = rotation.y;
+	Rotate = rotation;
+	updateCameraVectors();
+}
+
+void CCamera::SetMode(Camera_Mode mode)
+{
+	Mode = mode; 
+	switch (Mode)
+	{
+	case CenterRoate:
+		Reset();
+		break;
+	case OutRoataround:
+		Reset();
+		Position = glm::vec3(0.0f, 0.0f, 3.0f);
+		Rotate = glm::vec3(-90.0f, 0.0f, 0.0f);
+		RoateYForWorld = 0.0f;
+		RoateXForWorld = 0.0f;
+		updateCameraVectors();
+		break;
+	case Static:
+		Reset();
+		break;
+	default:
+		break;
+	}
+}
+
+void CCamera::ForceUpdate() {
+	updateCameraVectors();
+}
+
+void CCamera::Reset()
+{
+	Position = glm::vec3(0.0f);
+	Up = glm::vec3(0.0f, 1.0f, 0.0f);
+	Front = glm::vec3(0.0f, 0.0f, -1.0f);
+	Rotate = glm::vec3(YAW, PITCH, 0.0f);
+	Zoom = ZOOM;
 	updateCameraVectors();
 }
 
@@ -99,9 +186,9 @@ void CCamera::updateCameraVectors()
 {
 	// 计算新的前向量
 	glm::vec3 front;
-	front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-	front.y = sin(glm::radians(Pitch));
-	front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+	front.x = cos(glm::radians(Rotate.x)) * cos(glm::radians(Rotate.y));
+	front.y = sin(glm::radians(Rotate.y));
+	front.z = sin(glm::radians(Rotate.x)) * cos(glm::radians(Rotate.y));
 	Front = glm::normalize(front);
 	// 再计算右向量和上向量
 	Right = glm::normalize(glm::cross(Front, WorldUp));  // 标准化

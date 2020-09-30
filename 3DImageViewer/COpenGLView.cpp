@@ -1,15 +1,16 @@
 #include "stdafx.h"
 #include "COpenGLView.h"
+#include "CApp.h"
+#include "resource.h"
 #include <stdio.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_win32.h>
-
-extern LoggerInternal* logger;
 
 COpenGLView::COpenGLView(COpenGLRenderer *renderer)
 {
 	this->OpenGLRenderer = renderer;
 	this->OpenGLRenderer->View = this;
+	this->logger = CApp::Instance->GetLogger();
 	memset(SizeText, 0, sizeof(SizeText));
 }
 COpenGLView::~COpenGLView()
@@ -18,10 +19,27 @@ COpenGLView::~COpenGLView()
 
 bool COpenGLView::Init(HINSTANCE hInstance, LPCWSTR Title, int Width, int Height, WNDPROC wndproc)
 {
-	Title = Title;
-	TextPadding = 10.0f / (this->Width / 2.0f);
-	CustomWndProc = wndproc;
+	this->Title = Title;
+	this->Width = Width;
+	this->Height = Height;
+	this->TextPadding = 10.0f / (this->Width / 2.0f);
+	this->CustomWndProc = wndproc;
 
+	if (!CreateViewWindow(hInstance))
+		return false;
+
+	Rendering = true;
+	RenderThreadRunning = true;
+	ViewportChanged = true;
+	hThreadRender = CreateThread(0, 0, RenderThread, this, 0, 0);
+	hThreadMain = CreateThread(0, 0, MainThread, this, 0, 0);
+	startTime = GetTickCount();
+
+	inited = true;
+	return true;
+}
+
+bool COpenGLView::CreateViewWindow(HINSTANCE hInstance) {
 	WNDCLASSEX WndClassEx;
 
 	memset(&WndClassEx, 0, sizeof(WNDCLASSEX));
@@ -30,8 +48,8 @@ bool COpenGLView::Init(HINSTANCE hInstance, LPCWSTR Title, int Width, int Height
 	WndClassEx.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
 	WndClassEx.lpfnWndProc = WndProc;
 	WndClassEx.hInstance = hInstance;
-	WndClassEx.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	WndClassEx.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+	WndClassEx.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APP));
+	WndClassEx.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APP));
 	WndClassEx.hCursor = LoadCursor(NULL, IDC_ARROW);
 	WndClassEx.lpszClassName = L"Win32OpenGLWindow";
 
@@ -43,7 +61,7 @@ bool COpenGLView::Init(HINSTANCE hInstance, LPCWSTR Title, int Width, int Height
 
 	DWORD Style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
-	hWnd = CreateWindowEx(WS_EX_APPWINDOW, WndClassEx.lpszClassName, Title, Style, 0, 0, Width, Height, NULL, NULL, hInstance, NULL);
+	hWnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_ACCEPTFILES, WndClassEx.lpszClassName, Title, Style, 0, 0, Width, Height, NULL, NULL, hInstance, NULL);
 
 	if (hWnd == NULL)
 	{
@@ -86,17 +104,8 @@ bool COpenGLView::Init(HINSTANCE hInstance, LPCWSTR Title, int Width, int Height
 		return false;
 	}
 
-	Rendering = true;
-	RenderThreadRunning = true;
-	ViewportChanged = true;
-	hThread = CreateThread(0, 0, RenderThread, this, 0, 0);
-	startTime = GetTickCount();
-
-	inited = true;
-
 	return true;
 }
-
 bool COpenGLView::InitGl() {
 	hGLRC = wglCreateContext(hDC);
 	if (hGLRC == NULL)
@@ -130,6 +139,17 @@ void COpenGLView::InitImgui() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	static ImVector<ImWchar> myRange;
+	ImFontGlyphRangesBuilder myGlyph;
+
+	myGlyph.AddText(u8"1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,./<>?;:\"'{}[]|\\+_-=()：；\
+*&^%$#@!~`，。《》￥ 关于文件这是一个简易的全景图查看软件染支持多种投影方式可快速打开您浏览程序信息好欢迎使用请先提渲\
+示确定设置模式帮助关于全屏调试退出显示控制台配使用球面平小行星水晶球单闭当前载入中稍后此案像该球体轴分段失败误错不灰度色或位格");
+	myGlyph.BuildRanges(&myRange);
+
+	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.5f, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+	io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.5f, NULL, myRange.Data);
+
 	//设置颜色风格
 	ImGui::StyleColorsDark();
 
@@ -167,10 +187,13 @@ void COpenGLView::MessageLoop()
 }
 void COpenGLView::Destroy()
 {
-	Rendering = false;
-	RenderThreadRunning = false;
-	Destroying = true;
-	DestroyWindow(hWnd);
+	if (!Destroying) {
+		closeActived = true;
+		Rendering = false;
+		RenderThreadRunning = false;
+		Destroying = true;
+		DestroyWindow(hWnd);
+	}
 }
 void COpenGLView::DestroyRender()
 {
@@ -192,6 +215,8 @@ void COpenGLView::Render() {
 		//绘制
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		if (Rendering && OpenGLRenderer) OpenGLRenderer->Render(currentFps);
+
 		//绘制UI
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -199,15 +224,12 @@ void COpenGLView::Render() {
 		RenderUI();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		if (Rendering && OpenGLRenderer) OpenGLRenderer->Render(currentFps);
 	}
 }
 void COpenGLView::RenderUI()
 {
 	//绘制信息文字
-	if(ShowInfoOverlay)
-		DrawViewInfoOverlay(&ShowInfoOverlay);
+	if(ShowInfoOverlay) DrawViewInfoOverlay(&ShowInfoOverlay);
 	//
 	if (OpenGLRenderer) OpenGLRenderer->RenderUI();
 }
@@ -228,7 +250,7 @@ void COpenGLView::DrawViewInfoOverlay(bool* p_open)
 	ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
 	if (ImGui::Begin("overlay", p_open, window_flags))
 	{
-		ImGui::Text("Render info \n(right-click to change position)");
+		ImGui::Text("Render (right-click to change position)");
 		ImGui::Separator();
 		ImGui::Text("FPS: %f", currentFps);
 		ImGui::Text(SizeText);
@@ -261,11 +283,11 @@ LRESULT WINAPI COpenGLView:: WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARA
 		switch (uiMsg)
 		{
 		case WM_KEYDOWN: {
-
+			view->HandleDownKey(wParam);
 			break;
 		}
 		case WM_KEYUP: {
-
+			view->HandleUpKey(wParam);
 			break;
 		}
 		case WM_SHOWWINDOW: {
@@ -287,11 +309,52 @@ LRESULT WINAPI COpenGLView:: WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARA
 			case SIZE_MAXSHOW:
 			case SIZE_RESTORED:
 				view->Rendering = true;
+				view->ViewportChanged = true;
 				break;
 			}
 			view->ViewportChanged = true;
 			break;
 		}
+		case WM_MOUSEMOVE: { 
+			if (view->mouseCallback != nullptr && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered()) {
+				short xPos = LOWORD(lParam), yPos = HIWORD(lParam);
+				view->mouseCallback(view, (float)xPos, (float)yPos, wParam, ViewMouseEventType::ViewMouseMouseMove);
+			}
+			break;
+		}
+		case WM_LBUTTONDOWN: {
+			view->CallMouseCallback(wParam, lParam, ViewMouseEventType::ViewMouseMouseDown);
+			break;
+		}
+		case WM_LBUTTONUP: {
+			view->CallMouseCallback(MK_LBUTTON, lParam, ViewMouseEventType::ViewMouseMouseUp);
+			break;
+		}
+		case WM_RBUTTONDOWN: {
+			view->CallMouseCallback(wParam, lParam, ViewMouseEventType::ViewMouseMouseDown);
+			break;
+		}
+		case WM_RBUTTONUP: {
+			view->CallMouseCallback(MK_RBUTTON, lParam, ViewMouseEventType::ViewMouseMouseUp);
+			break;
+		}
+		case WM_MBUTTONDOWN: {
+			view->CallMouseCallback(wParam, lParam, ViewMouseEventType::ViewMouseMouseDown);
+			break;
+		}
+		case WM_MBUTTONUP: {
+			view->CallMouseCallback(MK_MBUTTON, lParam, ViewMouseEventType::ViewMouseMouseUp);
+			break;
+		}
+		case WM_MOUSEWHEEL: {
+			if (view->scrollCallback != nullptr && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered()) {
+				short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+				view->scrollCallback(view, 0, (float)zDelta, wParam, ViewMouseEventType::ViewMouseMouseWhell);
+			}
+			break;
+		}
+		default:
+			break;
 		}
 		if (view->CustomWndProc)
 			return view->CustomWndProc(hWnd, uiMsg, wParam, lParam);
@@ -303,11 +366,11 @@ DWORD WINAPI COpenGLView::RenderThread(LPVOID lpParam)
 	COpenGLView* view = (COpenGLView*)lpParam;
 	double deltaTime = 0;;
 
-	logger->Log2(L"RenderThread start!");
+	view->logger->Log2(L"RenderThread start!");
 
 	//Init Opengl
 	if (!view->InitGl()) {
-		logger->LogError2(L"InitGl failed!");
+		view->logger->LogError2(L"InitGl failed!");
 		return -1;
 	}
 
@@ -316,7 +379,7 @@ DWORD WINAPI COpenGLView::RenderThread(LPVOID lpParam)
 	//Init render
 	if (view->OpenGLRenderer)
 		if (!view->OpenGLRenderer->Init()) {
-			logger->LogError2(L"OpenGLRenderer init failed!");
+			view->logger->LogError2(L"OpenGLRenderer init failed!");
 			return -1;
 		}
 
@@ -348,6 +411,8 @@ DWORD WINAPI COpenGLView::RenderThread(LPVOID lpParam)
 			}
 		}
 
+		view->UpdateTicked = true;
+
 		//Render
 		if (view->Rendering) {
 			view->Render();
@@ -365,19 +430,49 @@ DWORD WINAPI COpenGLView::RenderThread(LPVOID lpParam)
 	view->DestroyRender();
 	view->MarkDestroyComplete();
 
-	logger->Log2(L"RenderThread destroyed!");
+	view->logger->Log2(L"RenderThread destroyed!");
+
+	return 0;
+}
+DWORD WINAPI COpenGLView::MainThread(LPVOID lpParam)
+{
+	COpenGLView* view = (COpenGLView*)lpParam;
+
+	view->logger->Log2(L"MainThread created!");
+
+	while (view->RenderThreadRunning) {
+
+		if (view->UpdateTicked) {
+			if(view->OpenGLRenderer) view->OpenGLRenderer->Update();
+			view->UpdateTicked = false;
+		} else Sleep(10);
+	}
+
+	view->logger->Log2(L"MainThread destroyed!");
 
 	return 0;
 }
 
+void COpenGLView::CallMouseCallback(WPARAM wParam, LPARAM lParam, ViewMouseEventType type) {
+	
+	if (mouseCallback != nullptr && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered()) {
+		WORD xPos = LOWORD(lParam), yPos = HIWORD(lParam);
+		mouseCallback(this, (float)xPos, (float)yPos, wParam, type);
+	}
+}
 void COpenGLView::OnSize(int Width, int Height)
 {
-	this->Width = Width;
-	this->Height = Height;
+	if (Width != 0 && Height != 0) 
+	{
+		this->Width = Width;
+		this->Height = Height;
 
-	sprintf_s(SizeText, "%dx%d - %s", Width, Height, (char*)glGetString(GL_RENDERER));
+		sprintf_s(SizeText, "%dx%d - %s", Width, Height, (char*)glGetString(GL_RENDERER));
 
-	if (OpenGLRenderer) OpenGLRenderer->Resize(Width, Height);
+		logger->Log2(L"Resize view : %dx%d", Width, Height);
+
+		if (OpenGLRenderer) OpenGLRenderer->Resize(Width, Height);
+	}
 }
 
 glm::vec2 COpenGLView::ViewportPosToGLPos(glm::vec2 pos) {
@@ -392,12 +487,18 @@ float COpenGLView::GetTime()
 	return (float)currentTime / 1000.0f;
 }
 float COpenGLView::GetDeltaTime() {
-	return 1.0f / currentFps;
+	if(currentFps != 0)
+		return 1.0f / currentFps;
+	return 0.01f;
 }
 void COpenGLView::CloseView() {
-	CloseWindow(hWnd);
-	SendMessageW(hWnd, WM_CLOSE, 0, 0);
+	if (!closeActived) {
+		CloseWindow(hWnd);
+		::SendMessage(hWnd, WM_CLOSE, 0, 0);
+	}
 }
+
+int destroyWaitCount = 0;
 
 void COpenGLView::MarkDestroyComplete()
 {
@@ -405,11 +506,123 @@ void COpenGLView::MarkDestroyComplete()
 }
 void COpenGLView::WaitDestroyComplete()
 {
-	while (Destroying)
+	while (Destroying && destroyWaitCount < 111) {
 		Sleep(20);
+		destroyWaitCount++;
+	}
 }
+
+void COpenGLView::SetMouseCallback(ViewMouseCallback mouseCallback)
+{
+	this->mouseCallback = mouseCallback;
+}
+void COpenGLView::SetScrollCallback(ViewMouseCallback mouseCallback)
+{
+	this->scrollCallback = mouseCallback;
+}
+
+int COpenGLView::AddKeyInKeyList(int *list, int code) {
+	for (int i = 0; i < MAX_KEY_LIST; i++) {
+		if (list[i] == 0)
+		{
+			list[i] = code;
+			return i;
+		}
+	}	
+	return -1;
+}
+int COpenGLView::IsKeyInKeyListExists(int* list, int code) {
+	for (int i = 0; i < MAX_KEY_LIST; i++) {
+		if (list[i] == code)
+			return i;
+	}
+	return -1;
+}
+void COpenGLView::HandleDownKey(int code) {
+	
+	int upIndex = IsKeyInKeyListExists(UpedKeys, code);
+	if (upIndex > -1) UpedKeys[upIndex] = 0;
+
+	int downIndex = IsKeyInKeyListExists(DownedKeys, code);
+	if (downIndex == -1) AddKeyInKeyList(DownedKeys, code);
+
+}
+void COpenGLView::HandleUpKey(int code) {
+	int upIndex = IsKeyInKeyListExists(UpedKeys, code);
+	if (upIndex == -1) AddKeyInKeyList(UpedKeys, code);
+
+	int downIndex = IsKeyInKeyListExists(DownedKeys, code);
+	if (downIndex > -1) DownedKeys[downIndex] = 0;
+
+}
+
+bool COpenGLView::GetKeyPress(int code) {
+	return IsKeyInKeyListExists(DownedKeys, code) > -1;
+}
+bool COpenGLView::GetKeyDown(int code) {
+	int up = IsKeyInKeyListExists(DownedKeys, code);
+	if (up > -1) {
+		DownedKeys[up] = 0;
+		return true;
+	}
+	return  false;
+}
+bool COpenGLView::GetKeyUp(int code) {
+	int up =  IsKeyInKeyListExists(UpedKeys, code);
+	if (up > -1) {
+		UpedKeys[up] = 0;
+		return true;
+	}
+	return  false;
+}
+void COpenGLView::Resize(int w, int h, bool moveToCenter) {
+	int newx = moveToCenter ?(GetSystemMetrics(SM_CXSCREEN) - w) / 2 : 0,
+		newy = moveToCenter ? (GetSystemMetrics(SM_CYSCREEN) - h) / 2 - 30 : 0;
+	SetWindowPos(hWnd, NULL, newx, newy, w, h, SWP_NOZORDER | (moveToCenter ? 0 : SWP_NOMOVE));
+}
+void COpenGLView::UpdateFullScreenState() {
+	if (IsFullScreen) {
+		SetWindowLong(hWnd, GWL_STYLE, WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP);
+		ShowWindow(hWnd, SW_MAXIMIZE);
+	}
+	else {
+		SetWindowLong(hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
+		ShowWindow(hWnd, SW_RESTORE);
+	}
+}
+void COpenGLView::SetFullScreen(bool full) {
+	if (IsFullScreen != full) {
+		IsFullScreen = full;
+		UpdateFullScreenState();
+	}
+}
+bool COpenGLView::GetIsFullScreen() {
+	return IsFullScreen;
+}
+
+void COpenGLView::SetToLowerFpsMode() {
+	lastSetFps = LimitFps;
+	LimitFps = 2.0f;
+}
+void COpenGLView::QuitLowerFpsMode() {
+	if (lastSetFps > 0) {
+		LimitFps = lastSetFps;
+		lastSetFps = 0;
+	}
+}
+
+LRESULT COpenGLView::SendMessage(UINT Msg, WPARAM wParam, LPARAM lParam) {
+	return ::SendMessage(hWnd, Msg, wParam, lParam);
+}
+
+void COpenGLView::MouseCapture() { SetCapture(hWnd); }
+void COpenGLView::ReleaseCapture() { ::ReleaseCapture(); }
 
 COpenGLRenderer * COpenGLView::GetRenderer()
 {
 	return OpenGLRenderer;
+}
+HWND COpenGLView::GetHWND()
+{
+	return hWnd;
 }

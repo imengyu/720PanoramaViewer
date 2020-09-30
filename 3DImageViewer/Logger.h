@@ -71,6 +71,9 @@ public:
 	void SetLogOutPutFile(const wchar_t *filePath) override;
 	void SetLogOutPutCallback(LogCallBack callback, LPARAM lparam);
 
+	void InitLogConsoleStdHandle();
+	void LogOutputToStdHandle(LogLevel level, const wchar_t* str, size_t len);
+
 	void ResentNotCaputureLog();
 	void WritePendingLog(const wchar_t *str, LogLevel level);
 
@@ -88,6 +91,7 @@ private:
 	LogOutPut outPut = LogOutPutConsolne;
 	LogCallBack callBack = nullptr;
 	LPARAM callBackData;
+	HANDLE hOutput = NULL;
 };
 
 #define LogError2(str, ...) LogError2(str, __FILE__, __LINE__, __FUNCTION__,__VA_ARGS__)

@@ -3,6 +3,17 @@
 #include "CCamera.h"
 #include <imgui.h>
 
+typedef void(*ViewMouseCallback)(COpenGLView* view, float xpos, float ypos, int button, int type);
+
+const int MAX_KEY_LIST = 8;
+
+enum ViewMouseEventType {
+	ViewMouseMouseDown,
+	ViewMouseMouseUp,
+	ViewMouseMouseMove,
+	ViewMouseMouseWhell,
+};
+
 class COpenGLView
 {
 protected:
@@ -11,7 +22,8 @@ protected:
 	HDC hDC = NULL;
 	HGLRC hGLRC = NULL;
 	COpenGLRenderer *OpenGLRenderer = NULL;
-	HANDLE hThread = NULL;
+	HANDLE hThreadRender = NULL;
+	HANDLE hThreadMain = NULL;
 	float currentFps = 0.0f;
 
 
@@ -29,11 +41,19 @@ private:
 	bool RenderThreadRunning = false;
 	bool Destroying = false;
 	WNDPROC CustomWndProc = nullptr;
-	std::vector<int> DownedKeys;
+
+	int DownedKeys[MAX_KEY_LIST];
+	int UpedKeys[MAX_KEY_LIST];
 
 	bool ViewportChanged = false;
+	bool UpdateTicked = false;
 
+	LoggerInternal* logger = nullptr;
 
+	ViewMouseCallback scrollCallback = nullptr;
+	ViewMouseCallback mouseCallback = nullptr;
+
+	bool CreateViewWindow(HINSTANCE hInstance);
 	bool InitGl();
 	void InitImgui();
 	void DrawViewInfoOverlay(bool* p_open);
@@ -53,25 +73,63 @@ public:
 
 	static LRESULT __stdcall WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	static DWORD WINAPI RenderThread(LPVOID lpParam);
+	static DWORD __stdcall MainThread(LPVOID lpParam);
 
+	void CallMouseCallback(WPARAM wParam, LPARAM lParam, ViewMouseEventType type);
 	void OnSize(int Width, int Height);
 
 	glm::vec2  ViewportPosToGLPos(glm::vec2 pos);
 	glm::vec2 GLPosToViewportPos(glm::vec2 pos);
 
-	CCamera Camera = CCamera(glm::vec3(0.0f, 0.0f, 3.0f));
+	CCamera Camera = CCamera(glm::vec3(0.0f, 0.0f, 0.0f));
 
-	double LimitFps = 10;
+	float LimitFps = 25.0f;
+	float FixedTimeStep = 10.0f;
 
 	float GetTime();
 	float GetDeltaTime();
+
 
 	void CloseView();
 	void MarkDestroyComplete();
 	void WaitDestroyComplete();
 
 	bool ShowInfoOverlay = true;
+	bool IsFullScreen = false;
+
+	bool GetKeyPress(int code);
+	bool GetKeyDown(int code);
+	bool GetKeyUp(int code);
+
+	void Resize(int w, int h, bool moveToCenter);
+	void UpdateFullScreenState();
+	void SetFullScreen(bool full);
+	bool GetIsFullScreen();
+
+	void SetToLowerFpsMode();
+	void QuitLowerFpsMode();
+
+	LRESULT SendMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
+
+	void MouseCapture();
+	void ReleaseCapture();
 
 	COpenGLRenderer * GetRenderer();
+
+	HWND GetHWND();
+
+	void SetMouseCallback(ViewMouseCallback mouseCallback);
+	void SetScrollCallback(ViewMouseCallback mouseCallback);
+private:
+
+	bool closeActived = false;
+	float lastSetFps = 0;
+
+	int AddKeyInKeyList(int* list, int code);
+	int IsKeyInKeyListExists(int* list, int code);
+	void HandleDownKey(int code);
+	void HandleUpKey(int code);
+
+
 };
 

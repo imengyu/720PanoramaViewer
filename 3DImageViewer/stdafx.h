@@ -12,7 +12,7 @@
 #include <tchar.h>
 //Cpp
 #include <string>
-
+#include <intrin.h>
 // 在此处引用程序需要的其他标头
 
 
@@ -20,10 +20,9 @@
 #include <ext.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/constants.hpp>
+#define GLEW_STATIC
 #include <gl/glew.h>
 #include <gl/wglew.h>
-#include <gl/glut.h>
-
-#define PI 3.1415926f
 
 #include "Logger.h"
+#include "messages.h"
