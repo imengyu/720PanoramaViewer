@@ -153,14 +153,21 @@
     <ClCompile Include="CApp.cpp" />
     <ClCompile Include="CBMPLoader.cpp" />
     <ClCompile Include="CCamera.cpp" />
+    <ClCompile Include="CColor.cpp" />
+    <ClCompile Include="CCPanoramaRenderer.cpp" />
     <ClCompile Include="CCursor.cpp" />
+    <ClCompile Include="CFileManager.cpp" />
     <ClCompile Include="CGameRenderer.cpp" />
     <ClCompile Include="CHelpDialog.cpp" />
     <ClCompile Include="CImageLoader.cpp" />
     <ClCompile Include="CJpgLoader.cpp" />
+    <ClCompile Include="CCMesh.cpp" />
+    <ClCompile Include="CCModel.cpp" />
     <ClCompile Include="COpenGLRenderer.cpp" />
     <ClCompile Include="COpenGLView.cpp" />
+    <ClCompile Include="CCPanoramaCamera.cpp" />
     <ClCompile Include="CPngLoader.cpp" />
+    <ClCompile Include="CCTexture.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -263,14 +270,21 @@
     <ClInclude Include="CApp.h" />
     <ClInclude Include="CBMPLoader.h" />
     <ClInclude Include="CCamera.h" />
+    <ClInclude Include="CColor.h" />
+    <ClInclude Include="CCPanoramaRenderer.h" />
     <ClInclude Include="CCursor.h" />
+    <ClInclude Include="CFileManager.h" />
     <ClInclude Include="CGameRenderer.h" />
     <ClInclude Include="CHelpDialog.h" />
     <ClInclude Include="CImageLoader.h" />
     <ClInclude Include="CJpgLoader.h" />
+    <ClInclude Include="CCMesh.h" />
+    <ClInclude Include="CCModel.h" />
     <ClInclude Include="COpenGLRenderer.h" />
     <ClInclude Include="COpenGLView.h" />
+    <ClInclude Include="CCPanoramaCamera.h" />
     <ClInclude Include="CPngLoader.h" />
+    <ClInclude Include="CCTexture.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl3.h" />
@@ -315,6 +329,7 @@
     <ClInclude Include="libpng\pngstruct.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="messages.h" />
+    <ClInclude Include="platform.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SettingHlp.h" />
     <ClInclude Include="stdafx.h" />
@@ -348,6 +363,9 @@
     <Image Include="logo-small.bmp" />
     <Image Include="logo.bmp" />
     <Image Include="logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="not use code.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

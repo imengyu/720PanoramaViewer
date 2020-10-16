@@ -28,12 +28,16 @@ public:
 	virtual void Destroy();
 	virtual bool IsOpened();
 
+	float GetLoadingPrecent();
+	void SetLoadingPrecent(float v);
+
 protected:
 	void SetLastError(const wchar_t*err);
 	void SetLastError(const char* err);
 	void SetFullDataSize(unsigned long size);
 	void SetChunkDataSize(unsigned long size);
 
+	float loadingPrecent = 0;
 	unsigned long fullDataSize = 0;
 	unsigned long chunkDataSize = 0;
 private:

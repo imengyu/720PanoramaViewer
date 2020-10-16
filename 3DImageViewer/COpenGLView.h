@@ -26,8 +26,6 @@ protected:
 	HANDLE hThreadMain = NULL;
 	float currentFps = 0.0f;
 
-
-
 private:
 	DWORD startTime = 0;
 	DWORD currentTime = 0;
@@ -56,6 +54,7 @@ private:
 	bool CreateViewWindow(HINSTANCE hInstance);
 	bool InitGl();
 	void InitImgui();
+	void DrawNoCameraOverlay();
 	void DrawViewInfoOverlay(bool* p_open);
 	void DestroyRender();
 public:
@@ -71,6 +70,9 @@ public:
 	void Render();
 	void RenderUI();
 
+	void SetViewText(const char * text);
+	void SetViewText(const wchar_t* text);
+
 	static LRESULT __stdcall WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	static DWORD WINAPI RenderThread(LPVOID lpParam);
 	static DWORD __stdcall MainThread(LPVOID lpParam);
@@ -81,7 +83,7 @@ public:
 	glm::vec2  ViewportPosToGLPos(glm::vec2 pos);
 	glm::vec2 GLPosToViewportPos(glm::vec2 pos);
 
-	CCamera Camera = CCamera(glm::vec3(0.0f, 0.0f, 0.0f));
+	CCamera* Camera = nullptr; 
 
 	float LimitFps = 25.0f;
 	float FixedTimeStep = 10.0f;
@@ -89,6 +91,8 @@ public:
 	float GetTime();
 	float GetDeltaTime();
 
+	void SetCamera(CCamera* Camera);
+	void SetCameraLoc(GLint viewLoc, GLint projectionLoc);
 
 	void CloseView();
 	void MarkDestroyComplete();
@@ -124,6 +128,8 @@ private:
 
 	bool closeActived = false;
 	float lastSetFps = 0;
+	GLint viewLoc = -1;
+	GLint projectionLoc = -1;
 
 	int AddKeyInKeyList(int* list, int code);
 	int IsKeyInKeyListExists(int* list, int code);

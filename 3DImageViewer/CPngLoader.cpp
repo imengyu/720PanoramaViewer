@@ -11,14 +11,19 @@ BYTE* CPngLoader::GetAllImageData()
         const int stride = bytesPerPixel * width;
 
         SetFullDataSize(stride * height);
+        SetLoadingPrecent(0);
 
         unsigned char* data = new unsigned char[stride * height];
         png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
         for (unsigned int i = 0; i < height; ++i)
         {
+            SetLoadingPrecent(i / (float)height);
+
             const unsigned int row = height - i - 1;
             memcpy(data + (row * stride), row_pointers[i], stride);
         }
+
+        SetLoadingPrecent(1);
         return data;
     }
     return nullptr;

@@ -15,10 +15,7 @@ class CJpgLoader : public CImageLoader
 	bool IsOpened() override;
 	USHORT GetImageDepth() override;
 
-	FILE* file = nullptr;
 	std::wstring path;
-	struct jpeg_decompress_struct cinfo;
-	struct jpeg_error_mgr jerr;
 	ULONG width = 0;
 	ULONG height = 0;
 	USHORT depth = 0;

@@ -61,20 +61,14 @@
     <Filter Include="源文件\Lib\Zlib">
       <UniqueIdentifier>{bb0ed34f-cc00-4f0b-9842-83abf3dbfe5a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Render">
+      <UniqueIdentifier>{09020316-f6f6-4a49-b171-456c684ff65d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Render">
+      <UniqueIdentifier>{e8fbc6df-e3bd-4257-b989-a3a99062e5dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="COpenGLRenderer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="COpenGLView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CGameRenderer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CCamera.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="StringSplit.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
@@ -101,9 +95,6 @@
     </ClCompile>
     <ClCompile Include="imgui\imgui_impl_win32.cpp">
       <Filter>源文件\Imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="CCursor.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CApp.cpp">
       <Filter>源文件</Filter>
@@ -390,21 +381,45 @@
     <ClCompile Include="zlib\adler32.c">
       <Filter>源文件\Lib\Zlib</Filter>
     </ClCompile>
+    <ClCompile Include="CCamera.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCPanoramaRenderer.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameRenderer.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="COpenGLRenderer.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="COpenGLView.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCPanoramaCamera.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCursor.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CFileManager.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCTexture.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CColor.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCModel.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCMesh.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="COpenGLRenderer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="COpenGLView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CGameRenderer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CCamera.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="StringSplit.h">
@@ -439,9 +454,6 @@
     </ClInclude>
     <ClInclude Include="imgui\imgui_impl_win32.h">
       <Filter>头文件\Imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="CCursor.h">
-      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
@@ -611,6 +623,45 @@
     <ClInclude Include="zlib\zutil.h">
       <Filter>头文件\Lib\Zlib</Filter>
     </ClInclude>
+    <ClInclude Include="platform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CCamera.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCPanoramaRenderer.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameRenderer.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="COpenGLRenderer.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="COpenGLView.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCPanoramaCamera.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCursor.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CFileManager.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCTexture.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CColor.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCModel.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCMesh.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3DImageViewer.rc">
@@ -647,5 +698,10 @@
     <Image Include="logo-small.bmp">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="not use code.txt">
+      <Filter>源文件</Filter>
+    </Text>
   </ItemGroup>
 </Project>

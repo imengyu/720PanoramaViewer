@@ -144,7 +144,8 @@ void COpenGLView::InitImgui() {
 
 	myGlyph.AddText(u8"1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,./<>?;:\"'{}[]|\\+_-=()：；\
 *&^%$#@!~`，。《》￥ 关于文件这是一个简易的全景图查看软件染支持多种投影方式可快速打开您浏览程序信息好欢迎使用请先提渲\
-示确定设置模式帮助关于全屏调试退出显示控制台配使用球面平小行星水晶球单闭当前载入中稍后此案像该球体轴分段失败误错不灰度色或位格");
+示确定设置模式帮助能全屏调试退出显示控制台配使用球面平小行星水晶球单闭当前载入中稍后此案像该球体轴分段失败误错不灰度色或位格\
+非常大很抱歉我们暂时");
 	myGlyph.BuildRanges(&myRange);
 
 	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.5f, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
@@ -200,7 +201,14 @@ void COpenGLView::DestroyRender()
 	if (inited) {
 		inited = false;
 
-		if (OpenGLRenderer) OpenGLRenderer->Destroy();
+		if (OpenGLRenderer) {
+			OpenGLRenderer->Destroy();
+			OpenGLRenderer = nullptr;
+		}
+		if(Camera) {
+			delete Camera;
+			Camera = nullptr;
+		}
 
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplWin32_Shutdown();
@@ -215,13 +223,30 @@ void COpenGLView::Render() {
 		//绘制
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		if (Rendering && OpenGLRenderer) OpenGLRenderer->Render(currentFps);
+		if (Camera) {
+
+			//清空
+			glClearColor(Camera->Background.r, Camera->Background.g, Camera->Background.b, Camera->Background.a);
+
+			//摄像机矩阵变换
+			glm::mat4 view = Camera->GetViewMatrix();
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+			//摄像机投影
+			glm::mat4 projection = Camera->Projection == CCameraProjection::Perspective ?
+				glm::perspective(glm::radians(Camera->FiledOfView), (float)Width / (float)Height, Camera->ClippingNear, Camera->ClippingFar) :
+				glm::ortho(-(float)Width / (float)Height, (float)Width / (float)Height, Camera->OrthographicSize, 0.0f, Camera->ClippingNear, Camera->ClippingFar);
+			glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		}
+		//绘制
+		if (OpenGLRenderer) OpenGLRenderer->Render(currentFps);
 
 		//绘制UI
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 		RenderUI();
+		if (!Camera) DrawNoCameraOverlay();
+
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
@@ -234,6 +259,19 @@ void COpenGLView::RenderUI()
 	if (OpenGLRenderer) OpenGLRenderer->RenderUI();
 }
 	
+void COpenGLView::DrawNoCameraOverlay() {
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::SetNextWindowSize(io.DisplaySize);
+	ImGui::SetNextWindowBgAlpha(0.6f);
+	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_FirstUseEver, ImVec2(0.5f, 0.5f));
+	if (ImGui::Begin("no_camera_rendering_box", 0, window_flags))
+	{
+		ImGui::Text(u8"No camear rendering");
+		ImGui::End();
+	}
+}
 void COpenGLView::DrawViewInfoOverlay(bool* p_open)
 {
 	const float DISTANCE = 10.0f;
@@ -274,6 +312,15 @@ void COpenGLView::DrawViewInfoOverlay(bool* p_open)
 }
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+void COpenGLView::SetViewText(const char* text)
+{
+	SetWindowTextA(hWnd, text);
+}
+void COpenGLView::SetViewText(const wchar_t* text)
+{
+	SetWindowTextW(hWnd, text);
+}
 
 LRESULT WINAPI COpenGLView:: WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -496,6 +543,15 @@ void COpenGLView::CloseView() {
 		CloseWindow(hWnd);
 		::SendMessage(hWnd, WM_CLOSE, 0, 0);
 	}
+}
+void COpenGLView::SetCamera(CCamera* camera)
+{
+	Camera = camera;
+}
+void COpenGLView::SetCameraLoc(GLint viewLoc, GLint projectionLoc)
+{
+	this->viewLoc = viewLoc;
+	this->projectionLoc = projectionLoc;
 }
 
 int destroyWaitCount = 0;

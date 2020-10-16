@@ -94,6 +94,17 @@ bool CImageLoader::IsOpened()
 	return false;
 }
 
+float CImageLoader::GetLoadingPrecent()
+{
+	return loadingPrecent;
+}
+
+void CImageLoader::SetLoadingPrecent(float v)
+{
+	loadingPrecent = v;
+}
+
+
 void CImageLoader::SetLastError(const wchar_t* err)
 {
 	lastError = err;

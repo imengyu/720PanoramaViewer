@@ -4,32 +4,78 @@
 glm::vec2 CJpgLoader::GetImageSize()
 {
     if (decodeSuccess)
-        return glm::vec2(cinfo.image_width, cinfo.image_height);
+        return glm::vec2(width, height);
     return glm::vec2();
 }
 
 BYTE* CJpgLoader::GetAllImageData()
 {
     if (decodeSuccess) {
-        SetFullDataSize(width * height * depth);
+        struct jpeg_decompress_struct cinfo;
+        struct jpeg_error_mgr jerr;
+        FILE* file;
+        int width, height;
+        _wfopen_s(&file, path.c_str(), L"rb");
+        if (file) {
+            fseek(file, 0, SEEK_SET);
+            jpeg_create_decompress(&cinfo);
+            cinfo.err = jpeg_std_error(&jerr);
+            jerr.error_exit = jpeg_error_exit;
+            jerr.output_message = jpeg_output_message;
+            jpeg_stdio_src(&cinfo, file);
+            if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) {
+                SetLastError("Bad jpeg header");
+                return nullptr;
+            }
 
-        unsigned char* src_buff = (unsigned char*)malloc(fullDataSize);
-        memset(src_buff, 0, fullDataSize);
+            width = cinfo.image_width;//图像宽度
+            height = cinfo.image_height;//图像高度
+            int rat = (int)ceil(width / 4096.0);
+            if (rat > 2 && rat <= 16) {
+                cinfo.scale_num = 1;
+                cinfo.scale_denom = rat;
+            }
+            else if (rat > 16) {
+                SetLastError( "Too big image");
+                return nullptr;
+            }
 
-        JSAMPARRAY buffer;//用于存取一行数据
-        buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, width * depth, 1);//分配一行数据空间
+            if (width <= 0 || height <= 0) {
+                SetLastError("Bad image size");
+                return nullptr;
+            }
 
-        jpeg_start_decompress(&cinfo);
-        unsigned char* point = src_buff;
-        while (cinfo.output_scanline < height)//逐行读取位图数据
-        {
-            jpeg_read_scanlines(&cinfo, buffer, 1); //读取一行jpg图像数据到buffer
-            memcpy(point, *buffer, width * depth); //将buffer中的数据逐行给src_buff
-            point += width * depth; //指针偏移一行
+            jpeg_start_decompress(&cinfo);
+
+            int t_depth = cinfo.output_components;
+            int t_width = cinfo.output_width;
+            int t_height = cinfo.output_height;
+            UINT t_bufferSize = t_width * t_height * t_depth;
+            UCHAR* t_buffer = (UCHAR*)malloc(t_bufferSize);
+            memset(t_buffer, 0, t_bufferSize);
+
+            UINT bfferSize = cinfo.output_width * cinfo.output_components;
+            JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, bfferSize, 1);
+            UCHAR* point = t_buffer;
+
+            while (cinfo.output_scanline < t_height)//逐行读取位图数据
+            {
+                jpeg_read_scanlines(&cinfo, buffer, 1); //读取一行jpg图像数据到buffer
+                memcpy(point, *buffer, bfferSize); //将buffer中的数据逐行给src_buff
+                point += bfferSize; //指针偏移一行
+            }
+
+            if (height > t_height);
+                jpeg_skip_scanlines(&cinfo, height - t_height);
+            jpeg_finish_decompress(&cinfo);
+            jpeg_destroy_decompress(&cinfo);
+            fclose(file);
+
+            return t_buffer;
         }
 
-        jpeg_finish_decompress(&cinfo);
-        return src_buff;
+        SetLastError("File not exists");
+        return nullptr;
     }
     return nullptr;
 }
@@ -38,30 +84,106 @@ BYTE* CJpgLoader::GetImageChunkData(int x, int y, int chunkW, int chunkH)
 {
     SetChunkDataSize(chunkW * chunkH * depth);
 
-    unsigned char* src_buff = (unsigned char*)malloc(chunkDataSize);
-    memset(src_buff, 0, chunkDataSize);
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    FILE* file;
+    int width, height, depth;
+    _wfopen_s(&file, path.c_str(), L"rb");
+    if (file) {
+        fseek(file, 0, SEEK_SET);
+        jpeg_create_decompress(&cinfo);
+        cinfo.err = jpeg_std_error(&jerr);
+        jerr.error_exit = jpeg_error_exit;
+        jerr.output_message = jpeg_output_message;
+        jpeg_stdio_src(&cinfo, file);
+        if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) {
+            SetLastError("Bad jpeg header");
+            return nullptr;
+        }
 
-    JSAMPARRAY buffer;//用于存取一行数据
-    buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, chunkW * depth, 1);//分配一行数据空间
-    
-    JDIMENSION ux = x, uw = chunkW, end = y + chunkH;
+        width = cinfo.image_width;//图像宽度
+        height = cinfo.image_height;//图像高度
+        depth = cinfo.num_components;//图像深度
 
-    jpeg_start_decompress(&cinfo);
-    jpeg_skip_scanlines(&cinfo, y);
-    jpeg_crop_scanline(&cinfo, &ux, &uw);
-    unsigned char* point = src_buff;
+        if (width <= 0 || height <= 0) {
+            strcpy_s(jpeg_last_err, "Bad image size");
+            return nullptr;
+        }
 
-    while (cinfo.output_scanline < end)//逐行读取位图数据
-    {
-        jpeg_read_scanlines(&cinfo, buffer, 1); //读取一行jpg图像数据到buffer
-        memcpy(point, *buffer, uw * depth); //将buffer中的数据逐行给src_buff
-        point += uw * depth; //指针偏移一行
+        int t_depth = depth;
+        int t_width = width;
+        int t_height = height;
+
+        JDIMENSION ux = x, uw = chunkW, end = y + chunkH;
+
+        jpeg_start_decompress(&cinfo);
+
+        jpeg_crop_scanline(&cinfo, &ux, &uw);
+        jpeg_skip_scanlines(&cinfo, y);
+
+
+        UINT cropFixX =  - ux;
+        UINT t_bufferSize = uw * chunkH * depth;
+        UCHAR* t_buffer = (UCHAR*)malloc(t_bufferSize);
+        memset(t_buffer, 0, t_bufferSize);
+
+        UINT bfferSize = cinfo.output_width * cinfo.output_components;
+        JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, bfferSize, 1);
+        UCHAR* point = t_buffer;
+
+        while (cinfo.output_scanline < end)//逐行读取位图数据
+        {
+            jpeg_read_scanlines(&cinfo, buffer, 1); //读取一行jpg图像数据到buffer
+            memcpy(point, *buffer, bfferSize); //将buffer中的数据逐行给src_buff
+            point += bfferSize; //指针偏移一行
+        }
+
+        jpeg_skip_scanlines(&cinfo, height - chunkH - y);
+        jpeg_finish_decompress(&cinfo);
+
+        jpeg_destroy_decompress(&cinfo);
+        fclose(file);
+
+        UINT t_fix_bufferSize = uw * chunkH * depth;
+        UCHAR* t_fix_buffer = (UCHAR*)malloc(t_bufferSize);
+        memset(t_fix_buffer, 0, t_fix_bufferSize);
+
+        int ox = 0, oy = 0, cx = 0, cy = 0;
+        int cw = uw, ci = 0;;
+
+        for (UINT i = 0; i < t_bufferSize; )
+        {
+            if (cx >= cropFixX && cx < cropFixX + chunkW)
+            {
+
+                t_fix_buffer[ci++] = (UCHAR)buffer[i];
+                t_fix_buffer[ci++] = (UCHAR)buffer[i + 1];
+                t_fix_buffer[ci++] = (UCHAR)buffer[i + 2];
+
+                ox++;
+                if (ox >= chunkW)
+                {
+                    ox = 0;
+                    oy++;
+                }
+            }
+
+            cx++;
+            if (cx >= cw)
+            {
+                cx = 0;
+                cy++;
+            }
+
+            i += depth;
+        }
+
+        free(t_buffer);
+        return t_fix_buffer;
     }
 
-    jpeg_skip_scanlines(&cinfo, height - chunkH - y);
-    jpeg_finish_decompress(&cinfo);
-    jpeg_abort_decompress(&cinfo);
-    return src_buff;
+    SetLastError("File not exists");
+    return nullptr;
 }
 
 char jpeg_last_err[JMSG_LENGTH_MAX];
@@ -81,6 +203,10 @@ bool CJpgLoader::Load(const wchar_t* path)
 {
     decodeSuccess = false;
     this->path = path;
+
+    FILE *file = nullptr;
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
     if (file == nullptr) {
         _wfopen_s(&file, path, L"rb");
         if (file) {
@@ -92,6 +218,7 @@ bool CJpgLoader::Load(const wchar_t* path)
             jpeg_stdio_src(&cinfo, file);
             if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) {
                 SetLastError(jpeg_last_err);
+                fclose(file);
                 return false;
             }
 
@@ -102,10 +229,14 @@ bool CJpgLoader::Load(const wchar_t* path)
             if (width <= 0 || height <= 0)
             {
                 SetLastError(L"Bad image size");
+                fclose(file);
                 return false;
             }
 
+            jpeg_destroy_decompress(&cinfo);
+
             decodeSuccess = true;
+            fclose(file);
             return true;
         }
     }
@@ -118,15 +249,11 @@ const wchar_t* CJpgLoader::GetPath()
 }
 void CJpgLoader::Destroy()
 {   
-    jpeg_destroy_decompress(&cinfo);
-    if (file) {
-        fclose(file);
-        file = nullptr;
-    }
+    path = L"";
 }
 bool CJpgLoader::IsOpened()
 {
-    return file != nullptr;
+    return decodeSuccess;
 }
 
 USHORT CJpgLoader::GetImageDepth()

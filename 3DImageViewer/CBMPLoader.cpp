@@ -17,6 +17,7 @@ BYTE* CBMPLoader::GetAllImageData()
         ULONG fullLength = bitmapInfoHeader.biWidth * bitmapInfoHeader.biHeight * bitSize;
 
         SetFullDataSize(fullLength);
+        SetLoadingPrecent(0);
 
         fseek(file, bitStartOffest, SEEK_SET);
 
@@ -28,6 +29,8 @@ BYTE* CBMPLoader::GetAllImageData()
             BYTE buffer[4];
             fread(buffer, 1, bitSize, file);
 
+            SetLoadingPrecent(index / (float)fullLength);
+
             data[index] = buffer[0];//B
             data[index - 1] = buffer[1];//G
             data[index - 2] = buffer[2];//R
@@ -36,6 +39,7 @@ BYTE* CBMPLoader::GetAllImageData()
             else  index = 0;
         }
 
+        SetLoadingPrecent(1);
         return data;
     }
     return nullptr;
