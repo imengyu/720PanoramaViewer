@@ -1,0 +1,247 @@
+void CGameRenderer::renderPanel(bool wireframe) {
+
+    float zoomZv = FlatZoom * 2.0f;
+    float vratio = Width > 0 ? ((float)Height / (float)Width) : zoomZv;
+    float ustep = zoomZv / currentImageXSeg, vstep = vratio / currentImageYSeg;
+    float u = -zoomZv / 2.0f, v = -zoomZv / 2.0f;
+
+    for (int i = 0; i < currentImageXSeg; i++)
+    {
+        if (u > 1.0f) break;
+        if (u < -1.0f - ustep) {
+            u += ustep;
+            continue;
+        }
+
+        v = -zoomZv / 2.0f;
+        for (int j = 0; j < currentImageYSeg; j++)
+        {
+            if (v > 1.0f) break;
+            if (v < -1.0f - vstep) {
+                v += vstep;
+                continue;
+            }
+
+            glBegin(wireframe ? GL_LINE_LOOP : GL_TRIANGLES);
+
+            glm::vec2 uv1 = getMercatorPoint((u + ustep) / zoomZv, (v) / zoomZv);
+            glm::vec2 uv2 = getMercatorPoint((u + ustep) / zoomZv, (v + vstep) / zoomZv);
+            glm::vec2 uv3 = getMercatorPoint((u) / zoomZv, (v + vstep) / zoomZv);
+            glm::vec2 uv4 = getMercatorPoint((u) / zoomZv, (v) / zoomZv);
+
+            glTexCoord2f(uv1.x, uv1.y);
+            glVertex3f(u + ustep, v, 0.0f);
+            glTexCoord2f(uv2.x, uv2.y);
+            glVertex3f(u + ustep, v + vstep, 0.0f);
+            glTexCoord2f(uv4.x, uv4.y);
+            glVertex3f(u, v, 0.0f);
+            
+            glEnd();
+
+            glBegin(wireframe ? GL_LINE_LOOP : GL_TRIANGLES);
+
+            glTexCoord2f(uv4.x, uv4.y);
+            glVertex3f(u, v, 0.0f);
+            glTexCoord2f(uv2.x, uv2.y);
+            glVertex3f(u + ustep, v + vstep, 0.0f);
+            glTexCoord2f(uv3.x, uv3.y);
+            glVertex3f(u, v + vstep, 0.0f);
+
+            glEnd();
+
+            v += vstep;
+        } 
+        u += ustep;
+    }
+}
+
+void CGameRenderer::renderABox() {
+
+    float s = 0.1f;
+
+    glDisable(GL_CULL_FACE);
+    glBindTexture(GL_TEXTURE_2D, texture_logo);
+    glUniform1i(useColorLoc, 0);
+
+    // 前面
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(s, -s, s);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-s, -s, s);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-s, s, s);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(s, s, s);
+    glEnd();
+
+
+    glUniform1i(useColorLoc, 1);
+    glUniform3f(ourColorLoc, 0.6f, 0.7f, 0.2f);
+
+    // 底面
+    glBegin(GL_LINE_LOOP);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-s, -s, -s);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(s, -s, -s);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(s, -s, s);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-s, -s, s);
+    glEnd();
+
+
+    // 顶面
+    glBegin(GL_LINE_LOOP);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-s, s, s);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-s, s, -s);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(s, s, -s);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(s, s, s);
+    glEnd();
+
+    // 背面
+    glBegin(GL_LINE_LOOP);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-s, -s, -s);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(s, -s, -s);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(s, s, -s);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-s, s, -s);
+    glEnd();
+
+
+    // 右面
+    glBegin(GL_LINE_LOOP);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(s, -s, -s);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(s, -s, s);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(s, s, s);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(s, s, -s);
+    glEnd();
+
+    // 左面
+    glBegin(GL_LINE_LOOP);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-s, -s, -s);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-s, -s, s);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-s, s, s);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-s, s, -s);
+    glEnd();
+}
+
+
+void CGameRenderer::HandleFlatZoom(float yoffset) {
+    if (FlatZoom >= FlatFovMin && FlatZoom <= FlatFovMax) FlatZoom += yoffset * FlatZoomSpeed;
+    if (FlatZoom <= FlatFovMin) FlatZoom = FlatFovMin;
+    if (FlatZoom >= FlatFovMax) FlatZoom = FlatFovMax;
+}
+
+
+	glm::vec2 getMercatorPoint(float u, float v);
+
+    
+
+glm::vec2 CGameRenderer::getMercatorPoint(float u, float v)
+{    
+    //获取平面上UV映射点
+    return glm::vec2(-u / 2.0f + UVOffest.x, 0.5f - v + UVOffest.y);
+}
+
+
+void CGameRenderer::ResetCamera() {
+    View->Camera.SetMode(View->Camera.Mode);
+}
+
+void CGameRenderer::loadLogoTexture() {
+    HRSRC hResource = NULL;
+    HGLOBAL hGlobal = NULL;
+    LPVOID pData = NULL;
+    DWORD dwSize = NULL;
+    DWORD writed;
+
+    hResource = FindResourceW(CApp::Instance->GetHInstance(), MAKEINTRESOURCE(IDB_LOGO), L"BIN"); if (!hResource) return;
+    hGlobal = LoadResource(CApp::Instance->GetHInstance(), hResource); if (!hGlobal) return;
+    pData = LockResource(hGlobal);
+    dwSize = SizeofResource(CApp::Instance->GetHInstance(), hResource);
+
+    std::wstring logoPath(CApp::Instance->GetCurrentDir());
+    logoPath += L"\\logo.bmp";
+    if (!PathFileExists(logoPath.c_str())) {
+        HANDLE hFile = CreateFile(logoPath.c_str(), GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile == INVALID_HANDLE_VALUE)
+        {
+            logger->LogError2(L"Create logo file: %s Failed %d", logoPath.c_str(), GetLastError());
+            return;
+        }
+        if (!WriteFile(hFile, pData, dwSize, &writed, NULL)) {
+            logger->LogError2(L"Write logo file: %s Failed %d", logoPath.c_str(), GetLastError());
+            CloseHandle(hFile);
+            return;
+        }
+        CloseHandle(hFile);
+    }
+
+    char* pathAnsi = StringHlp::UnicodeToAnsi(logoPath.c_str());
+    int w, h, nrChannels;
+    logoImageData = stbi_load(pathAnsi, &w, &h, &nrChannels, 0);
+    StringHlp::FreeStringPtr(pathAnsi);
+
+    texture_logo_size = glm::vec2(w, h);
+
+    glGenTextures(1, &texture_logo);
+    glBindTexture(GL_TEXTURE_2D, texture_logo);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)w, (GLsizei)h, 0, GL_RGB, GL_UNSIGNED_BYTE, logoImageData);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(logoImageData);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    FreeResource(hGlobal);
+}
+
+    //绘制向量标线
+    if (DrawVector) {
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glUniform1i(useColorLoc, 1);
+        glUniform3f(ourColorLoc, 1.0f, 0.0f, 0.0f);
+
+        glBegin(GL_LINES);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(Up.x, Up.y, Up.z);
+        glEnd();
+
+        glUniform3f(ourColorLoc, 0.0f, 1.0f, 0.0f);
+
+        glBegin(GL_LINES);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(Front.x, Front.y, Front.z);
+        glEnd();
+
+        glUniform3f(ourColorLoc, 0.0f, 0.0f, 1.0f);
+
+        glBegin(GL_LINES);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(Right.x, Right.y, Right.z);
+        glEnd();
+    }
+
