@@ -21,15 +21,19 @@ void CCPanoramaCamera::ProcessKeyboard(CCameraMovement direction, float deltaTim
 		break;
 	case CCameraMovement::ROATE_UP:
 		Rotate.y += RoateSpeed * deltaTime;
+		CallRotateCallback();
 		break;
 	case CCameraMovement::ROATE_DOWN:
 		Rotate.y -= RoateSpeed * deltaTime;
+		CallRotateCallback();
 		break;
 	case CCameraMovement::ROATE_LEFT:
 		Rotate.x -= RoateSpeed * 1.3f * deltaTime;
+		CallRotateCallback();
 		break;
 	case CCameraMovement::ROATE_RIGHT:
 		Rotate.x += RoateSpeed * 1.3f * deltaTime;
+		CallRotateCallback();
 		break;
 	default:
 		break;
@@ -61,6 +65,8 @@ void CCPanoramaCamera::ProcessMouseMovement(float xoffset, float yoffset, bool c
 
 		// 使用更新的欧拉角更新3个向量
 		updateCameraVectors();
+
+		CallRotateCallback();
 		break;
 	}
 	case CCPanoramaCameraMode::OutRoataround: {
@@ -143,4 +149,14 @@ void CCPanoramaCamera::SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback 
 {
 	fovChangedCallback = callback;
 	fovChangedCallbackData = data;
+}
+
+void CCPanoramaCamera::SetRotateCallback(CCPanoramaCameraCallback callback, void* data)
+{
+	rotateCallback = callback;
+	rotateCallbackData = data;
+}
+
+void CCPanoramaCamera::CallRotateCallback() {
+	if (rotateCallback) rotateCallback(rotateCallbackData, this);
 }

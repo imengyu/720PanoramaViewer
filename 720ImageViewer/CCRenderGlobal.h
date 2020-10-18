@@ -14,6 +14,8 @@ public :
 	GLint ourTextrueLoc = -1;
 	GLint ourColorLoc = -1;
 	GLint useColorLoc = -1;
+	GLint texTilling = -1;
+	GLint texOffest = -1;
 
 	GLubyte* glVendor = nullptr;
 	GLubyte* glRenderer = nullptr;

@@ -155,9 +155,13 @@
     <ClCompile Include="CBMPLoader.cpp" />
     <ClCompile Include="CCamera.cpp" />
     <ClCompile Include="CCFileReader.cpp" />
+    <ClCompile Include="CCMaterial.cpp" />
+    <ClCompile Include="CCMeshLoader.cpp" />
+    <ClCompile Include="CCObjLoader.cpp" />
     <ClCompile Include="CColor.cpp" />
     <ClCompile Include="CCPanoramaRenderer.cpp" />
     <ClCompile Include="CCRenderGlobal.cpp" />
+    <ClCompile Include="CCShader.cpp" />
     <ClCompile Include="CCTextureLoadQueue.cpp" />
     <ClCompile Include="CCursor.cpp" />
     <ClCompile Include="CCFileManager.cpp" />
@@ -276,9 +280,13 @@
     <ClInclude Include="CBMPLoader.h" />
     <ClInclude Include="CCamera.h" />
     <ClInclude Include="CCFileReader.h" />
+    <ClInclude Include="CCMaterial.h" />
+    <ClInclude Include="CCMeshLoader.h" />
+    <ClInclude Include="CCObjLoader.h" />
     <ClInclude Include="CColor.h" />
     <ClInclude Include="CCPanoramaRenderer.h" />
     <ClInclude Include="CCRenderGlobal.h" />
+    <ClInclude Include="CCShader.h" />
     <ClInclude Include="CCTextureLoadQueue.h" />
     <ClInclude Include="CCursor.h" />
     <ClInclude Include="CCFileManager.h" />

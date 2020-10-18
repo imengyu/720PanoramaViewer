@@ -1,6 +1,6 @@
 #pragma once
 #include "COpenGLRenderer.h"
-#include "CCamera.h"
+
 #include <imgui.h>
 
 typedef void(*ViewMouseCallback)(COpenGLView* view, float xpos, float ypos, int button, int type);
@@ -14,7 +14,9 @@ enum ViewMouseEventType {
 	ViewMouseMouseMove,
 	ViewMouseMouseWhell,
 };
-
+class CCamera;
+class CCShader;
+class CCRenderGlobal;
 class COpenGLView
 {
 protected:
@@ -26,6 +28,7 @@ protected:
 	HANDLE hThreadRender = NULL;
 	HANDLE hThreadMain = NULL;
 	float currentFps = 0.0f;
+	float currentMaxFps = 0.0f;
 
 private:
 	DWORD startTime = 0;
@@ -33,6 +36,12 @@ private:
 	DWORD lastTime = 0;
 	DWORD time = 0;
 	DWORD drawTime = 0;
+	DWORD drawTimeReal = 0;
+	DWORD drawLastTime = 0;
+	double lastSleepTime = 0;
+
+	std::string imguiIniPath;
+
 	bool inited = false;
 	char SizeText[250];
 	float TextPadding = 0;
@@ -46,8 +55,6 @@ private:
 
 	bool ViewportChanged = false;
 	bool UpdateTicked = false;
-
-	GLuint shaderProgram = 0;
 
 	LoggerInternal* logger = nullptr;
 
@@ -78,7 +85,7 @@ public:
 	void SetViewText(const char * text);
 	void SetViewText(const wchar_t* text);
 
-	void SetShaderProgram(GLuint shaderProgram);
+	void CalcMainCameraProjection(CCShader* shader);
 
 	static LRESULT __stdcall WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	static DWORD WINAPI RenderThread(LPVOID lpParam);
@@ -99,7 +106,6 @@ public:
 	float GetDeltaTime();
 
 	void SetCamera(CCamera* Camera);
-	void SetCameraLoc(GLint viewLoc, GLint projectionLoc);
 
 	void CloseView();
 	void MarkDestroyComplete();
@@ -136,8 +142,6 @@ private:
 
 	bool closeActived = false;
 	float lastSetFps = 0;
-	GLint viewLoc = -1;
-	GLint projectionLoc = -1;
 
 	int AddKeyInKeyList(int* list, int code);
 	int IsKeyInKeyListExists(int* list, int code);

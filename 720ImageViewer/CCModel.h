@@ -1,7 +1,8 @@
 #pragma once
 #include "stdafx.h"
-#include "CCMesh.h"
 
+class CCMaterial;
+class CCMesh;
 //模型类
 class CCModel
 {
@@ -15,11 +16,16 @@ public:
 	glm::mat4 GetMatrix();
 	//重置模型位置和旋转
 	void Reset();
+	//绘制模型
+	void Render();
 
 	//模型位置
 	glm::vec3 Positon = glm::vec3(0.0f);
 	//模型旋转
 	glm::vec3 Rotation = glm::vec3(0.0f);
+
+	//模型材质
+	CCMaterial* Material = nullptr;
 	//模型网格
 	CCMesh* Mesh = nullptr;
 

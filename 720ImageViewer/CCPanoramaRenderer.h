@@ -2,8 +2,20 @@
 #include "stdafx.h"
 #include "CCTexture.h"
 #include "CCModel.h"
+#include "CCShader.h"
 #include "CColor.h"
 #include <vector>
+
+struct ChunkModel {
+	CCModel* model;
+	int chunkX;
+	int chunkY;
+	float chunkXv;
+	float chunkYv;
+	bool loadMarked = false;
+	bool loadStarted = false;
+	bool loadFinished = false;
+};
 
 class CCRenderGlobal;
 class COpenGLRenderer;
@@ -23,12 +35,15 @@ public:
 
 	CCRenderGlobal* globalRenderInfo = nullptr;
 
-	GLuint shaderProgram = 0;
+	CCShader* shader = nullptr;
 
 	CCModel* mainModel = nullptr;
+	std::vector<ChunkModel*> fullModels;
 
-	int sphereSegmentY = 32;
-	int sphereSegmentX = 32;
+	int sphereSegmentY = 64;
+	int sphereSegmentX = 128;
+	//int sphereSegmentY = 50;
+	//int sphereSegmentX = 40;
 	int sphereFullSegmentY = 24;
 	int sphereFullSegmentX = 48;
 
@@ -36,21 +51,28 @@ public:
 	bool renderPanoramaFull = false;
 	bool renderDebugVector = false;
 
+	CCTexture* panoramaCheckTex = nullptr;
 	CCTexture*panoramaThumbnailTex = nullptr;
 	std::vector<CCTexture*> panoramaTexPool;
 
 	void ReleaseTexPool();
+	void ReleaseFullModel();
+	void GenerateFullModel(int chunkW, int chunkH);
 
 	void ResetModel();
 	void RotateModel(float xoffset, float yoffset);
+
+	void UpdateMainModelTex();
+
 
 private:
 	COpenGLRenderer* Renderer = nullptr;
 
 	void CreateMainModel();
+	void CreateFullModelSphereMesh(CCMesh* mesh, int chunkW, int chunkH, int currentChuntX, int currentChuntY);
 	void CreateMainModelSphereMesh(CCMesh* mesh);
 
-	bool CreateShader();
+	void LoadBuiltInResources();
 	void RenderThumbnail(bool wireframe = false);
 	void RenderFullChunks();
 

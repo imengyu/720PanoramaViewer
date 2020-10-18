@@ -3,32 +3,8 @@
 #include "COpenGLRenderer.h"
 #include "CGameRenderer.h"
 #include "CCMesh.h"
+#include "CCMaterial.h"
 #include "CCRenderGlobal.h"
-
-const char* vertexShaderSource = "\
-#version 410 core\n\
-layout (location = 0) in vec3 aPosition;\n\
-layout (location = 1) in vec2 aUv;\n\
-out vec2 TexCoord;\n\
-\n\
-uniform mat4 model;\n\
-uniform mat4 view;\n\
-uniform mat4 projection;\n\
-void main() {\n\
-    gl_Position = projection * view * model * vec4(aPosition, 1.0f);\n\
-    TexCoord = aUv;\n\
-}\0";
-
-const char* fragmentShaderSource = "\
-#version 410 core\n\
-out vec4 FragColor; \n\
-in vec2 TexCoord;\n\
-uniform sampler2D ourTexture;\n\
-uniform bool useColor;\n\
-uniform vec3 ourColor;\n\
-void main(){\n\
-    FragColor = useColor ? vec4(ourColor, 1.0f) : texture(ourTexture, TexCoord);\n\
-}\n\0";
 
 CCPanoramaRenderer::CCPanoramaRenderer(COpenGLRenderer* renderer)
 {
@@ -41,7 +17,12 @@ void CCPanoramaRenderer::Init()
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    CreateShader();
+    LoadBuiltInResources();
+
+    shader = new CCShader(
+        CCFileManager::GetResourcePath("shader", "Standard_vertex.glsl").c_str(),
+        CCFileManager::GetResourcePath("shader", "Standard_fragment.glsl").c_str());
+
     CreateMainModel();
 
     globalRenderInfo = new CCRenderGlobal();
@@ -51,42 +32,50 @@ void CCPanoramaRenderer::Init()
     globalRenderInfo->glVersion = (GLubyte*)glGetString(GL_VERSION);    //返回当前OpenGL实现的版本号
     globalRenderInfo->glslVersion = (GLubyte*)glGetString(GL_SHADING_LANGUAGE_VERSION);//返回着色预压编译器版本号
 
-    globalRenderInfo->viewLoc = glGetUniformLocation(shaderProgram, "view");
-    globalRenderInfo->projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-    globalRenderInfo->modelLoc = glGetUniformLocation(shaderProgram, "model");
-    globalRenderInfo->ourTextrueLoc = glGetUniformLocation(shaderProgram, "ourTexture");
-    globalRenderInfo->useColorLoc = glGetUniformLocation(shaderProgram, "useColor");
-    globalRenderInfo->ourColorLoc = glGetUniformLocation(shaderProgram, "ourColor");
+    globalRenderInfo->viewLoc = shader->GetUniformLocation("view");
+    globalRenderInfo->projectionLoc = shader->GetUniformLocation("projection");
+    globalRenderInfo->modelLoc = shader->GetUniformLocation("model");
+    globalRenderInfo->ourTextrueLoc = shader->GetUniformLocation("ourTexture");
+    globalRenderInfo->useColorLoc = shader->GetUniformLocation("useColor");
+    globalRenderInfo->ourColorLoc = shader->GetUniformLocation("ourColor");
+    globalRenderInfo->texOffest = shader->GetUniformLocation("texOffest");
+    globalRenderInfo->texTilling = shader->GetUniformLocation("texTilling");
 
-    CCRenderGlobal::SetInstance(globalRenderInfo);
 }
 void CCPanoramaRenderer::Destroy()
 {
     CCRenderGlobal::Destroy();
 
+    if (shader != nullptr) {
+        delete shader;
+        shader = nullptr;
+    }
     if (mainModel != nullptr) {
         delete mainModel;
         mainModel = nullptr;
     }
-
-    glDeleteProgram(shaderProgram);
+    if (panoramaCheckTex != nullptr) {
+        delete panoramaCheckTex;
+        panoramaCheckTex = nullptr;
+    }
+    ReleaseTexPool();
 }
 
 void CCPanoramaRenderer::Render()
 {
+    CCRenderGlobal::SetInstance(globalRenderInfo);
     CCTexture::UnUse();
+    shader->Use();
+
+    //摄像机矩阵
+    Renderer->View->CalcMainCameraProjection(shader);
 
     //模型位置和矩阵映射
     glUniformMatrix4fv(globalRenderInfo->modelLoc, 1, GL_FALSE, glm::value_ptr(mainModel->GetMatrix()));
 
     //绘制外层缩略图
-    if (panoramaThumbnailTex) {
-        glUniform1i(globalRenderInfo->useColorLoc, 0);
-        panoramaThumbnailTex->Use();
-        RenderThumbnail();
-    }
-
-    CCTexture::UnUse();
+    glUniform1i(globalRenderInfo->useColorLoc, 0);
+    RenderThumbnail();
 
     if (renderPanoramaFull) {
         RenderFullChunks();
@@ -109,50 +98,45 @@ void CCPanoramaRenderer::CreateMainModelSphereMesh(CCMesh* mesh) {
     //顶点
     //=======================================================
 
-    mesh->vertices.push_back(GetSpherePoint(0.0f, 0.0f, r));
-    mesh->uv.push_back(glm::vec2(0.0f, 0.0f));
-
-    u = 0, v = vstep;
-    for (int j = 1; j < sphereSegmentY; j++, v += vstep) {
+    for (int j = 0; j <= sphereSegmentY; j++, v += vstep) {
         u = 0;
-        for (int i = 0; i < sphereSegmentX; i++, u += ustep) {
-            mesh->vertices.push_back(GetSpherePoint(u, v, r));
-            mesh->uv.push_back(glm::vec2(u, v));
+        for (int i = 0; i <= sphereSegmentX; i++, u += ustep) {
+            mesh->position.push_back(GetSpherePoint(u, v, r));
+            mesh->texCoords.push_back(glm::vec2(u, v));
         }
     }
-
-    mesh->vertices.push_back(GetSpherePoint(0.0f, 1.0f, r));
-    mesh->uv.push_back(glm::vec2(0.0f, 1.0f));
 
     //顶点索引
     //=======================================================
 
-    int all_vertices_count = mesh->vertices.size();
+    int all_vertices_count = mesh->position.size();
+    int vertices_line_count = sphereSegmentX + 1;
+    int line_start_pos = vertices_line_count;
 
-    for (int i = 0; i < sphereSegmentX; i++) {
-        mesh->indices.push_back(i == sphereSegmentX - 1 ? 1 : i + 2);
-        mesh->indices.push_back(i + 1);
-        mesh->indices.push_back(0);
+    for (int i = 0; i < sphereSegmentX ; i++) {
+        mesh->indices.push_back(line_start_pos + i + 1);
+        mesh->indices.push_back(line_start_pos + i);
+        mesh->indices.push_back(i);
     } 
-    for (int j = 1; j < sphereSegmentY - 1; j++) {
-        int line_start_pos = 1 + (j - 1) * sphereSegmentX;
+    for (int j = 0; j < sphereSegmentY - 1; j++) {
+        line_start_pos = (j + 1)  * vertices_line_count;
         for (int i = 0; i < sphereSegmentX; i++) {
 
             mesh->indices.push_back(line_start_pos + i);
-            mesh->indices.push_back(i == sphereSegmentX - 1 ? line_start_pos + sphereSegmentX : line_start_pos + i + sphereSegmentX + 1);
-            mesh->indices.push_back(line_start_pos + i + sphereSegmentX);
+            mesh->indices.push_back(line_start_pos + i + vertices_line_count + 1);
+            mesh->indices.push_back(line_start_pos + i + vertices_line_count);
             
-            mesh->indices.push_back(i == sphereSegmentX - 1 ? line_start_pos + sphereSegmentX : line_start_pos + i + sphereSegmentX + 1);
+            mesh->indices.push_back(line_start_pos + i + vertices_line_count + 1);
             mesh->indices.push_back(line_start_pos + i);
-            mesh->indices.push_back(i == sphereSegmentX - 1 ? line_start_pos : line_start_pos + i + 1);
+            mesh->indices.push_back(line_start_pos + i + 1);
         }
     }
-    int line_start_pos = 1 + sphereSegmentX * (sphereSegmentY - 3);
+    
+    line_start_pos = vertices_line_count * sphereSegmentY;
     for (int i = 0; i < sphereSegmentX; i++) {
-        mesh->indices.push_back(i == sphereSegmentX - 1 ? line_start_pos : line_start_pos + i + 1);
-        mesh->indices.push_back(all_vertices_count - 1);
         mesh->indices.push_back(line_start_pos + i);
-
+        mesh->indices.push_back(line_start_pos + i + 1);
+        mesh->indices.push_back(line_start_pos + i + vertices_line_count);
     }  
 
     //创建缓冲区
@@ -161,56 +145,79 @@ void CCPanoramaRenderer::CreateMainModelSphereMesh(CCMesh* mesh) {
 void CCPanoramaRenderer::CreateMainModel() {
     mainModel = new CCModel();
     mainModel->Mesh = new CCMesh();
+    mainModel->Material = new CCMaterial(panoramaCheckTex);
+    mainModel->Material->tilling = glm::vec2(50.0f, 25.0f);
 
     CreateMainModelSphereMesh(mainModel->Mesh);
 }
-bool CCPanoramaRenderer::CreateShader() {
+void CCPanoramaRenderer::CreateFullModelSphereMesh(CCMesh* mesh, int chunkW, int chunkH, int currentChuntX, int currentChuntY) {
 
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    float r = 0.99f;
+    float ustep = 1.0f / sphereFullSegmentX, vstep = 1.0f / sphereFullSegmentY;
+    float u = 0, v = 0, cu = 0, cv = 0;
 
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
+    int segXStart = currentChuntX / chunkW;
+    int segYStart = currentChuntY / chunkH;
+    int segXEnd = segXStart + sphereFullSegmentX / chunkW;
+    int segYEnd = segXStart + sphereFullSegmentY / chunkW;
 
-    GLint compileResult = GL_TRUE;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compileResult);
-    if (compileResult == GL_FALSE) {
-        char szLog[1024] = { 0 }; GLsizei logLen = 0;
-        glGetShaderInfoLog(vertexShader, 1024, &logLen, szLog);
+    float u_start = (float)currentChuntX / (float)chunkW;
+    u = u_start;
+    v = (float)currentChuntY / (float)chunkH;
 
-        CApp::Instance->GetLogger()->LogError2(L"Compile vertexShader FAILED ! \n%hs", szLog);
-
-        glDeleteShader(vertexShader);
-        return false;
+    for (int j = segYStart; j <= segYEnd; j++, v += vstep, cv += vstep) {
+        u = u_start;
+        cu = 0;
+        for (int i = segXStart; i <= segXEnd; i++, u += ustep, cu += vstep) {
+            mesh->position.push_back(GetSpherePoint(u, v, r));
+            mesh->texCoords.push_back(glm::vec2(cu, cv));
+        }
     }
 
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
+    int all_vertices_count = mesh->position.size();
+    int vertices_line_count = (segYEnd - segYStart) + 1;
+    int line_start_pos = vertices_line_count;
 
-    compileResult = GL_TRUE;
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &compileResult);
-    if (compileResult == GL_FALSE) {
-        char szLog[1024] = { 0 }; GLsizei logLen = 0;
-        glGetShaderInfoLog(fragmentShader, 1024, &logLen, szLog);
-
-        CApp::Instance->GetLogger()->LogError2(L"Compile fragmentShader FAILED ! \n%hs", szLog);
-
-        glDeleteShader(fragmentShader);
-        return false;
+    if (segYStart == 0) {
+        for (int i = segXStart; i < segXEnd; i++) {
+            mesh->indices.push_back(line_start_pos + i + 1);
+            mesh->indices.push_back(line_start_pos + i);
+            mesh->indices.push_back(i);
+        }
     }
 
-    shaderProgram = glCreateProgram();
+    for (int j = segYStart; j < segYEnd - 1; j++) {
+        line_start_pos = (j + 1 - segYStart) * vertices_line_count;
+        for (int i = segXStart; i < segXEnd; i++) {
 
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+            mesh->indices.push_back(line_start_pos + i);
+            mesh->indices.push_back(line_start_pos + i + vertices_line_count + 1);
+            mesh->indices.push_back(line_start_pos + i + vertices_line_count);
 
-    glUseProgram(shaderProgram);
+            mesh->indices.push_back(line_start_pos + i + vertices_line_count + 1);
+            mesh->indices.push_back(line_start_pos + i);
+            mesh->indices.push_back(line_start_pos + i + 1);
+        }
+    }
 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    if (segYEnd == 0) {
+        line_start_pos = vertices_line_count * (segYEnd - segYStart) ;
+        for (int i = segXStart; i < segXEnd; i++) {
+            mesh->indices.push_back(line_start_pos + i);
+            mesh->indices.push_back(line_start_pos + i + 1);
+            mesh->indices.push_back(line_start_pos + i + vertices_line_count);
+        }
+    }
 
-    return true;
+    //创建缓冲区
+    mesh->GenerateBuffer();
+}
+void CCPanoramaRenderer::LoadBuiltInResources() {
+    panoramaCheckTex = new CCTexture();
+    if (!panoramaCheckTex->Load(CCFileManager::GetResourcePath(L"textures", L"checker.jpg").c_str())) {
+        delete panoramaCheckTex;
+        panoramaCheckTex = nullptr;
+    }
 }
 void CCPanoramaRenderer::ReleaseTexPool() {
     renderPanoramaFull = false;
@@ -225,6 +232,35 @@ void CCPanoramaRenderer::ReleaseTexPool() {
     panoramaThumbnailTex = nullptr;
 }
 
+void CCPanoramaRenderer::ReleaseFullModel()
+{
+    if (fullModels.size() > 0) {
+        std::vector<ChunkModel*>::iterator it;
+        for (it = fullModels.begin(); it != fullModels.end(); it++) {
+            ChunkModel* m = *it;
+            delete m->model;
+            delete m;
+        }
+        fullModels.clear();
+    }
+}
+void CCPanoramaRenderer::GenerateFullModel(int chunkW, int chunkH)
+{
+    for (int i = 0; i < chunkW; i++) {
+        for (int j = 0; j < chunkH; j++) {
+            ChunkModel* model = new ChunkModel();
+            model->model = new CCModel();
+            model->model->Mesh = new CCMesh();
+            model->chunkX = i;
+            model->chunkY = j;
+            model->chunkXv = (float)i / (float)chunkW;
+            model->chunkYv = (float)j / (float)chunkH;
+            CreateFullModelSphereMesh(model->model->Mesh, chunkW, chunkH, i, j);
+            fullModels.push_back(model);
+        }
+    }
+}
+
 void CCPanoramaRenderer::ResetModel()
 {
     mainModel->Reset();
@@ -236,19 +272,31 @@ void CCPanoramaRenderer::RotateModel(float xoffset, float yoffset)
     mainModel->UpdateVectors();
 }
 
+void CCPanoramaRenderer::UpdateMainModelTex()
+{
+    if (panoramaThumbnailTex) {
+        mainModel->Material->diffuse = panoramaThumbnailTex;
+        mainModel->Material->tilling = glm::vec2(1.0f);
+    }
+    else {
+        mainModel->Material->diffuse = panoramaCheckTex;
+        mainModel->Material->tilling = glm::vec2(50.0f);
+    }
+}
+
 void CCPanoramaRenderer::RenderThumbnail(bool wireframe)
 {
     glPolygonMode(GL_FRONT, wireframe ? GL_LINE : GL_FILL);
     glPolygonMode(GL_BACK, GL_LINE);
 
     //绘制
-    mainModel->Mesh->RenderMesh();
+    mainModel->Render();
 }
 void CCPanoramaRenderer::RenderFullChunks()
 {
-
-
-
+    auto rotate = mainModel->Rotation;
+    float x = glm::abs(rotate.x) / 360.0f;
+    float y = 90.0f + rotate.y / 90.0f;
 
 }
 

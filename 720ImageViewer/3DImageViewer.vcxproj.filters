@@ -73,6 +73,12 @@
     <Filter Include="源文件\App">
       <UniqueIdentifier>{a1497307-8c2a-4378-b214-d2076bc13564}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\MeshLoader">
+      <UniqueIdentifier>{90dc4533-4e8b-4ee6-8f32-a6b48542ba6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\MeshLoader">
+      <UniqueIdentifier>{657d0a25-2599-4df8-87cf-85a895569eee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StringSplit.cpp">
@@ -435,6 +441,18 @@
     <ClCompile Include="CCRenderGlobal.cpp">
       <Filter>源文件\Render</Filter>
     </ClCompile>
+    <ClCompile Include="CCMaterial.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCMeshLoader.cpp">
+      <Filter>源文件\MeshLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="CCShader.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCObjLoader.cpp">
+      <Filter>源文件\MeshLoader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -691,6 +709,18 @@
     </ClInclude>
     <ClInclude Include="CCRenderGlobal.h">
       <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCMaterial.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCMeshLoader.h">
+      <Filter>头文件\MeshLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="CCShader.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCObjLoader.h">
+      <Filter>头文件\MeshLoader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

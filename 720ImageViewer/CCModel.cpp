@@ -1,4 +1,6 @@
 #include "CCModel.h"
+#include "CCMesh.h"
+#include "CCMaterial.h"
 
 CCModel::CCModel()
 {
@@ -9,6 +11,10 @@ CCModel::~CCModel()
     if (Mesh) {
         delete Mesh;
         Mesh = nullptr;
+    }
+    if (Material) {
+        delete Material;
+        Material = nullptr;
     }
 }
 
@@ -37,4 +43,10 @@ void CCModel::Reset() {
     Positon = glm::vec3(0.0f);
     Rotation = glm::vec3(0.0f);
     UpdateVectors();
+}
+
+void CCModel::Render()
+{
+    if (Material) Material->Use();
+    if (Mesh) Mesh->RenderMesh();
 }

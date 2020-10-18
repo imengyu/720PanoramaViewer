@@ -17,6 +17,7 @@ public:
 	LoggerInternal* GetLogger();
 	SettingHlp* GetSettings();
 	LPWSTR GetCurrentDir();
+	LPCSTR GetCurrentDirA();
 	LPWSTR GetCurrentPath();
 	HWND GetConsoleHWND();
 
@@ -31,6 +32,7 @@ private:
 	CGameRenderer* gameRenderer = nullptr;
 	SettingHlp* settings = nullptr;
 	WCHAR currentDir[MAX_PATH];
+	CHAR currentDirA[MAX_PATH];
 	WCHAR currentPath[MAX_PATH];
 	HWND hConsole;
 	FILE* fileIn;

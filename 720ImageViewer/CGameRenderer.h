@@ -31,6 +31,7 @@ public:
 	void SetOpenFilePath(const wchar_t* path);
 	void DoOpenFile();
 	void TestSplitImageAndLoadTexture();
+	void TestAndLoadImageChunk();
 	void NotifyAboutDialogClosed() { about_dialog_showed = false; }
 	void NotifyHelpDialogClosed() { help_dialog_showed = false; }
 
@@ -56,6 +57,8 @@ private:
 	CAppUIWapper*uiWapper = nullptr;
 	CCTextureLoadQueue*texLoadQueue = nullptr;
 
+
+
 	//UI¿ØÖÆ
 
 	bool debug_tool_active = false;
@@ -76,6 +79,7 @@ private:
 	static TextureLoadQueueDataResult* LoadTexCallback(TextureLoadQueueInfo* info, CCTexture* texture, void* data);
 	static void FileCloseCallback(void* data);
 	static void CameraFOVChanged(void* data, float fov);
+	static void CameraRotate(void* data, CCPanoramaCamera* cam);
 	static void BeforeQuitCallback(COpenGLView* view);
 
 	void SwitchMode(PanoramaMode mode);
@@ -83,6 +87,8 @@ private:
 
 	float MouseSensitivity = 0.1f;
 	float RoateSpeed = 20.0f;
+
+	bool SplitFullImage = true;
 
 	static void MouseCallback(COpenGLView* view, float x, float y, int button, int type);
 	static void ScrollCallback(COpenGLView* view, float x, float y, int button, int type);

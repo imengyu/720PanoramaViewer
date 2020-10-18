@@ -1,5 +1,6 @@
 #include "CApp.h"
 #include "CCursor.h"
+#include "CCMeshLoader.h"
 #include "COpenGLView.h"
 #include "CGameRenderer.h"
 #include "CAboutDialog.h"
@@ -94,6 +95,9 @@ int CApp::Run()
 	GetModuleFileName(NULL, currentPath, MAX_PATH);
 	wcscpy_s(currentDir, currentPath);
 	PathRemoveFileSpec(currentDir);
+	char* currentDirAb = StringHlp::UnicodeToAnsi(currentDir);
+	strcpy_s(currentDirA, currentDirAb);
+	StringHlp::FreeStringPtr(currentDirAb);
 
 	appArgList = CommandLineToArgvW(GetCommandLine(), &appArgCount);
 	if (appArgList == NULL)
@@ -106,9 +110,10 @@ int CApp::Run()
 	logger->SetLogLevel(LogLevel::LogLevelText);
 	logger->SetLogOutPut(LogOutPut::LogOutPutConsolne);
 
-	settings = new SettingHlpInternal(FormatString(L"%s\\config.ini", currentDir).c_str());
+	settings = new SettingHlpInternal(FormatString(L"%s\\config\\config.ini", currentDir).c_str());
 
 	CCursor::Init(hInst);
+	CCMeshLoader::Init();
 
 	//√¸¡Ó––∂¡»°
 	std::wstring filePath;
@@ -195,6 +200,7 @@ QUIT_AND_DESTROY:
 	fclose(fileErr);
 
 	CCursor::Destroy();
+	CCMeshLoader::Destroy();
 	delete settings;
 	delete gameRenderer;
 	delete mainView;
@@ -218,6 +224,10 @@ SettingHlp* CApp::GetSettings()
 LPWSTR CApp::GetCurrentDir()
 {
 	return currentDir;
+}
+LPCSTR CApp::GetCurrentDirA()
+{
+	return currentDirA;
 }
 LPWSTR CApp::GetCurrentPath()
 {

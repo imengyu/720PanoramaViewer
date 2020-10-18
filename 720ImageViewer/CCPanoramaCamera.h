@@ -20,7 +20,10 @@ enum class CCameraMovement {
 	ROATE_RIGHT = 7
 };
 
-typedef void(*CCPanoramaCameraFovChangedCallback)(void* data, float fov);
+class CCPanoramaCamera;
+
+typedef void(*CCPanoramaCameraFovChangedCallback)(void* data, float fov); 
+typedef void(*CCPanoramaCameraCallback)(void* data, CCPanoramaCamera* cam);
 
 //È«¾°ÉãÏñ»ú
 class CCPanoramaCamera : public CCamera
@@ -40,6 +43,10 @@ public:
 
 	void SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback, void*data);
 
+	void SetRotateCallback(CCPanoramaCameraCallback callback, void* data);
+
+
+
 	float RoateNearMax = 0.2f;
 	float RoateFarMax = 3.5f;
 	float ZoomSpeed = 0.05f;
@@ -54,6 +61,9 @@ public:
 private:
 	CCPanoramaCameraFovChangedCallback fovChangedCallback = nullptr;
 	void* fovChangedCallbackData = nullptr;
+	CCPanoramaCameraCallback rotateCallback = nullptr;
+	void* rotateCallbackData = nullptr;
 
+	void CallRotateCallback();
 };
 

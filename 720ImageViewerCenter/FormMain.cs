@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace _720ImageViewerCenter
 {
-    public partial class FormCenterMain : Form
+    public partial class FormMain : Form
     {
-        public FormCenterMain()
+        public FormMain()
         {
             InitializeComponent();
         }

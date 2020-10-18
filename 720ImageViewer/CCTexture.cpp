@@ -1,4 +1,5 @@
 #include "CCTexture.h"
+#include "CCRenderGlobal.h"
 #include "StringHlp.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -11,7 +12,7 @@ CCTexture::~CCTexture()
 	Destroy();
 }
 
-bool CCTexture::Load(LPWSTR path)
+bool CCTexture::Load(const wchar_t* path)
 {
 	char* pathAnsi = StringHlp::UnicodeToAnsi(path);
 	bool result = Load(pathAnsi);
@@ -42,11 +43,13 @@ void CCTexture::LoadRGBA(BYTE* data, int width, int height)
 void CCTexture::LoadBytes(BYTE* data, int width, int height, GLenum type) {
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)width, (GLsizei)height, 0, type, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -68,6 +71,7 @@ void CCTexture::Use()
 void CCTexture::UnUse()
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
+
 }
 
 bool CCTexture::Loaded()

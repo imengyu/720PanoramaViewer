@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "COpenGLView.h"
+#include "CCFileManager.h"
+#include "CCRenderGlobal.h"
+#include "CCamera.h"
+#include "CCShader.h"
 #include "CApp.h"
+#include "StringHlp.h"
 #include "resource.h"
 #include <stdio.h>
 #include <imgui_impl_opengl3.h>
@@ -139,6 +144,12 @@ void COpenGLView::InitImgui() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	char*iniFilePath = StringHlp::UnicodeToAnsi(CCFileManager::GetDirResourcePath(L"config", L"imgui.ini").c_str());
+	imguiIniPath = iniFilePath;
+	delete iniFilePath;
+
+	io.IniFilename = imguiIniPath.c_str();
 	static ImVector<ImWchar> myRange;
 	ImFontGlyphRangesBuilder myGlyph;
 
@@ -231,22 +242,11 @@ void COpenGLView::Render() {
 	{
 		//绘制
 		glClear(GL_COLOR_BUFFER_BIT);
-		glUseProgram(shaderProgram);
 
-		if (Camera) {
-
-			//清空
+		//清空
+		if (Camera) 
 			glClearColor(Camera->Background.r, Camera->Background.g, Camera->Background.b, Camera->Background.a);
 
-			//摄像机矩阵变换
-			glm::mat4 view = Camera->GetViewMatrix();
-			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-			//摄像机投影
-			glm::mat4 projection = Camera->Projection == CCameraProjection::Perspective ?
-				glm::perspective(glm::radians(Camera->FiledOfView), (float)Width / (float)Height, Camera->ClippingNear, Camera->ClippingFar) :
-				glm::ortho(-(float)Width / (float)Height, (float)Width / (float)Height, Camera->OrthographicSize, 0.0f, Camera->ClippingNear, Camera->ClippingFar);
-			glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		}
 		//绘制
 		if (OpenGLRenderer) OpenGLRenderer->Render(currentFps);
 
@@ -289,6 +289,7 @@ void COpenGLView::DrawViewInfoOverlay(bool* p_open)
 {
 	const float DISTANCE = 10.0f;
 	static int corner = 0;
+
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 	if (corner != -1)
@@ -301,9 +302,8 @@ void COpenGLView::DrawViewInfoOverlay(bool* p_open)
 	ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
 	if (ImGui::Begin("overlay", p_open, window_flags))
 	{
-		ImGui::Text("Render (right-click to change position)");
-		ImGui::Separator();
-		ImGui::Text("FPS: %f", currentFps);
+		ImGui::Text("FPS: %0.2f (%d ms) Max : %0.2f (%d ms)", currentFps, drawTime, currentMaxFps, drawTimeReal);
+		ImGui::Text("Last Sleep: %d ms", (int)lastSleepTime);
 		ImGui::Text(SizeText);
 		if (ImGui::IsMousePosValid())
 			ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
@@ -334,9 +334,20 @@ void COpenGLView::SetViewText(const wchar_t* text)
 {
 	SetWindowTextW(hWnd, text);
 }
-void COpenGLView::SetShaderProgram(GLuint shaderProgram)
+
+void COpenGLView::CalcMainCameraProjection(CCShader* shader)
 {
-	this->shaderProgram = shaderProgram;
+	if (Camera) {
+
+		//摄像机矩阵变换
+		glm::mat4 view = Camera->GetViewMatrix();
+		glUniformMatrix4fv(shader->viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		//摄像机投影
+		glm::mat4 projection = Camera->Projection == CCameraProjection::Perspective ?
+			glm::perspective(glm::radians(Camera->FiledOfView), (float)Width / (float)Height, Camera->ClippingNear, Camera->ClippingFar) :
+			glm::ortho(-(float)Width / (float)Height, (float)Width / (float)Height, Camera->OrthographicSize, 0.0f, Camera->ClippingNear, Camera->ClippingFar);
+		glUniformMatrix4fv(shader->projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	}
 }
 
 LRESULT WINAPI COpenGLView:: WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
@@ -441,13 +452,18 @@ DWORD WINAPI COpenGLView::RenderThread(LPVOID lpParam)
 	view->InitImgui();
 
 	//Init render
-	if (view->OpenGLRenderer)
-		if (!view->OpenGLRenderer->Init()) {
+	if (view->OpenGLRenderer && !view->OpenGLRenderer->Init()) {
 			view->logger->LogError2(L"OpenGLRenderer init failed!");
 			return -1;
 		}
 
+	//Loop
 	while (view->RenderThreadRunning) {
+
+		//limit fps
+		view->lastTime = GetTickCount();
+		view->lastSleepTime = (1000.0 / view->LimitFps) - (double)(view->drawTime);
+		if (view->lastSleepTime > 0) Sleep((DWORD)view->lastSleepTime);
 
 		//Change viewport
 		if (view->ViewportChanged) {
@@ -456,25 +472,7 @@ DWORD WINAPI COpenGLView::RenderThread(LPVOID lpParam)
 			view->ViewportChanged = false;
 		}
 
-		//limit fps
-		view->lastTime = GetTickCount();
-		deltaTime = (1000.0 / view->LimitFps) - (view->drawTime);
-		while (deltaTime > 0) {
-			if (deltaTime > 20) {
-				Sleep(20);
-				deltaTime -= 20;
-			} else if (deltaTime > 10) {
-				Sleep(10);
-				deltaTime -= 10;
-			} else if (deltaTime > 5) {
-				Sleep(5);
-				deltaTime-= 5;
-			} else {
-				Sleep(1);
-				deltaTime--;
-			}
-		}
-
+		view->drawLastTime = GetTickCount();
 		view->UpdateTicked = true;
 
 		//Render
@@ -486,9 +484,14 @@ DWORD WINAPI COpenGLView::RenderThread(LPVOID lpParam)
 		//calc fps
 		view->currentTime = GetTickCount();
 		view->drawTime = view->currentTime - view->lastTime;
+		view->drawTimeReal = view->currentTime - view->drawLastTime;
 		if (view->drawTime > 0)
 			view->currentFps = 1000.0f / view->drawTime;
+		if (view->drawTimeReal > 0)
+			view->currentMaxFps = 1000.0f / view->drawTimeReal;
 		view->time = view->currentTime - view->startTime;
+
+
 	}
 
 	view->DestroyRender();
@@ -564,11 +567,6 @@ void COpenGLView::CloseView() {
 void COpenGLView::SetCamera(CCamera* camera)
 {
 	Camera = camera;
-}
-void COpenGLView::SetCameraLoc(GLint viewLoc, GLint projectionLoc)
-{
-	this->viewLoc = viewLoc;
-	this->projectionLoc = projectionLoc;
 }
 
 int destroyWaitCount = 0;

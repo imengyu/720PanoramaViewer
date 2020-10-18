@@ -27,6 +27,7 @@ void CGameRenderer::DoOpenFile()
         //主图
         renderer->panoramaThumbnailTex = texLoadQueue->Push(new CCTexture(), 0, 0, -1);//MainTex
         renderer->panoramaTexPool.push_back(renderer->panoramaThumbnailTex);
+        renderer->UpdateMainModelTex();
 
         //检查是否需要分片并加载
         TestSplitImageAndLoadTexture();
@@ -37,8 +38,35 @@ void CGameRenderer::DoOpenFile()
     }
 }
 void CGameRenderer::TestSplitImageAndLoadTexture() {
+    glm::vec2 size = fileManager->CurrentFileLoader->GetImageSize();
+    SplitFullImage = size.x > 4096 || size.y > 2048;
+    if (SplitFullImage) {
+        float chunkW = size.x / 4096.0f;
+        float chunkH = size.y / 2048.0f;
+        if (chunkW < 2) chunkW = 2;
+        if (chunkH < 2) chunkH = 2;
+        if (chunkW > 64 || chunkH > 32) {
+            logger->LogError2(L"Too big image (%.2f, %.2f) that cant split chunks.", chunkW, chunkH);
+            SplitFullImage = false;
+            return;
+        }
+
+        int chunkWi = (int)ceil(chunkW), chunkHi = (int)ceil(chunkH);
+        renderer->sphereFullSegmentX = renderer->sphereSegmentX + (chunkWi % 2 == 0 ? 0 : 1);
+        renderer->sphereFullSegmentY = renderer->sphereSegmentY + (chunkHi % 2 == 0 ? 0 : 1);
+        renderer->GenerateFullModel(chunkWi, chunkHi);
+        TestAndLoadImageChunk();
+    }
+
+    SwitchMode(mode);
+}
+void CGameRenderer::TestAndLoadImageChunk() {
+    auto rotate = renderer->mainModel->Rotation;
+
+
 
 }
+
 
 bool CGameRenderer::Init()
 {
@@ -53,12 +81,11 @@ bool CGameRenderer::Init()
     renderer->Init();
     texLoadQueue->SetLoadHandle(LoadTexCallback, this);
     camera->SetFOVChangedCallback(CameraFOVChanged, this);
+    camera->SetRotateCallback(CameraRotate, this);
     camera->Background = CColor::FromString("#4682B4");
     fileManager->SetOnCloseCallback(FileCloseCallback, this);
 
-    View->SetShaderProgram(renderer->shaderProgram);
     View->SetCamera(camera);
-    View->SetCameraLoc(renderer->globalRenderInfo->viewLoc, renderer->globalRenderInfo->projectionLoc);
     View->SetBeforeQuitCallback(BeforeQuitCallback);
     View->SetMouseCallback(MouseCallback);
     View->SetScrollCallback(ScrollCallback);
@@ -139,6 +166,7 @@ void CGameRenderer::MouseCallback(COpenGLView* view, float xpos, float ypos, int
                 float xoffset = -renderer->xoffset * renderer->MouseSensitivity;
                 float yoffset = -renderer->yoffset * renderer->MouseSensitivity;
                 renderer->renderer->RotateModel(xoffset, yoffset);
+                if (renderer->SplitFullImage) renderer->TestAndLoadImageChunk();
             }
             //全景模式是更改U偏移和纬度偏移
 
@@ -468,12 +496,22 @@ TextureLoadQueueDataResult* CGameRenderer::LoadTexCallback(TextureLoadQueueInfo*
 }
 void CGameRenderer::FileCloseCallback(void* data) {
     CGameRenderer* ptr = (CGameRenderer*)data;
+    ptr->renderer->panoramaThumbnailTex = nullptr;
+    ptr->renderer->renderPanoramaFull = false;
     ptr->renderer->ReleaseTexPool();
+    ptr->renderer->ReleaseFullModel();
+    ptr->renderer->UpdateMainModelTex();
 }
 void CGameRenderer::CameraFOVChanged(void* data, float fov) {
     CGameRenderer* ptr = (CGameRenderer*)data;
     if (ptr->mode == PanoramaSphere || ptr->mode == PanoramaCylinder) {
-        ptr->renderer->renderPanoramaFull = fov >= 40;
+        ptr->renderer->renderPanoramaFull = ptr->SplitFullImage && fov < 30;
+    }
+}
+void CGameRenderer::CameraRotate(void* data, CCPanoramaCamera* cam)
+{
+    CGameRenderer* ptr = (CGameRenderer*)data;
+    if (ptr->SplitFullImage) {
     }
 }
 void CGameRenderer::BeforeQuitCallback(COpenGLView* view) {
@@ -490,13 +528,20 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
     case PanoramaMercator:
         camera->SetMode(CCPanoramaCameraMode::Static);
         renderer->ResetModel();
+        renderer->renderPanoramaFull = false;
+        MouseSensitivity = 0.01f;
+        break;
+    case PanoramaFull360:
+        camera->SetMode(CCPanoramaCameraMode::Static);
+        renderer->ResetModel();
+        renderer->renderPanoramaFull = false;
         MouseSensitivity = 0.01f;
         break;
     case PanoramaAsteroid:
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Position.z = 1.0f;
         camera->FiledOfView = 135.0f;
-        camera->FovMin = 75.0f;
+        camera->FovMin = 35.0f;
         camera->FovMax = 135.0f;
         MouseSensitivity = 0.1f;
         break;
@@ -504,24 +549,27 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Position.z = 0.0f;
         camera->FiledOfView = 70.0f;
-        camera->FovMin = 30.0f;
+        camera->FovMin = 10.0f;
         camera->FovMax = 120.0f;
+        renderer->renderPanoramaFull = SplitFullImage && camera->FiledOfView < 30;
         MouseSensitivity = 0.1f;
         break;
     case PanoramaSphere:
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Position.z = 0.5f;
         camera->FiledOfView = 50.0f;
-        camera->FovMin = 30.0f;
+        camera->FovMin = 10.0f;
         camera->FovMax = 75.0f;
+        renderer->renderPanoramaFull = SplitFullImage && camera->FiledOfView < 30;
         MouseSensitivity = 0.1f;
         break;
     case PanoramaOuterBall:
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->FiledOfView = 90.0f;
         camera->Position.z = 1.5f;
-        camera->FovMin = 45.0f;
+        camera->FovMin = 35.0f;
         camera->FovMax = 90.0f;
+        renderer->renderPanoramaFull = false;
         MouseSensitivity = 0.1f;
         break;
     default:

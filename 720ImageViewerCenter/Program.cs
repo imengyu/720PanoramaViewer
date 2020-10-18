@@ -16,7 +16,7 @@ namespace _720ImageViewerCenter
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormCenterMain());
+            Application.Run(new FormMain());
         }
     }
 }
