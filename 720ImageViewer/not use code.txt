@@ -245,3 +245,23 @@ void CGameRenderer::loadLogoTexture() {
         glEnd();
     }
 
+
+
+        testModel->Mesh->positions.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+    testModel->Mesh->positions.push_back(glm::vec3(1.0f, 0.0f, -1.0f));
+    testModel->Mesh->positions.push_back(glm::vec3(-1.0f, 0.0f, -1.0f));
+    testModel->Mesh->positions.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+    testModel->Mesh->texCoords.push_back(glm::vec2(0.0f, 0.0f));
+    testModel->Mesh->texCoords.push_back(glm::vec2(0.0f, 1.0f));
+    testModel->Mesh->texCoords.push_back(glm::vec2(1.0f, 0.0f));
+    testModel->Mesh->texCoords.push_back(glm::vec2(1.0f, 1.0f));
+
+    int ar[] = {
+        0,1,2,
+        2,1,3,
+        1,2,3,
+        0,1,3
+    };
+    for (int i = 0; i < sizeof(ar) / sizeof(int); i++)
+        testModel->Mesh->indices.push_back(ar[i]);
+    testModel->Mesh->GenerateBuffer();

@@ -453,6 +453,9 @@
     <ClCompile Include="CCObjLoader.cpp">
       <Filter>源文件\MeshLoader</Filter>
     </ClCompile>
+    <ClCompile Include="GlUtils.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -721,6 +724,9 @@
     </ClInclude>
     <ClInclude Include="CCObjLoader.h">
       <Filter>头文件\MeshLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="GlUtils.h">
+      <Filter>头文件\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

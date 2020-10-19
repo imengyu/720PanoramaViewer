@@ -31,9 +31,9 @@ public:
 	void SetOpenFilePath(const wchar_t* path);
 	void DoOpenFile();
 	void TestSplitImageAndLoadTexture();
-	void TestAndLoadImageChunk();
 	void NotifyAboutDialogClosed() { about_dialog_showed = false; }
 	void NotifyHelpDialogClosed() { help_dialog_showed = false; }
+	void AddTextureToQueue(CCTexture* tex, int x, int y, int id);
 
 private:
 
@@ -73,9 +73,12 @@ private:
 	bool render_dialog_active = false;
 	bool loading_dialog_active = false;
 
+	bool destroying = false;
+	bool needTestImageAndSplit = false;
 	bool firstMouse = true;
 	float lastX = 0, lastY = 0, xoffset = 0, yoffset = 0;
 
+	TextureLoadQueueDataResult* LoadChunkTexCallback(TextureLoadQueueInfo* info, CCTexture* texture);
 	static TextureLoadQueueDataResult* LoadTexCallback(TextureLoadQueueInfo* info, CCTexture* texture, void* data);
 	static void FileCloseCallback(void* data);
 	static void CameraFOVChanged(void* data, float fov);

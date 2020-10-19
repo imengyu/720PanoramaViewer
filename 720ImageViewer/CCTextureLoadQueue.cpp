@@ -45,8 +45,8 @@ void CCTextureLoadQueue::SetLoadHandle(CCTextureLoadQueueLoadHandle handle, void
 void CCTextureLoadQueue::ResolveMain()
 {
 	if (pendingTexture == nullptr && queue.size() > 0) {
-		pendingTexture = queue.back();
-		queue.pop_back();
+		pendingTexture = queue.front();
+		queue.pop_front();
 
 		logger->Log(L"[CCTextureLoadQueue] Load Texture %d", pendingTexture->id);
 

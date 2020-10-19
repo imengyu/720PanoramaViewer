@@ -47,6 +47,7 @@ void CCModel::Reset() {
 
 void CCModel::Render()
 {
+    if (!Visible) return;
     if (Material) Material->Use();
     if (Mesh) Mesh->RenderMesh();
 }

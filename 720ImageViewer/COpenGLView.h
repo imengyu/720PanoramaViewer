@@ -86,6 +86,7 @@ public:
 	void SetViewText(const wchar_t* text);
 
 	void CalcMainCameraProjection(CCShader* shader);
+	void CalcNoMainCameraProjection(CCShader* shader);
 
 	static LRESULT __stdcall WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 	static DWORD WINAPI RenderThread(LPVOID lpParam);

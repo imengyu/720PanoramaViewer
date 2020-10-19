@@ -30,7 +30,7 @@ void CGameRenderer::DoOpenFile()
         renderer->UpdateMainModelTex();
 
         //检查是否需要分片并加载
-        TestSplitImageAndLoadTexture();
+        needTestImageAndSplit = true;
     }
     else {
         loading_dialog_active = false;
@@ -41,8 +41,8 @@ void CGameRenderer::TestSplitImageAndLoadTexture() {
     glm::vec2 size = fileManager->CurrentFileLoader->GetImageSize();
     SplitFullImage = size.x > 4096 || size.y > 2048;
     if (SplitFullImage) {
-        float chunkW = size.x / 4096.0f;
-        float chunkH = size.y / 2048.0f;
+        float chunkW = size.x / 2048.0f;
+        float chunkH = size.y / 1024.0f;
         if (chunkW < 2) chunkW = 2;
         if (chunkH < 2) chunkH = 2;
         if (chunkW > 64 || chunkH > 32) {
@@ -52,19 +52,14 @@ void CGameRenderer::TestSplitImageAndLoadTexture() {
         }
 
         int chunkWi = (int)ceil(chunkW), chunkHi = (int)ceil(chunkH);
+
+        logger->Log(L"Image use split mode , size: %d, %d", chunkWi, chunkHi);
         renderer->sphereFullSegmentX = renderer->sphereSegmentX + (chunkWi % 2 == 0 ? 0 : 1);
         renderer->sphereFullSegmentY = renderer->sphereSegmentY + (chunkHi % 2 == 0 ? 0 : 1);
         renderer->GenerateFullModel(chunkWi, chunkHi);
-        TestAndLoadImageChunk();
     }
 
     SwitchMode(mode);
-}
-void CGameRenderer::TestAndLoadImageChunk() {
-    auto rotate = renderer->mainModel->Rotation;
-
-
-
 }
 
 
@@ -80,6 +75,7 @@ bool CGameRenderer::Init()
 
     renderer->Init();
     texLoadQueue->SetLoadHandle(LoadTexCallback, this);
+    camera->SetMode(CCPanoramaCameraMode::CenterRoate);
     camera->SetFOVChangedCallback(CameraFOVChanged, this);
     camera->SetRotateCallback(CameraRotate, this);
     camera->Background = CColor::FromString("#4682B4");
@@ -93,10 +89,16 @@ bool CGameRenderer::Init()
     LoadSettings();
     SwitchMode(PanoramaMode::PanoramaSphere);
 
+    //renderer->renderPanoramaFullTest = true;
+    //renderer->renderPanoramaFullRollTest = true;
+    //renderer->renderPanoramaATest = true;
+    //TestSplitImageAndLoadTexture();
+
 	return true;
 }
 void CGameRenderer::Destroy()
 {
+    destroying = true;
     if (fileManager != nullptr) {
         delete fileManager;
         fileManager = nullptr;
@@ -110,9 +112,9 @@ void CGameRenderer::Destroy()
         texLoadQueue = nullptr;
     }
     if (camera != nullptr) {
+        View->SetCamera(nullptr);
         delete camera;
         camera = nullptr;
-        View->SetCamera(nullptr);
     }
     if (renderer != nullptr) {
         renderer->Destroy();
@@ -166,7 +168,6 @@ void CGameRenderer::MouseCallback(COpenGLView* view, float xpos, float ypos, int
                 float xoffset = -renderer->xoffset * renderer->MouseSensitivity;
                 float yoffset = -renderer->yoffset * renderer->MouseSensitivity;
                 renderer->renderer->RotateModel(xoffset, yoffset);
-                if (renderer->SplitFullImage) renderer->TestAndLoadImageChunk();
             }
             //全景模式是更改U偏移和纬度偏移
 
@@ -251,7 +252,7 @@ void CGameRenderer::Render(float FrameTime)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    renderer->Render();
+    renderer->Render(View->GetDeltaTime());
 
     glLoadIdentity();
 
@@ -259,6 +260,11 @@ void CGameRenderer::Render(float FrameTime)
     //===========================
 
     texLoadQueue->ResolveRender();
+
+    if (needTestImageAndSplit) {
+        needTestImageAndSplit = false;
+        TestSplitImageAndLoadTexture();
+    }
 }
 void CGameRenderer::RenderUI()
 {
@@ -385,7 +391,15 @@ void CGameRenderer::RenderUI()
         else if (debug_tool_active_tab == 3) {
         }
         else if (debug_tool_active_tab == 4) {
+            ImGui::InputInt("FullTestIndex", &renderer->renderPanoramaFullTestIndex);
+            ImGui::Checkbox("FullTest", &renderer->renderPanoramaFullTest);
+            ImGui::Checkbox("Full Roll Test", &renderer->renderPanoramaFullRollTest);
             ImGui::Separator();
+            ImGui::Checkbox("RenderTest modul", &renderer->renderPanoramaATest);
+            ImGui::Separator();
+            ImGui::Checkbox("Render full", &renderer->renderPanoramaFull);
+            ImGui::Checkbox("No Panorama Small", &renderer->renderNoPanoramaSmall);
+            
         }
         ImGui::End();
     }
@@ -468,8 +482,29 @@ void CGameRenderer::Update()
 
 //逻辑控制
 
+TextureLoadQueueDataResult* CGameRenderer::LoadChunkTexCallback(TextureLoadQueueInfo* info, CCTexture* texture) {
+
+    auto imgSize = fileManager->CurrentFileLoader->GetImageSize();
+    int chunkW = (int)imgSize.x / renderer->panoramaFullSplitW;
+    int chunkH = (int)imgSize.y / renderer->panoramaFullSplitH;
+    int chunkX = info->x * chunkW;
+    int chunkY = info->y * chunkH;
+
+    //Load full main tex
+    TextureLoadQueueDataResult* result = new TextureLoadQueueDataResult();
+    result->buffer = fileManager->CurrentFileLoader->GetImageChunkData(chunkX, chunkY, chunkW, chunkH);
+    result->size = fileManager->CurrentFileLoader->GetChunkDataSize();
+    result->compoents = fileManager->CurrentFileLoader->GetImageDepth();
+    result->width = chunkW;
+    result->height = chunkH;
+    result->success = true;
+
+    return result;
+}
 TextureLoadQueueDataResult* CGameRenderer::LoadTexCallback(TextureLoadQueueInfo* info, CCTexture* texture, void* data) {
     CGameRenderer* ptr = (CGameRenderer*)data;
+    if (ptr->destroying)
+        return nullptr;
     if (info->id == -1) {
         ptr->logger->Log(L"Load main tex: id: -1");
 
@@ -489,8 +524,7 @@ TextureLoadQueueDataResult* CGameRenderer::LoadTexCallback(TextureLoadQueueInfo*
     }
     else {
         ptr->logger->Log2(L"Load block tex : x: %d y: %d id: %d", info->x, info->y, info->id);
-
-
+        return ptr->LoadChunkTexCallback(info, texture);
     }
     return nullptr;
 }
@@ -505,7 +539,8 @@ void CGameRenderer::FileCloseCallback(void* data) {
 void CGameRenderer::CameraFOVChanged(void* data, float fov) {
     CGameRenderer* ptr = (CGameRenderer*)data;
     if (ptr->mode == PanoramaSphere || ptr->mode == PanoramaCylinder) {
-        ptr->renderer->renderPanoramaFull = ptr->SplitFullImage && fov < 30;
+        ptr->renderer->renderPanoramaFull = ptr->SplitFullImage && fov < 40;
+        if(ptr->renderer->renderPanoramaFull) ptr->renderer->UpdateFullChunksVisible();
     }
 }
 void CGameRenderer::CameraRotate(void* data, CCPanoramaCamera* cam)
@@ -519,6 +554,9 @@ void CGameRenderer::BeforeQuitCallback(COpenGLView* view) {
     renderer->SaveSettings();
 }
 
+void CGameRenderer::AddTextureToQueue(CCTexture* tex, int x, int y, int id) {
+    texLoadQueue->Push(tex, x, y, id);
+}
 void CGameRenderer::SwitchMode(PanoramaMode mode)
 {
     this->mode = mode;
@@ -549,7 +587,7 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Position.z = 0.0f;
         camera->FiledOfView = 70.0f;
-        camera->FovMin = 10.0f;
+        camera->FovMin = 5.0f;
         camera->FovMax = 120.0f;
         renderer->renderPanoramaFull = SplitFullImage && camera->FiledOfView < 30;
         MouseSensitivity = 0.1f;
@@ -558,7 +596,7 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Position.z = 0.5f;
         camera->FiledOfView = 50.0f;
-        camera->FovMin = 10.0f;
+        camera->FovMin = 5.0f;
         camera->FovMax = 75.0f;
         renderer->renderPanoramaFull = SplitFullImage && camera->FiledOfView < 30;
         MouseSensitivity = 0.1f;

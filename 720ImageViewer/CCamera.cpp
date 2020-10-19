@@ -1,4 +1,6 @@
 #include "CCamera.h"
+#include "GlUtils.h"
+#include "COpenGLView.h"
 
 CCamera::CCamera(glm::vec3 position, glm::vec3 up, glm::vec3 rotate)
 {
@@ -53,4 +55,29 @@ void CCamera::updateCameraVectors()
 	// 再计算右向量和上向量
 	Right = glm::normalize(glm::cross(Front, WorldUp));  // 标准化
 	Up = glm::normalize(glm::cross(Right, Front));
+}
+
+void CCamera::SetView(COpenGLView* view)
+{
+	this->glView = view;
+}
+
+
+glm::vec3 CCamera::Screen2World(const glm::vec2& screenPoint, glm::mat4& model, float* pPointDepth = nullptr)
+{
+	GLfloat pointDepth(0.0f);
+	if (nullptr != pPointDepth)
+	{
+		pointDepth = *pPointDepth;
+	}
+	else
+	{
+		// 获取深度缓冲区中x,y的数值
+		glReadPixels((GLint)screenPoint.x, (GLint)screenPoint.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &pointDepth);
+	}
+	return glm::unProject(glm::vec3(screenPoint, pointDepth), view * model, projection, glm::vec4(0.0f, 0.0f, glView->Width, glView->Height));
+}
+glm::vec3 CCamera::World2Screen(const glm::vec3& worldPoint, glm::mat4&model)
+{
+	return glm::project(worldPoint, view * model, projection, glm::vec4(0.0f, 0.0f, glView->Width, glView->Height));
 }

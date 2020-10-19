@@ -19,6 +19,8 @@ public:
 	//绘制模型
 	void Render();
 
+	bool Visible = true;
+
 	//模型位置
 	glm::vec3 Positon = glm::vec3(0.0f);
 	//模型旋转
@@ -29,7 +31,6 @@ public:
 	//模型网格
 	CCMesh* Mesh = nullptr;
 
-private:
 	glm::vec3 Front = glm::vec3(0.0f);
 	glm::vec3 Right = glm::vec3(0.0f);
 	glm::vec3 Up = glm::vec3(0.0f);

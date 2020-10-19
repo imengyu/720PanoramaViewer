@@ -1,5 +1,6 @@
 #include "CCTexture.h"
 #include "CCRenderGlobal.h"
+#include "CApp.h"
 #include "StringHlp.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -30,6 +31,8 @@ bool CCTexture::Load(char* path)
 			LoadRGBA(data, w, h);
 		return true;
 	}
+	else 
+		CApp::Instance->GetLogger()->LogError2(L"Load texture %hs failed!", path);
 	return false;
 }
 void CCTexture::LoadRGB(BYTE* data, int width, int height)
@@ -61,7 +64,7 @@ void CCTexture::LoadBytes(BYTE* data, int width, int height, GLenum type) {
 
 void CCTexture::Destroy()
 {
-	if (texture > 0)
+	if (texture >= 0)
 		glDeleteTextures(1, &texture);
 }
 void CCTexture::Use()
@@ -71,7 +74,6 @@ void CCTexture::Use()
 void CCTexture::UnUse()
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
-
 }
 
 bool CCTexture::Loaded()

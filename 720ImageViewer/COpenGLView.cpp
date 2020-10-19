@@ -340,16 +340,23 @@ void COpenGLView::CalcMainCameraProjection(CCShader* shader)
 	if (Camera) {
 
 		//摄像机矩阵变换
-		glm::mat4 view = Camera->GetViewMatrix();
-		glUniformMatrix4fv(shader->viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		Camera->view = Camera->GetViewMatrix();
+		glUniformMatrix4fv(shader->viewLoc, 1, GL_FALSE, glm::value_ptr(Camera->view));
 		//摄像机投影
-		glm::mat4 projection = Camera->Projection == CCameraProjection::Perspective ?
+		Camera->projection = Camera->Projection == CCameraProjection::Perspective ?
 			glm::perspective(glm::radians(Camera->FiledOfView), (float)Width / (float)Height, Camera->ClippingNear, Camera->ClippingFar) :
 			glm::ortho(-(float)Width / (float)Height, (float)Width / (float)Height, Camera->OrthographicSize, 0.0f, Camera->ClippingNear, Camera->ClippingFar);
-		glUniformMatrix4fv(shader->projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(shader->projectionLoc, 1, GL_FALSE, glm::value_ptr(Camera->projection));
 	}
 }
-
+void COpenGLView::CalcNoMainCameraProjection(CCShader* shader)
+{
+	glm::mat4 view(1.0f);
+	Camera->view = view;
+	Camera->projection = view;
+	glUniformMatrix4fv(shader->viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(shader->projectionLoc, 1, GL_FALSE, glm::value_ptr(view));
+}
 LRESULT WINAPI COpenGLView:: WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
 {
 	COpenGLView *view = (COpenGLView*)GetWindowLongW(hWnd, GWL_USERDATA);
@@ -533,11 +540,7 @@ void COpenGLView::OnSize(int Width, int Height)
 	{
 		this->Width = Width;
 		this->Height = Height;
-
 		sprintf_s(SizeText, "%dx%d - %s", Width, Height, (char*)glGetString(GL_RENDERER));
-
-		logger->Log2(L"Resize view : %dx%d", Width, Height);
-
 		if (OpenGLRenderer) OpenGLRenderer->Resize(Width, Height);
 	}
 }
@@ -566,7 +569,9 @@ void COpenGLView::CloseView() {
 }
 void COpenGLView::SetCamera(CCamera* camera)
 {
+	if (Camera) Camera->SetView(nullptr);
 	Camera = camera;
+	if (Camera) Camera->SetView(this);
 }
 
 int destroyWaitCount = 0;
