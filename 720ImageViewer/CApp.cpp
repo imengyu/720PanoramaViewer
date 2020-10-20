@@ -85,6 +85,11 @@ LRESULT CALLBACK  CApp::mainWndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM
 		}
 		break;
 	}
+	case WM_CUSTOM_DEL_FILE: {
+		if (MessageBox(hWnd, L"你是否真的要删除该图像？\n删除后不能恢复！", L"警告", MB_YESNO | MB_ICONEXCLAMATION) == IDYES) {
+			Instance->gameRenderer->MarkCloseFile(true);
+		}
+	}
 	default:
 		break;
 	}
@@ -170,7 +175,7 @@ int CApp::Run()
 		if (hasInputFile) {
 			logger->Log(L"Command input file %hs", filePath.c_str());
 			gameRenderer->SetOpenFilePath(filePath.c_str());
-			gameRenderer->DoOpenFile();
+			gameRenderer->MarkShouldOpenFile();
 		}
 
 		logger->Log(L"Init ok");

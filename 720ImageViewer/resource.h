@@ -13,6 +13,7 @@
 #define IDB_LOGO                        111
 #define IDD_REG                         114
 #define IDI_HELP                        116
+#define IDB_ABOUT_TOP                   117
 #define IDC_REGIST                      1001
 #define IDC_EDIT_INPUT                  1002
 #define IDC_REG_TO                      1003
@@ -21,7 +22,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        117
+#define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           101

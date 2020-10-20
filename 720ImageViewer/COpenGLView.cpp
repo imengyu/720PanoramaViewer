@@ -145,18 +145,16 @@ void COpenGLView::InitImgui() {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	char*iniFilePath = StringHlp::UnicodeToAnsi(CCFileManager::GetDirResourcePath(L"config", L"imgui.ini").c_str());
-	imguiIniPath = iniFilePath;
-	delete iniFilePath;
+	imguiIniPath = StringHlp::UnicodeToAnsi(CCFileManager::GetDirResourcePath(L"config", L"imgui.ini"));
 
 	io.IniFilename = imguiIniPath.c_str();
 	static ImVector<ImWchar> myRange;
 	ImFontGlyphRangesBuilder myGlyph;
 
 	myGlyph.AddText(u8"1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,./<>?;:\"'{}[]|\\+_-=()：；\
-*&^%$#@!~`，。《》￥ 关于文件修这是一个简易的全景期图查看软件染支持多种投影方式可快速打开您浏览程序信息好欢迎使用请先提渲\
-示确定设置模式帮日助能全屏未调试退出显示控制台配使用球面平小行星水晶球单闭当前载入中稍后此案像该球体轴分段失败误错不灰度色或位格\
-非常大很抱歉我们改暂时加缩细放更器＋－─");
+*&^%$#@!~`，。《》￥ 关于文件修这是一个简易删除它的全景期图查看软件染支持多种投影方式可快速打开您浏览程序信息好欢迎使用请先提渲\
+示确定设置模式帮日助能全屏未调试退出显示控制台配使用球栏面平小行星水晶球单闭当前载入中稍后此案像该球体轴分段失败误错不灰度色或位格\
+非常大很抱歉我们改暂时加缩细放更器帧率限需要重新启动才生效视暂停状态工其他具＋－─");
 	//
 	myGlyph.BuildRanges(&myRange);
 
@@ -164,10 +162,15 @@ void COpenGLView::InitImgui() {
 	io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.5f, NULL, myRange.Data);
 
 	//设置颜色风格
-	ImGui::StyleColorsDark();
+	ImGui::StyleColorsLight();
 
 	ImGui_ImplWin32_Init(hWnd);
 	ImGui_ImplOpenGL3_Init();
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.WindowRounding = 0;
+	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
 }
 
 void COpenGLView::Show(bool Maximized)
@@ -563,6 +566,14 @@ float COpenGLView::GetTime()
 {
 	return (float)currentTime / 1000.0f;
 }
+float COpenGLView::GetCurrentFps()
+{
+	return currentFps;
+}
+DWORD COpenGLView::GetDrawTime()
+{
+	return drawTime;
+}
 float COpenGLView::GetDeltaTime() {
 	if(currentFps != 0)
 		return 1.0f / currentFps;
@@ -704,8 +715,8 @@ void COpenGLView::QuitLowerFpsMode() {
 	}
 }
 
-LRESULT COpenGLView::SendMessage(UINT Msg, WPARAM wParam, LPARAM lParam) {
-	return ::SendMessage(hWnd, Msg, wParam, lParam);
+LRESULT COpenGLView::SendWindowsMessage(UINT Msg, WPARAM wParam, LPARAM lParam) {
+	return ::PostMessage(hWnd, Msg, wParam, lParam);
 }
 
 void COpenGLView::MouseCapture() { SetCapture(hWnd); }

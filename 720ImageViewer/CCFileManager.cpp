@@ -8,7 +8,7 @@
 #include "PathHelper.h"
 
 void CCFileManager::OpenFile() {
-   Render->View->SendMessage(WM_CUSTOM_OPEN_FILE, 0, 0);
+   Render->View->SendWindowsMessage(WM_CUSTOM_OPEN_FILE, 0, 0);
 }
 void CCFileManager::CloseFile() {
     logger->Log(L"Closing file");
@@ -19,6 +19,14 @@ void CCFileManager::CloseFile() {
         delete CurrentFileLoader;
         CurrentFileLoader = nullptr;
     }
+}
+void CCFileManager::DeleteCurrentFile() {
+    if (CurrentFileLoader) 
+        Render->View->SendWindowsMessage(WM_CUSTOM_DEL_FILE, (WPARAM)CurrentFileLoader->GetPath(), 0);
+}
+void CCFileManager::OpenCurrentFileAs() {
+    if (CurrentFileLoader)
+        SystemHelper::OpenAs(CurrentFileLoader->GetPath());
 }
 std::wstring CCFileManager::GetCurrentFileName() {
     if (CurrentFileLoader) 
@@ -58,7 +66,7 @@ bool CCFileManager::DoOpenFile(const wchar_t* path) {
         return false;
     }
 
-    ImageRatioNotStandard = (glm::abs(size.x / size.y - 2.0f) > 0.1f);
+    ImageRatioNotStandard = (glm::abs(size.x / size.y - 2.0f) > 0.2f);
     return true;
 }
 const std::wstring CCFileManager::GetResourcePath(const wchar_t* typeName, const wchar_t* name)

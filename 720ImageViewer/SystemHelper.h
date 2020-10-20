@@ -8,5 +8,7 @@ public:
    static bool ChooseOneFileA(HWND hWnd, LPCSTR startDir, LPCSTR title, LPCSTR fileFilter, LPCSTR fileName, LPCSTR defExt, LPCSTR strrs, size_t bufsize);
    static bool FileExists(LPCWSTR file);
    static bool FileExists(LPCSTR file);
+   static bool OpenAs(LPCWSTR file);
+   static bool ShellDeleteFile(HWND hWnd, LPCWSTR file);
 };
 

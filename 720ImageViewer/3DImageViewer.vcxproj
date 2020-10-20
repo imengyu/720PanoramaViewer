@@ -383,6 +383,7 @@
     <None Include="cur\bin2.bin" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="about.bmp" />
     <Image Include="help.bmp" />
     <Image Include="help.ico" />
     <Image Include="logo-small.bmp" />

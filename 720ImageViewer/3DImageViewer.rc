@@ -50,25 +50,24 @@ END
 // Dialog
 //
 
-IDD_ABOUT DIALOGEX 0, 0, 325, 277
+IDD_ABOUT DIALOGEX 0, 0, 267, 231
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "关于"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "确定",IDOK,268,256,50,14
-    LTEXT           "720 Image viewer",IDC_STATIC,134,92,58,8
-    CONTROL         IDB_LOGO,IDC_STATIC,"Static",SS_BITMAP,119,7,85,78
-    LTEXT           "Version: 1.0\nBuild 2  2020/09/29",IDC_STATIC,23,137,71,16
-    LTEXT           "Copyright (C) 2020  By imengyu",IDC_STATIC,23,159,106,9
-    LTEXT           "使用的开源组件",IDC_STATIC,22,177,57,8
-    LTEXT           "The OpenGL Extension Wrangler Library (GLEW)",IDC_STATIC,22,191,155,8
-    LTEXT           "OpenGL Mathematics (GLM)",IDC_STATIC,23,201,89,8
-    LTEXT           "Dear ImGui  (github.com/ocornut/imgui)",IDC_STATIC,23,212,127,8
-    LTEXT           "stb (github.com/nothings/stb)",IDC_STATIC,23,223,96,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,7,121,311,1
-    LTEXT           "一个极简的 720 度全景图片查看器",IDC_STATIC,106,105,121,8
-    PUSHBUTTON      "注册软件",IDC_REGIST,213,256,50,14
-    LTEXT           "您已经激活了本软件",IDC_REG_TO,23,242,73,8
+    DEFPUSHBUTTON   "确定",IDOK,207,208,50,14
+    CONTROL         IDB_ABOUT_TOP,IDC_STATIC,"Static",SS_BITMAP,0,0,267,101
+    LTEXT           "Version: 1.0 Build 2  2020/09/29",IDC_STATIC,83,106,105,8
+    LTEXT           "Copyright (C) 2020  By imengyu",IDC_STATIC,83,115,102,8
+    LTEXT           "使用的开源组件",IDC_STATIC,7,135,57,8
+    LTEXT           "The OpenGL Extension Wrangler Library (GLEW)",IDC_STATIC,7,148,155,8
+    LTEXT           "OpenGL Mathematics (GLM)",IDC_STATIC,9,159,89,8
+    LTEXT           "Dear ImGui  (github.com/ocornut/imgui)",IDC_STATIC,9,170,127,8
+    LTEXT           "stb (github.com/nothings/stb)",IDC_STATIC,9,180,96,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,101,268,1
+    PUSHBUTTON      "注册软件",IDC_REGIST,8,208,50,14
+    LTEXT           "您已经激活了本软件",IDC_REG_TO,9,210,73,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,127,268,1
 END
 
 IDD_HELP DIALOGEX 0, 0, 267, 333
@@ -78,6 +77,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "好的",IDOK,211,314,50,14
     CONTROL         IDB_HELP,IDC_STATIC,"Static",SS_BITMAP,0,0,267,308
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,307,267,1
 END
 
 IDD_REG DIALOGEX 0, 0, 309, 107
@@ -103,10 +103,6 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUT, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 318
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 270
     END
 
     IDD_HELP, DIALOG
@@ -218,6 +214,8 @@ END
 IDB_HELP                BITMAP                  "help.bmp"
 
 IDB_LOGO                BITMAP                  "logo-small.bmp"
+
+IDB_ABOUT_TOP           BITMAP                  "about.bmp"
 
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////

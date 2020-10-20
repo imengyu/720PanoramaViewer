@@ -168,7 +168,7 @@ void CCPanoramaRenderer::CreateMainModelSphereMesh(CCMesh* mesh) {
         u = 0;
         for (int i = 0; i <= sphereSegmentX; i++, u += ustep) {
             mesh->positions.push_back(GetSpherePoint(u, v, r));
-            mesh->texCoords.push_back(glm::vec2(u, v));
+            mesh->texCoords.push_back(glm::vec2(1.0f - u, v));
         }
     }
 
@@ -214,12 +214,12 @@ glm::vec3 CCPanoramaRenderer::CreateFullModelSphereMesh(ChunkModel*info, int seg
 
     float r = 0.99f;
     float ustep = 1.0f / sphereFullSegmentX, vstep = 1.0f / sphereFullSegmentY;
-    float u = 0, v = 0, cu = 0, cv = 0;
+    float u = 0, v = 0, cu = 1.0f, cv = 0;
 
     int segXEnd = segXStart + segX;
     int segYEnd = segYStart + segY;
 
-    float u_start = segXStart * ustep, v_start = segYStart * vstep;
+    float u_start =  segXStart * ustep, v_start = segYStart * vstep;
     float custep = 1.0f / (segXEnd - segXStart), cvstep = 1.0f / (segYEnd - segYStart);
     u = u_start;
     v = v_start;
@@ -232,8 +232,8 @@ glm::vec3 CCPanoramaRenderer::CreateFullModelSphereMesh(ChunkModel*info, int seg
             continue;
         }
         u = u_start;
-        cu = 0;
-        for (int i = segXStart; i <= segXEnd; i++, u += ustep, cu += custep) {
+        cu = 1.0f;
+        for (int i = segXStart; i <= segXEnd; i++, u += ustep, cu -= custep) {
             mesh->positions.push_back(GetSpherePoint(u, v, r));
             mesh->texCoords.push_back(glm::vec2(cu, cv));
         }
@@ -341,8 +341,8 @@ void CCPanoramaRenderer::GenerateFullModel(int chunkW, int chunkH)
             model->model->Mesh = new CCMesh();
             model->model->Material = new CCMaterial(panoramaRedCheckTex);
             model->model->Material->tilling = glm::vec2(50.0f);
-            model->chunkX = i;
-            model->chunkY = j;
+            model->chunkX = chunkW - i - 1;
+            model->chunkY =  j;
             model->chunkXv = (float)i / (float)chunkW;
             model->chunkYv = (float)j / (float)chunkH;
             model->chunkXv = model->chunkXv + chunkWf;

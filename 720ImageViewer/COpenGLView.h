@@ -105,6 +105,8 @@ public:
 	float FixedTimeStep = 10.0f;
 
 	float GetTime();
+	float GetCurrentFps();
+	DWORD GetDrawTime();
 	float GetDeltaTime();
 
 	void SetCamera(CCamera* Camera);
@@ -128,7 +130,7 @@ public:
 	void SetToLowerFpsMode();
 	void QuitLowerFpsMode();
 
-	LRESULT SendMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
+	LRESULT SendWindowsMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
 
 	void MouseCapture();
 	void ReleaseCapture();

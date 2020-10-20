@@ -21,7 +21,7 @@ void CCursor::Destroy() {
 
 void CCursor::SetViewCursur(COpenGLView* view, CCursor* cursor)
 {
-	//SetClassLong(view->GetHWND(), GCL_HCURSOR, (LONG)cursor->hCursor);
+	SetClassLong(view->GetHWND(), GCL_HCURSOR, (LONG)cursor->hCursor);
 	SetCursor(cursor->hCursor);
 }
 

@@ -15,6 +15,8 @@ public:
 
 	void OpenFile();
 	void CloseFile();
+	void DeleteCurrentFile();
+	void OpenCurrentFileAs();
 	std::wstring  GetCurrentFileName();
 	bool DoOpenFile(const wchar_t* path);
 

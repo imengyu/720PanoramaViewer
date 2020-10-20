@@ -1,6 +1,7 @@
 #include "SystemHelper.h"
 #include <commdlg.h>
 #include <Shlwapi.h>
+#include <shellapi.h>
 
 bool SystemHelper::ChooseOneFile(HWND hWnd, LPCWSTR startDir, LPCWSTR title, LPCWSTR fileFilter, LPCWSTR fileName, LPCWSTR defExt, LPCWSTR strrs, size_t bufsize)
 {
@@ -65,4 +66,17 @@ bool SystemHelper::FileExists(LPCWSTR file) {
 }
 bool SystemHelper::FileExists(LPCSTR file) {
 	return PathFileExistsA(file);
+}
+bool SystemHelper::OpenAs(LPCWSTR file) {
+	return ShellExecute(NULL, L"open", L"OpenWith.exe", file, NULL, NULL);
+}
+bool SystemHelper::ShellDeleteFile(HWND hWnd, LPCWSTR file) {
+	SHFILEOPSTRUCT lpfileop;
+	lpfileop.hwnd = hWnd;
+	lpfileop.wFunc = FO_DELETE;//É¾³ý²Ù×÷
+	lpfileop.pFrom = file;
+	lpfileop.pTo = NULL;
+	lpfileop.fFlags = FOF_ALLOWUNDO | FOF_NO_UI;
+	lpfileop.hNameMappings = NULL;
+	return SHFileOperation(&lpfileop) == 0;
 }

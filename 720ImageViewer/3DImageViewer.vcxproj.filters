@@ -785,6 +785,9 @@
     <Image Include="help.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="about.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="not use code.txt">

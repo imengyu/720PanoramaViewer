@@ -32,6 +32,11 @@ public:
 
 	void SetOpenFilePath(const wchar_t* path);
 	void DoOpenFile();
+	void MarkShouldOpenFile() { should_open_file = true; }
+	void MarkCloseFile(bool delete_after_close) {
+		should_close_file = true; 
+		this->delete_after_close = delete_after_close;
+	}
 	void NotifyAboutDialogClosed() { about_dialog_showed = false; }
 	void NotifyHelpDialogClosed() { help_dialog_showed = false; }
 	void AddTextureToQueue(CCTexture* tex, int x, int y, int id);
@@ -67,8 +72,12 @@ private:
 
 	bool debug_tool_active = false;
 	bool show_console = false;
+	bool show_status_bar = true;
+	bool show_fps = true;
 	int debug_tool_active_tab = 1;
 	bool main_menu_active = true;
+	float ui_update_tick = 0.0f;
+
 
 	bool about_dialog_showed = false;
 	bool help_dialog_showed = false;
@@ -78,9 +87,16 @@ private:
 	bool loading_dialog_active = false;
 	bool welecome_dialog_active = true;
 	bool reg_dialog_showed = false;
+	bool file_opened = false;
+
+	float current_fps = 0;
+	DWORD current_draw_time = 0;
 
 	int zoom_slider_value = 50;
 
+	bool should_open_file = false;
+	bool should_close_file = false;
+	bool delete_after_close = false;
 	bool destroying = false;
 	bool needTestImageAndSplit = false;
 	bool firstMouse = true;
