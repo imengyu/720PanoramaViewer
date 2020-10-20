@@ -145,12 +145,6 @@ void CCPanoramaCamera::SetMode(CCPanoramaCameraMode mode)
 	}
 }
 
-void CCPanoramaCamera::SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data)
-{
-	fovChangedCallback = callback;
-	fovChangedCallbackData = data;
-}
-
 void CCPanoramaCamera::SetRotateCallback(CCPanoramaCameraCallback callback, void* data)
 {
 	rotateCallback = callback;

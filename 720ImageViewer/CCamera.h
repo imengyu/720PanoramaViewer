@@ -17,6 +17,8 @@ enum class CCameraProjection {
 	Orthographic
 };
 
+typedef void(*CCPanoramaCameraFovChangedCallback)(void* data, float fov);
+
 class COpenGLView;
 // 摄像机类，处理输入并计算相应的欧拉角，矢量和矩阵
 class CCamera
@@ -46,8 +48,11 @@ public:
 	// 返回使用欧拉角和LookAt矩阵计算的view矩阵
 	glm::mat4 GetViewMatrix();
 
+	void SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data);
+
 	void SetPosItion(glm::vec3 position);
 	void SetRotation(glm::vec3 rotation);
+	void SetFOV(float fov);
 
 	void ForceUpdate();
 	void Reset();
@@ -103,5 +108,7 @@ protected:
 	// 从更新的CameraEuler的欧拉角计算前向量
 	void updateCameraVectors();
 
+	CCPanoramaCameraFovChangedCallback fovChangedCallback = nullptr;
+	void* fovChangedCallbackData = nullptr;
 
 };

@@ -50,21 +50,25 @@ END
 // Dialog
 //
 
-IDD_ABOUT DIALOGEX 0, 0, 325, 155
+IDD_ABOUT DIALOGEX 0, 0, 325, 277
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "关于"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "确定",IDOK,268,134,50,14
-    LTEXT           "720 Image viewer",IDC_STATIC,108,18,58,8
-    CONTROL         IDB_LOGO,IDC_STATIC,"Static",SS_BITMAP,7,7,85,78
-    LTEXT           "Version: 1.0\nBuild 2  2020/09/29",IDC_STATIC,109,48,71,16
-    LTEXT           "Copyright (C) 2020  By imengyu",IDC_STATIC,109,29,106,9
-    LTEXT           "使用的开源组件",IDC_STATIC,109,81,57,8
-    LTEXT           "The OpenGL Extension Wrangler Library (GLEW)",IDC_STATIC,110,93,155,8
-    LTEXT           "OpenGL Mathematics (GLM)",IDC_STATIC,110,103,89,8
-    LTEXT           "Dear ImGui  (github.com/ocornut/imgui)",IDC_STATIC,110,113,127,8
-    LTEXT           "stb (github.com/nothings/stb)",IDC_STATIC,110,124,96,8
+    DEFPUSHBUTTON   "确定",IDOK,268,256,50,14
+    LTEXT           "720 Image viewer",IDC_STATIC,134,92,58,8
+    CONTROL         IDB_LOGO,IDC_STATIC,"Static",SS_BITMAP,119,7,85,78
+    LTEXT           "Version: 1.0\nBuild 2  2020/09/29",IDC_STATIC,23,137,71,16
+    LTEXT           "Copyright (C) 2020  By imengyu",IDC_STATIC,23,159,106,9
+    LTEXT           "使用的开源组件",IDC_STATIC,22,177,57,8
+    LTEXT           "The OpenGL Extension Wrangler Library (GLEW)",IDC_STATIC,22,191,155,8
+    LTEXT           "OpenGL Mathematics (GLM)",IDC_STATIC,23,201,89,8
+    LTEXT           "Dear ImGui  (github.com/ocornut/imgui)",IDC_STATIC,23,212,127,8
+    LTEXT           "stb (github.com/nothings/stb)",IDC_STATIC,23,223,96,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,7,121,311,1
+    LTEXT           "一个极简的 720 度全景图片查看器",IDC_STATIC,106,105,121,8
+    PUSHBUTTON      "注册软件",IDC_REGIST,213,256,50,14
+    LTEXT           "您已经激活了本软件",IDC_REG_TO,23,242,73,8
 END
 
 IDD_HELP DIALOGEX 0, 0, 267, 333
@@ -74,6 +78,18 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "好的",IDOK,211,314,50,14
     CONTROL         IDB_HELP,IDC_STATIC,"Static",SS_BITMAP,0,0,267,308
+END
+
+IDD_REG DIALOGEX 0, 0, 309, 107
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "输入序列号"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "激活软件",IDOK,181,86,64,14
+    PUSHBUTTON      "取消",IDCANCEL,252,86,50,14
+    LTEXT           "需要激活产品，以去除软件的使用限制\n你还可以继续试用本软件 ∞ 天",IDC_STATIC,20,17,229,25
+    EDITTEXT        IDC_EDIT_INPUT,19,51,226,14,ES_AUTOHSCROLL
+    LTEXT           "(序列号应该为 xxx-xxxxx 格式)",IDC_STATIC,20,82,109,8
 END
 
 
@@ -90,11 +106,19 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 318
         TOPMARGIN, 7
-        BOTTOMMARGIN, 148
+        BOTTOMMARGIN, 270
     END
 
     IDD_HELP, DIALOG
     BEGIN
+    END
+
+    IDD_REG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 100
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -111,6 +135,11 @@ BEGIN
 END
 
 IDD_HELP AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_REG AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -138,6 +167,8 @@ IDC_CUR_HAND            CURSOR                  "cur\\15_link_select.cur"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_APP                 ICON                    "logo.ico"
+
+IDI_HELP                ICON                    "help.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -187,14 +218,6 @@ END
 IDB_HELP                BITMAP                  "help.bmp"
 
 IDB_LOGO                BITMAP                  "logo-small.bmp"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// BIN
-//
-
-IDB_LOGO                BIN                     "logo-small.bmp"
 
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////

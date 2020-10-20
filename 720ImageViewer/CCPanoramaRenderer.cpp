@@ -17,9 +17,17 @@ CCPanoramaRenderer::CCPanoramaRenderer(CGameRenderer* renderer)
 void CCPanoramaRenderer::Init()
 {
     glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glEnable(GL_ALPHA_TEST);
+    glDisable(GL_DITHER);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
     glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+    staticTexPool.push_back(uiLogoTex);
+    staticTexPool.push_back(uiOpenButtonTex);
+    staticTexPool.push_back(uiTitleTex);
+    staticTexPool.push_back(uiOpenButtonTex);
 
     LoadBuiltInResources();
 
@@ -58,13 +66,14 @@ void CCPanoramaRenderer::Destroy()
         delete mainModel;
         mainModel = nullptr;
     }
-    if (panoramaCheckTex != nullptr) {
-        delete panoramaCheckTex;
-        panoramaCheckTex = nullptr;
-    }
-    if (panoramaRedCheckTex != nullptr) {
-        delete panoramaRedCheckTex;
-        panoramaRedCheckTex = nullptr;
+    if (staticTexPool.size() > 0) {
+        std::vector<CCTexture*>::iterator it;
+        for (it = staticTexPool.begin(); it != staticTexPool.end(); it++) {
+            CCTexture* tex = *it;
+            if (tex)
+                delete tex;
+        }
+        staticTexPool.clear();
     }
     ReleaseTexPool();
 }
@@ -203,7 +212,7 @@ glm::vec3 CCPanoramaRenderer::CreateFullModelSphereMesh(ChunkModel*info, int seg
 
     CCMesh* mesh = info->model->Mesh;
 
-    float r = 0.98f;
+    float r = 0.99f;
     float ustep = 1.0f / sphereFullSegmentX, vstep = 1.0f / sphereFullSegmentY;
     float u = 0, v = 0, cu = 0, cv = 0;
 
@@ -218,7 +227,7 @@ glm::vec3 CCPanoramaRenderer::CreateFullModelSphereMesh(ChunkModel*info, int seg
     int skip = 0;
 
     for (int j = segYStart; j <= segYEnd; j++, v += vstep, cv += cvstep) {
-        if (j <= 2 || j >= sphereFullSegmentY - 2) {
+        if (j <= 2 || j >= sphereFullSegmentY - 4) {
             skip++;
             continue;
         }
@@ -269,6 +278,15 @@ void CCPanoramaRenderer::LoadBuiltInResources() {
     panoramaRedCheckTex = new CCTexture();
     panoramaRedCheckTex->Load(CCFileManager::GetResourcePath(L"textures", L"red_checker.jpg").c_str());
 
+    uiLogoTex = new CCTexture();
+    uiLogoTex->Load(CCFileManager::GetResourcePath(L"textures", L"logo.png").c_str());
+
+    uiOpenButtonTex = new CCTexture();
+    uiOpenButtonTex->Load(CCFileManager::GetResourcePath(L"textures", L"open_file.jpg").c_str());
+
+    uiTitleTex = new CCTexture();
+    uiTitleTex->Load(CCFileManager::GetResourcePath(L"textures", L"title.png").c_str());
+
     testModel = new CCModel();
     testModel->Mesh = new CCMesh();
 
@@ -311,14 +329,15 @@ void CCPanoramaRenderer::GenerateFullModel(int chunkW, int chunkH)
     panoramaFullSplitW = chunkW;
     panoramaFullSplitH = chunkH;
 
-    int segX = (int)ceil((float)sphereFullSegmentX / (float)chunkW);
-    int segY = (int)ceil((float)sphereFullSegmentY / (float)chunkH);
+    int segX = (int)floor((float)sphereFullSegmentX / (float)chunkW);
+    int segY = (int)floor((float)sphereFullSegmentY / (float)chunkH);
 
     float chunkWf = 1.0f / chunkW, chunkHf = 1.0f / chunkH;
     for (int i = 0; i < chunkW; i++) {
         for (int j = 0; j < chunkH; j++) {
             ChunkModel* model = new ChunkModel();
             model->model = new CCModel();
+            model->model->Visible = false;
             model->model->Mesh = new CCMesh();
             model->model->Material = new CCMaterial(panoramaRedCheckTex);
             model->model->Material->tilling = glm::vec2(50.0f);
@@ -328,7 +347,9 @@ void CCPanoramaRenderer::GenerateFullModel(int chunkW, int chunkH)
             model->chunkYv = (float)j / (float)chunkH;
             model->chunkXv = model->chunkXv + chunkWf;
             model->chunkYv = model->chunkYv + chunkHf;
-            model->pointCenter = CreateFullModelSphereMesh(model, i * segX, j * segY, segX, segY);
+            model->pointCenter = CreateFullModelSphereMesh(model,
+                i * segX, j * segY, 
+                segX + ((i == chunkW - 1 && chunkW % 2 != 0) ? 1 : 0), segY);
             fullModels.push_back(model);
         }
     }
@@ -363,10 +384,12 @@ void CCPanoramaRenderer::RenderFullChunks(float deltaTime)
 {
     if (renderPanoramaFullTest && !renderPanoramaFullRollTest) {
         renderPanoramaFullTestTime += deltaTime;
-        if (renderPanoramaFullTestTime > 1) {
-            renderPanoramaFullTestTime = 0;
-            if (renderPanoramaFullTestIndex < (int)fullModels.size() - 1)renderPanoramaFullTestIndex++;
-            else renderPanoramaFullTestIndex = 0;
+        if (renderPanoramaFullTestAutoLoop) {
+            if (renderPanoramaFullTestTime > 1) {
+                renderPanoramaFullTestTime = 0;
+                if (renderPanoramaFullTestIndex < (int)fullModels.size() - 1)renderPanoramaFullTestIndex++;
+                else renderPanoramaFullTestIndex = 0;
+            }
         }
         fullModels[renderPanoramaFullTestIndex]->model->Render();
     }
@@ -393,26 +416,28 @@ void CCPanoramaRenderer::UpdateMainModelTex()
     }
 }
 void CCPanoramaRenderer::UpdateFullChunksVisible() {
-    float fov = Renderer->View->Camera->FiledOfView;
-    for (auto it = fullModels.begin(); it != fullModels.end(); it++) {
-        ChunkModel* m = *it;
-        if (fov > 50)
-            m->model->Visible = IsInView(m->pointCenter);
-        else
-            m->model->Visible = IsInView(m->pointA) || IsInView(m->pointB) || IsInView(m->pointC) || IsInView(m->pointD);
-        if (m->model->Visible) {
-            if (!m->loadMarked && !renderPanoramaFullTest) {//¼ÓÔØÌùÍ¼
-                m->loadMarked = true;
+    if (renderPanoramaFull || renderPanoramaFullTest) {
+        float fov = Renderer->View->Camera->FiledOfView;
+        for (auto it = fullModels.begin(); it != fullModels.end(); it++) {
+            ChunkModel* m = *it;
+            if (fov > 50)
+                m->model->Visible = IsInView(m->pointCenter);
+            else
+                m->model->Visible = IsInView(m->pointA) || IsInView(m->pointB) || IsInView(m->pointC) || IsInView(m->pointD);
+            if (m->model->Visible) {
+                if (!m->loadMarked && !renderPanoramaFullTest) {//¼ÓÔØÌùÍ¼
+                    m->loadMarked = true;
 
-                logger->Log(L"Star load chunk %d, %d", m->chunkX, m->chunkY);
+                    logger->Log(L"Star load chunk %d, %d", m->chunkX, m->chunkY);
 
-                CCTexture* tex = new CCTexture();
-                tex->wrapS = GL_MIRRORED_REPEAT;
-                tex->wrapT = GL_MIRRORED_REPEAT;
-                m->model->Material->diffuse = tex;
-                m->model->Material->tilling = glm::vec2(1.0f, 1.0f);
-                Renderer->AddTextureToQueue(tex, m->chunkX, m->chunkY, m->chunkY * m->chunkX + m->chunkX);//MainTex
-                panoramaTexPool.push_back(tex);
+                    CCTexture* tex = new CCTexture();
+                    tex->wrapS = GL_MIRRORED_REPEAT;
+                    tex->wrapT = GL_MIRRORED_REPEAT;
+                    m->model->Material->diffuse = tex;
+                    m->model->Material->tilling = glm::vec2(1.0f, 1.0f);
+                    Renderer->AddTextureToQueue(tex, m->chunkX, m->chunkY, m->chunkY * m->chunkX + m->chunkX);//MainTex
+                    panoramaTexPool.push_back(tex);
+                }
             }
         }
     }

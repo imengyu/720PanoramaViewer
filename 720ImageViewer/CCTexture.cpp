@@ -25,14 +25,16 @@ bool CCTexture::Load(char* path)
 	int w, h, nrChannels;
 	BYTE*data = stbi_load(path, &w, &h, &nrChannels, 0);
 	if (data) {
+		CApp::Instance->GetLogger()->Log(L"Load texture %hs : %dx%dx%db", path, w, h, nrChannels);
 		if(nrChannels == 3)
 			LoadRGB(data, w, h);
 		else if(nrChannels == 4)
 			LoadRGBA(data, w, h);
+		stbi_image_free(data);
 		return true;
 	}
 	else 
-		CApp::Instance->GetLogger()->LogError2(L"Load texture %hs failed!", path);
+		CApp::Instance->GetLogger()->LogError2(L"Load texture %hs failed : %hs", path, stbi_failure_reason());
 	return false;
 }
 void CCTexture::LoadRGB(BYTE* data, int width, int height)
@@ -48,14 +50,16 @@ void CCTexture::LoadBytes(BYTE* data, int width, int height, GLenum type) {
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+	alpha = type == GL_RGBA;
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)width, (GLsizei)height, 0, type, GL_UNSIGNED_BYTE, data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)width, (GLsizei)height, 0, type, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
+	//glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	this->width = width;
@@ -70,6 +74,7 @@ void CCTexture::Destroy()
 void CCTexture::Use()
 {
 	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, (alpha ? GL_REPLACE : GL_MODULATE));
 }
 void CCTexture::UnUse()
 {

@@ -63,15 +63,21 @@ public:
 
 	int renderPanoramaFullTestIndex = 0;
 	float renderPanoramaFullTestTime = 0;
+	bool renderPanoramaFullTestAutoLoop = true;
 
 	bool renderDebugWireframe = false;
-	bool renderNoPanoramaSmall = false;
+	bool renderNoPanoramaSmall = true;
 	bool renderPanoramaFull = false;
 	bool renderPanoramaFullTest = false;
 	bool renderPanoramaFullRollTest = false;
 	bool renderPanoramaATest = false;
 	bool renderDebugVector = false;
 
+	CCTexture* uiLogoTex = nullptr;
+	CCTexture* uiButtonTex = nullptr;
+	CCTexture* uiOpenButtonTex = nullptr;
+	CCTexture* uiTitleTex = nullptr;
+	std::vector<CCTexture*> staticTexPool;
 	CCTexture* panoramaRedCheckTex = nullptr;
 	CCTexture* panoramaCheckTex = nullptr;
 	CCTexture*panoramaThumbnailTex = nullptr;

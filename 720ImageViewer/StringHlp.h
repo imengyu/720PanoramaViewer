@@ -12,6 +12,8 @@ public:
 	StringHlp();
 	~StringHlp();
 
+	static std::string GetFileSizeStringAuto(long long byteSize);
+
 	static std::string & FormatString(std::string & _str, const char * _Format, ...);
 	static std::wstring & FormatString(std::wstring & _str, const wchar_t * _Format, ...);
 	static std::wstring FormatString(const wchar_t * format, ...);
@@ -23,6 +25,12 @@ public:
 	static char* UnicodeToAnsi(const wchar_t* szStr);
 	static char* UnicodeToUtf8(const wchar_t* unicode);
 	static wchar_t* AnsiToUnicode(const char* szStr);
+
+	static std::string UnicodeToAnsi(std::wstring szStr);
+	static std::string UnicodeToUtf8(std::wstring unicode);
+	static std::wstring AnsiToUnicode(std::string szStr);
+	static std::wstring Utf8ToUnicode(std::string szU8);
+
 	static void FreeStringPtr(void * ptr);
 
 	static std::string* FormatStringPtr2A(std::string *_str, const char * _Format, ...);

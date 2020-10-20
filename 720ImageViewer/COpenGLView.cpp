@@ -154,9 +154,10 @@ void COpenGLView::InitImgui() {
 	ImFontGlyphRangesBuilder myGlyph;
 
 	myGlyph.AddText(u8"1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,./<>?;:\"'{}[]|\\+_-=()：；\
-*&^%$#@!~`，。《》￥ 关于文件这是一个简易的全景图查看软件染支持多种投影方式可快速打开您浏览程序信息好欢迎使用请先提渲\
-示确定设置模式帮助能全屏调试退出显示控制台配使用球面平小行星水晶球单闭当前载入中稍后此案像该球体轴分段失败误错不灰度色或位格\
-非常大很抱歉我们暂时");
+*&^%$#@!~`，。《》￥ 关于文件修这是一个简易的全景期图查看软件染支持多种投影方式可快速打开您浏览程序信息好欢迎使用请先提渲\
+示确定设置模式帮日助能全屏未调试退出显示控制台配使用球面平小行星水晶球单闭当前载入中稍后此案像该球体轴分段失败误错不灰度色或位格\
+非常大很抱歉我们改暂时加缩细放更器＋－─");
+	//
 	myGlyph.BuildRanges(&myRange);
 
 	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.5f, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
@@ -378,6 +379,12 @@ LRESULT WINAPI COpenGLView:: WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARA
 		}
 		case WM_CLOSE: {
 			view->Destroy();
+			break;
+		}
+		case WM_GETMINMAXINFO: {
+			LPMINMAXINFO info = (LPMINMAXINFO)lParam;
+			info->ptMinTrackSize.x = 500;
+			info->ptMinTrackSize.y = 400;
 			break;
 		}
 		case WM_SIZE: {
@@ -662,12 +669,18 @@ void COpenGLView::Resize(int w, int h, bool moveToCenter) {
 }
 void COpenGLView::UpdateFullScreenState() {
 	if (IsFullScreen) {
+		lastSize = glm::vec2(Width, Height);
 		SetWindowLong(hWnd, GWL_STYLE, WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP);
 		ShowWindow(hWnd, SW_MAXIMIZE);
 	}
 	else {
 		SetWindowLong(hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
 		ShowWindow(hWnd, SW_RESTORE);
+		if (lastSize.x >= 500 && lastSize.y >= 400) {
+			Width = (int)lastSize.x;
+			Height = (int)lastSize.y;
+			Resize(Width, Height, true);
+		}
 	}
 }
 void COpenGLView::SetFullScreen(bool full) {

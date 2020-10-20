@@ -5,6 +5,7 @@
 #include "CCFileReader.h"
 #include "CApp.h"
 #include "SystemHelper.h"
+#include "PathHelper.h"
 
 void CCFileManager::OpenFile() {
    Render->View->SendMessage(WM_CUSTOM_OPEN_FILE, 0, 0);
@@ -19,7 +20,14 @@ void CCFileManager::CloseFile() {
         CurrentFileLoader = nullptr;
     }
 }
+std::wstring CCFileManager::GetCurrentFileName() {
+    if (CurrentFileLoader) 
+        return Path::GetFileName(CurrentFileLoader->GetPath());
+    return std::wstring();
+}
 bool CCFileManager::DoOpenFile(const wchar_t* path) {
+
+    CloseFile();
 
     if (!SystemHelper::FileExists(path)) {
         lastErr = L"文件不存在";
@@ -50,6 +58,7 @@ bool CCFileManager::DoOpenFile(const wchar_t* path) {
         return false;
     }
 
+    ImageRatioNotStandard = (glm::abs(size.x / size.y - 2.0f) > 0.1f);
     return true;
 }
 const std::wstring CCFileManager::GetResourcePath(const wchar_t* typeName, const wchar_t* name)

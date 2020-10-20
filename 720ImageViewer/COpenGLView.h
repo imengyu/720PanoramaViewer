@@ -49,6 +49,7 @@ private:
 	bool RenderThreadRunning = false;
 	bool Destroying = false;
 	WNDPROC CustomWndProc = nullptr;
+	glm::vec2 lastSize;
 
 	int DownedKeys[MAX_KEY_LIST];
 	int UpedKeys[MAX_KEY_LIST];

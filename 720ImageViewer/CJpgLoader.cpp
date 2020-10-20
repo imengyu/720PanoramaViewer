@@ -74,6 +74,7 @@ BYTE* CJpgLoader::GetAllImageData()
 
             scaledSize = glm::vec2(t_width, t_height);
             SetFullDataSize(t_bufferSize);
+            SetLoadingPrecent(0);
 
             UINT bfferSize = cinfo.output_width * cinfo.output_components;
             JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, bfferSize, 1);
@@ -81,6 +82,8 @@ BYTE* CJpgLoader::GetAllImageData()
 
             while (cinfo.output_scanline < t_height)//逐行读取位图数据
             {
+                SetLoadingPrecent(cinfo.output_scanline / (float)t_height);
+
                 jpeg_read_scanlines(&cinfo, buffer, 1); //读取一行jpg图像数据到buffer
                 memcpy(point, *buffer, bfferSize); //将buffer中的数据逐行给src_buff
                 point += bfferSize; //指针偏移一行
@@ -91,6 +94,8 @@ BYTE* CJpgLoader::GetAllImageData()
             jpeg_finish_decompress(&cinfo);
             jpeg_destroy_decompress(&cinfo);
             fclose(file);
+
+            SetLoadingPrecent(1.0f);
 
             return t_buffer;
         }
@@ -121,6 +126,8 @@ BYTE* CJpgLoader::GetImageChunkData(int x, int y, int chunkW, int chunkH)
             SetLastError("Bad jpeg header");
             return nullptr;
         }
+
+        SetLoadingPrecent(0);
 
         width = cinfo.image_width;//图像宽度
         height = cinfo.image_height;//图像高度
@@ -154,6 +161,7 @@ BYTE* CJpgLoader::GetImageChunkData(int x, int y, int chunkW, int chunkH)
 
         while (cinfo.output_scanline < end)//逐行读取位图数据
         {
+            SetLoadingPrecent(cinfo.output_scanline / (float)end);
             jpeg_read_scanlines(&cinfo, buffer, 1); //读取一行jpg图像数据到buffer
             memcpy(point, *buffer, bfferSize); //将buffer中的数据逐行给src_buff
             point += bfferSize; //指针偏移一行
@@ -202,6 +210,8 @@ BYTE* CJpgLoader::GetImageChunkData(int x, int y, int chunkW, int chunkH)
         }
 
         free(t_buffer);
+        
+        SetLoadingPrecent(1);
         return t_fix_buffer;
     }
 
@@ -260,6 +270,7 @@ const wchar_t* CJpgLoader::GetPath()
 void CJpgLoader::Destroy()
 {   
     path = L"";
+    CImageLoader::Destroy();
 }
 bool CJpgLoader::IsOpened()
 {

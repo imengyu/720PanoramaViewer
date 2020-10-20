@@ -5,6 +5,7 @@
 #include "CGameRenderer.h"
 #include "CAboutDialog.h"
 #include "CHelpDialog.h"
+#include "CRegDialog.h"
 #include "SystemHelper.h"
 #include "StringSplit.h"
 #include "StringHlp.h"
@@ -41,6 +42,10 @@ LRESULT CALLBACK  CApp::mainWndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM
 	case WM_CUSTOM_SHOW_HELPBOX: {
 		CHelpDialog::Show(hWnd);
 		Instance->gameRenderer->NotifyHelpDialogClosed();
+		break;
+	}
+	case WM_CUSTOM_SHOW_REG: {
+		CRegDialog::Show(hWnd);
 		break;
 	}
 	case WM_CUSTOM_OPEN_FILE: {

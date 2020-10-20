@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "StringHlp.h"
+#include <string>
 
 std::string & FormatString(std::string & _str, const char * _Format, ...) {
 	std::string tmp;
@@ -100,6 +101,24 @@ StringHlp::StringHlp()
 }
 StringHlp::~StringHlp()
 {
+}
+
+std::string StringHlp::GetFileSizeStringAuto(long long byteSize) {
+	std::string sizeStr;
+	double size;
+	if (byteSize >= 1073741824) {
+		size = round(byteSize / 1073741824 * 100.0f) / 100.0f;
+		sizeStr = FormatString("%.2fG", size);
+	}
+	else if (byteSize >= 1048576) {
+		size = round(byteSize / 1048576 * 100.0f) / 100.0f;
+		sizeStr = FormatString("%.2fM", size);
+	}
+	else {
+		size = round(byteSize / 1024 * 100.0f) / 100.0f;
+		sizeStr = FormatString("%.2fK", size);
+	}
+	return sizeStr;
 }
 
 std::string *StringHlp::FormatStringPtr2A(std::string *_str, const char * _Format, ...) {
@@ -218,6 +237,45 @@ wchar_t* StringHlp::Utf8ToUnicode(const char* szU8)
 	::MultiByteToWideChar(CP_UTF8, NULL, szU8, (int)strlen(szU8), wszString, wcsLen);
 	//最后加上'\0'
 	wszString[wcsLen] = '\0';
+	return wszString;
+}
+
+std::string  StringHlp::UnicodeToAnsi(std::wstring szStr)
+{
+	int nLen = WideCharToMultiByte(CP_ACP, 0, szStr.c_str(), -1, NULL, 0, NULL, NULL);
+	if (nLen == 0)
+		return NULL;
+	std::string pResult;
+	pResult.resize(nLen);
+	WideCharToMultiByte(CP_ACP, 0, szStr.c_str(), -1, (LPSTR)pResult.data(), nLen, NULL, NULL);
+	return pResult;
+}
+
+std::string StringHlp::UnicodeToUtf8(std::wstring unicode)
+{
+	int len;
+	len = WideCharToMultiByte(CP_UTF8, 0, unicode.c_str(), -1, NULL, 0, NULL, NULL);
+	std::string  szUtf8;
+	szUtf8.resize(len);
+	WideCharToMultiByte(CP_UTF8, 0, unicode.c_str(), -1, (LPSTR)szUtf8.data(), len, NULL, NULL);
+	return szUtf8;
+}
+std::wstring StringHlp::AnsiToUnicode(std::string szStr)
+{
+	int nLen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szStr.c_str(), -1, NULL, 0);
+	if (nLen == 0)
+		return NULL;
+	std::wstring  pResult;
+	pResult.resize(nLen + 1);
+	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szStr.c_str(), -1, (LPWSTR)pResult.data(), nLen);
+	return pResult;
+}
+std::wstring StringHlp::Utf8ToUnicode(std::string szU8)
+{
+	int wcsLen = ::MultiByteToWideChar(CP_UTF8, NULL, szU8.c_str(), szU8.size(), NULL, 0);
+	std::wstring wszString;
+	wszString.resize(wcsLen + 1) ;
+	::MultiByteToWideChar(CP_UTF8, NULL, szU8.c_str(), szU8.size(), (LPWSTR)wszString.data(), wcsLen);
 	return wszString;
 }
 

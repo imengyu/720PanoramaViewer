@@ -456,6 +456,15 @@
     <ClCompile Include="GlUtils.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="PathHelper.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCGUInfo.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CRegDialog.cpp">
+      <Filter>源文件\Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -728,6 +737,15 @@
     <ClInclude Include="GlUtils.h">
       <Filter>头文件\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="PathHelper.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCGUInfo.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CRegDialog.h">
+      <Filter>头文件\Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3DImageViewer.rc">
@@ -762,6 +780,9 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="logo-small.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="help.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

@@ -18,6 +18,7 @@ public:
 	static void UnUse();	
 	bool Loaded();
 
+	bool alpha = false;
 	int width = 0;
 	int height = 0;
 	GLuint texture = 0;

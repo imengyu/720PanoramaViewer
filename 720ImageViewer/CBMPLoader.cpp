@@ -130,6 +130,7 @@ void CBMPLoader::Destroy()
         fclose(file);
         file = nullptr;
     }
+    CImageLoader::Destroy();
 }
 
 bool CBMPLoader::IsOpened()

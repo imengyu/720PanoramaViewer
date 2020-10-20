@@ -80,6 +80,8 @@ void CCTextureLoadQueue::ResolveRender()
 			default:
 				break;
 			}
+			if(result->buffer)
+				free(result->buffer);
 			delete result;
 			pendingLoadDataTexture->pendingResult = nullptr;
 		}

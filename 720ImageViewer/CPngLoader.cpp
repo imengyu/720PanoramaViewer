@@ -118,6 +118,7 @@ void CPngLoader::Destroy()
         fclose(file);
         file = nullptr;
     }
+    CImageLoader::Destroy();
 }
 
 bool CPngLoader::IsOpened()

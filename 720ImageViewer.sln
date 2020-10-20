@@ -3,12 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "720ImageViewerCenter", "720ImageViewerCenter\720ImageViewerCenter.csproj", "{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "720ImageViewer", "720ImageViewer\3DImageViewer.vcxproj", "{5FFA5D96-32C6-4BF9-B59E-2E7773C35282}"
-	ProjectSection(ProjectDependencies) = postProject
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B} = {97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,18 +15,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Debug|x64.Build.0 = Debug|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Debug|x86.Build.0 = Debug|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Release|x64.ActiveCfg = Release|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Release|x64.Build.0 = Release|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Release|x86.ActiveCfg = Release|Any CPU
-		{97CFC452-DB7D-46DB-A9F9-F8A11D93D61B}.Release|x86.Build.0 = Release|Any CPU
 		{5FFA5D96-32C6-4BF9-B59E-2E7773C35282}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{5FFA5D96-32C6-4BF9-B59E-2E7773C35282}.Debug|Any CPU.Build.0 = Debug|Win32
 		{5FFA5D96-32C6-4BF9-B59E-2E7773C35282}.Debug|x64.ActiveCfg = Debug|x64

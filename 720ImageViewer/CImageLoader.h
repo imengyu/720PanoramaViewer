@@ -1,6 +1,10 @@
 #pragma once
 #include "stdafx.h"
 
+struct ImageFileInfo {
+	long long fileSize;
+	std::string Create, Access, Write;
+};
 enum ImageType {
 	Unknow,
 	BMP,
@@ -22,10 +26,10 @@ public:
 
 	const wchar_t* GetLastError();
 	unsigned long GetFullDataSize();
-
 	unsigned long GetChunkDataSize();
 
 	virtual const wchar_t* GetPath();
+	ImageFileInfo* GetImageFileInfo();
 	virtual bool Load(const wchar_t*path);
 	virtual void Destroy();
 	virtual bool IsOpened();
@@ -44,5 +48,6 @@ protected:
 	unsigned long chunkDataSize = 0;
 private:
 	std::wstring lastError = std::wstring(L"Not implemented");
+	ImageFileInfo* currentImageInfo = nullptr;
 };
 

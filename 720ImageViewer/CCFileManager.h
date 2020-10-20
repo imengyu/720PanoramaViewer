@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "CImageLoader.h"
+#include <string>
 
 //¼ÓÔØÌùÍ¼»Øµ÷
 typedef void (*CCFileManagerOnCloseCallback)(void* data);
@@ -14,6 +15,7 @@ public:
 
 	void OpenFile();
 	void CloseFile();
+	std::wstring  GetCurrentFileName();
 	bool DoOpenFile(const wchar_t* path);
 
 	static const std::wstring GetResourcePath(const wchar_t* typeName, const wchar_t* name);
@@ -28,6 +30,8 @@ public:
 		onCloseCallback = c;
 		onCloseCallbackData = data;
 	}
+
+	bool ImageRatioNotStandard = false;
 
 	const wchar_t* GetLastError();
 private:

@@ -5,10 +5,12 @@
 #include "CCPanoramaCamera.h"
 #include "CCPanoramaRenderer.h"
 #include "CCTextureLoadQueue.h"
+#include "CCModel.h"
 #include "CCFileManager.h"
+#include "CCGUInfo.h"
 #include "CAppUIWapper.h"
 #include "CApp.h"
-#include "CCModel.h"
+
 #include <vector>
 
 //全景模式
@@ -30,10 +32,10 @@ public:
 
 	void SetOpenFilePath(const wchar_t* path);
 	void DoOpenFile();
-	void TestSplitImageAndLoadTexture();
 	void NotifyAboutDialogClosed() { about_dialog_showed = false; }
 	void NotifyHelpDialogClosed() { help_dialog_showed = false; }
 	void AddTextureToQueue(CCTexture* tex, int x, int y, int id);
+	CCGUInfo* GetGUInfo() { return uiInfo; }
 
 private:
 
@@ -57,9 +59,11 @@ private:
 	CAppUIWapper*uiWapper = nullptr;
 	CCTextureLoadQueue*texLoadQueue = nullptr;
 
-
+	char* GetCurrentPanoramaModeStr();
 
 	//UI控制
+
+	CCGUInfo* uiInfo = nullptr;
 
 	bool debug_tool_active = false;
 	bool show_console = false;
@@ -72,11 +76,19 @@ private:
 	bool glinfo_dialog_active = false;
 	bool render_dialog_active = false;
 	bool loading_dialog_active = false;
+	bool welecome_dialog_active = true;
+	bool reg_dialog_showed = false;
+
+	int zoom_slider_value = 50;
 
 	bool destroying = false;
 	bool needTestImageAndSplit = false;
 	bool firstMouse = true;
 	float lastX = 0, lastY = 0, xoffset = 0, yoffset = 0;
+	float loopCount = 0;
+
+	void LoadImageInfo();
+	void TestSplitImageAndLoadTexture();
 
 	TextureLoadQueueDataResult* LoadChunkTexCallback(TextureLoadQueueInfo* info, CCTexture* texture);
 	static TextureLoadQueueDataResult* LoadTexCallback(TextureLoadQueueInfo* info, CCTexture* texture, void* data);
@@ -87,6 +99,8 @@ private:
 
 	void SwitchMode(PanoramaMode mode);
 	void UpdateConsoleState();
+
+	void LoadAndChechRegister();
 
 	float MouseSensitivity = 0.1f;
 	float RoateSpeed = 20.0f;

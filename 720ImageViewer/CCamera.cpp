@@ -28,6 +28,21 @@ void CCamera::SetRotation(glm::vec3 rotation)
 	updateCameraVectors();
 }
 
+void CCamera::SetFOV(float fov)
+{
+	if (FiledOfView != fov) {
+		FiledOfView = fov;
+		if (fovChangedCallback)
+			fovChangedCallback(fovChangedCallbackData, FiledOfView);
+	}
+}
+
+void CCamera::SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data)
+{
+	fovChangedCallback = callback;
+	fovChangedCallbackData = data;
+}
+
 void CCamera::ForceUpdate() {
 	updateCameraVectors();
 }

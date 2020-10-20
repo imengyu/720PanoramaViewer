@@ -22,7 +22,6 @@ enum class CCameraMovement {
 
 class CCPanoramaCamera;
 
-typedef void(*CCPanoramaCameraFovChangedCallback)(void* data, float fov); 
 typedef void(*CCPanoramaCameraCallback)(void* data, CCPanoramaCamera* cam);
 
 //全景摄像机
@@ -41,8 +40,6 @@ public:
 	//设置模式
 	void SetMode(CCPanoramaCameraMode mode);
 
-	void SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback, void*data);
-
 	void SetRotateCallback(CCPanoramaCameraCallback callback, void* data);
 
 
@@ -59,8 +56,6 @@ public:
 	float MouseSensitivity = DEF_SENSITIVITY;
 
 private:
-	CCPanoramaCameraFovChangedCallback fovChangedCallback = nullptr;
-	void* fovChangedCallbackData = nullptr;
 	CCPanoramaCameraCallback rotateCallback = nullptr;
 	void* rotateCallbackData = nullptr;
 
