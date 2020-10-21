@@ -24,12 +24,12 @@ void CCPanoramaRenderer::Init()
     glDisable(GL_DEPTH_TEST);
     glEnableClientState(GL_VERTEX_ARRAY);
 
+    LoadBuiltInResources();
+
     staticTexPool.push_back(uiLogoTex);
     staticTexPool.push_back(uiOpenButtonTex);
     staticTexPool.push_back(uiTitleTex);
-    staticTexPool.push_back(uiOpenButtonTex);
-
-    LoadBuiltInResources();
+    staticTexPool.push_back(uiFailedTex);
 
     shader = new CCShader(
         CCFileManager::GetResourcePath("shader", "Standard_vertex.glsl").c_str(),
@@ -66,6 +66,10 @@ void CCPanoramaRenderer::Destroy()
         delete mainModel;
         mainModel = nullptr;
     }
+    if (mainFlatModel != nullptr) {
+        delete mainFlatModel;
+        mainFlatModel = nullptr;
+    }
     if (staticTexPool.size() > 0) {
         std::vector<CCTexture*>::iterator it;
         for (it = staticTexPool.begin(); it != staticTexPool.end(); it++) {
@@ -91,13 +95,22 @@ void CCPanoramaRenderer::Render(float deltaTime)
     model = mainModel->GetMatrix();
     glUniformMatrix4fv(globalRenderInfo->modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-    //绘制外层缩略图
-    glUniform1i(globalRenderInfo->useColorLoc, 0);
-    if(!renderNoPanoramaSmall) RenderThumbnail();
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glPolygonMode(GL_BACK, GL_LINE);
 
-    //绘制区块式完整全景球
-    if (renderPanoramaFull)
-        RenderFullChunks(deltaTime);
+    //完整绘制
+    glUniform1i(globalRenderInfo->useColorLoc, 0);
+    if (renderOn) {
+        //绘制外层缩略图
+        if (!renderNoPanoramaSmall) RenderThumbnail();
+
+        //绘制区块式完整全景球
+        if (renderPanoramaFull)
+            RenderFullChunks(deltaTime);
+
+        if (renderPanoramaFlat)
+            RenderFlat();
+    }
 
     //绘制测试
     if (renderPanoramaFullTest) {
@@ -113,10 +126,17 @@ void CCPanoramaRenderer::Render(float deltaTime)
 
     //绘制调试线框
     if (renderDebugWireframe) {
+
+        glPolygonMode(GL_FRONT, GL_LINE);
+        glPolygonMode(GL_BACK, GL_LINE);
         glUniform1i(globalRenderInfo->useColorLoc, 1);
         glUniform3f(globalRenderInfo->ourColorLoc, wireframeColor.r, wireframeColor.g, wireframeColor.b);
         glColor3f(wireframeColor.r, wireframeColor.g, wireframeColor.b);
-        RenderThumbnail(true);
+
+        if (renderPanoramaFlat)
+            RenderFlat();
+        else 
+            RenderThumbnail();
     }
     //绘制向量标线
     if (renderDebugVector) {
@@ -148,12 +168,57 @@ void CCPanoramaRenderer::Render(float deltaTime)
 }
 
 void CCPanoramaRenderer::CreateMainModel() {
+
     mainModel = new CCModel();
     mainModel->Mesh = new CCMesh();
     mainModel->Material = new CCMaterial(panoramaCheckTex);
     mainModel->Material->tilling = glm::vec2(50.0f, 25.0f);
 
     CreateMainModelSphereMesh(mainModel->Mesh);
+
+    mainFlatModel = new CCModel();
+    mainFlatModel->Mesh = new CCMesh();
+    mainFlatModel->Mesh->DrawType = GL_DYNAMIC_DRAW;
+    mainFlatModel->Material = new CCMaterial(panoramaCheckTex);
+    mainFlatModel->Material->tilling = glm::vec2(50.0f, 25.0f);
+
+    CreateMainModelFlatMesh(mainFlatModel->Mesh);
+}
+void CCPanoramaRenderer::CreateMainModelFlatMesh(CCMesh* mesh) {
+    mesh->normals.clear();
+    mesh->positions.clear();
+    mesh->texCoords.clear();
+    mesh->indices.clear();
+
+    float ustep = 1.0f / sphereSegmentX, vstep = 1.0f / sphereSegmentY;
+    float u = 0, v = 0;
+
+    for (int j = 0; j <= sphereSegmentY; j++, v += vstep) {
+        u = 0;
+        for (int i = 0; i <= sphereSegmentX; i++, u += ustep) {
+            mesh->positions.push_back(glm::vec3(0.5f - u, (0.5f - v) / 2.0f, 0.0f));
+            mesh->texCoords.push_back(glm::vec2(1.0f - u, v));
+        }
+    }
+
+
+    int vertices_line_count = sphereSegmentX + 1;
+    for (int j = 0, c = sphereSegmentY; j < c; j++) {
+        int line_start_pos = (j)*vertices_line_count;
+        for (int i = 0; i < sphereSegmentX; i++) {
+
+            mesh->indices.push_back(CCFace(line_start_pos + i, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count, 0, -1));
+
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + 1, 0, -1));
+        }
+    }
+
+    //创建缓冲区
+    mesh->GenerateBuffer();
 }
 void CCPanoramaRenderer::CreateMainModelSphereMesh(CCMesh* mesh) {
 
@@ -281,6 +346,9 @@ void CCPanoramaRenderer::LoadBuiltInResources() {
     uiLogoTex = new CCTexture();
     uiLogoTex->Load(CCFileManager::GetResourcePath(L"textures", L"logo.png").c_str());
 
+    uiFailedTex = new CCTexture();
+    uiFailedTex->Load(CCFileManager::GetResourcePath(L"textures", L"icon_image_error.jpg").c_str());
+
     uiOpenButtonTex = new CCTexture();
     uiOpenButtonTex->Load(CCFileManager::GetResourcePath(L"textures", L"open_file.jpg").c_str());
 
@@ -291,7 +359,7 @@ void CCPanoramaRenderer::LoadBuiltInResources() {
     testModel->Mesh = new CCMesh();
 
     CCMeshLoader::GetMeshLoaderByType(MeshTypeObj)->Load(
-        CCFileManager::GetResourcePath(L"prefabs", L"teapot.obj").c_str(),
+        CCFileManager::GetResourcePath(L"prefabs", L"cube.obj").c_str(),
         testModel->Mesh);
 
     testModel->Material = new CCMaterial(panoramaRedCheckTex);
@@ -369,15 +437,39 @@ void CCPanoramaRenderer::RotateModel(float xoffset, float yoffset)
 
     UpdateFullChunksVisible();
 }
+void CCPanoramaRenderer::RotateModelForce(float y, float z)
+{
+    mainModel->Rotation.y += y;
+    mainModel->Rotation.z += z;
+    mainModel->UpdateVectors();
+
+    UpdateFullChunksVisible();
+}
+void CCPanoramaRenderer::MoveModel(float xoffset, float yoffset)
+{
+    mainModel->Positon.x -= xoffset;
+    mainModel->Positon.y -= yoffset;
+
+    if (mainModel->Positon.x < FlatModelMin.x) mainModel->Positon.x = FlatModelMin.x;
+    if (mainModel->Positon.y < FlatModelMin.y) mainModel->Positon.y = FlatModelMin.y;
+    if (mainModel->Positon.x > FlatModelMax.x) mainModel->Positon.x = FlatModelMax.x;
+    if (mainModel->Positon.y > FlatModelMax.y) mainModel->Positon.y = FlatModelMax.y;
+}
+void CCPanoramaRenderer::MoveModelForce(float x, float y)
+{
+    mainModel->Positon.y += y;
+    mainModel->Positon.x += x;
+
+    if (mainModel->Positon.x < FlatModelMin.x) mainModel->Positon.x = FlatModelMin.x;
+    if (mainModel->Positon.y < FlatModelMin.y) mainModel->Positon.y = FlatModelMin.y;
+    if (mainModel->Positon.x > FlatModelMax.x) mainModel->Positon.x = FlatModelMax.x;
+    if (mainModel->Positon.y > FlatModelMax.y) mainModel->Positon.y = FlatModelMax.y;
+}
 
 //渲染
 
-void CCPanoramaRenderer::RenderThumbnail(bool wireframe)
+void CCPanoramaRenderer::RenderThumbnail()
 {
-    glPolygonMode(GL_FRONT, wireframe ? GL_LINE : GL_FILL);
-    glPolygonMode(GL_BACK, GL_LINE);
-
-    //绘制
     mainModel->Render();
 }
 void CCPanoramaRenderer::RenderFullChunks(float deltaTime)
@@ -401,6 +493,9 @@ void CCPanoramaRenderer::RenderFullChunks(float deltaTime)
         }
     }
 }
+void CCPanoramaRenderer::RenderFlat() {
+    mainFlatModel->Render();
+}
 
 //更新
 
@@ -409,10 +504,14 @@ void CCPanoramaRenderer::UpdateMainModelTex()
     if (panoramaThumbnailTex) {
         mainModel->Material->diffuse = panoramaThumbnailTex;
         mainModel->Material->tilling = glm::vec2(1.0f);
+        mainFlatModel->Material->diffuse = panoramaThumbnailTex;
+        mainFlatModel->Material->tilling = glm::vec2(1.0f);
     }
     else {
         mainModel->Material->diffuse = panoramaCheckTex;
         mainModel->Material->tilling = glm::vec2(50.0f);
+        mainFlatModel->Material->diffuse = panoramaCheckTex;
+        mainFlatModel->Material->tilling = glm::vec2(50.0f);
     }
 }
 void CCPanoramaRenderer::UpdateFullChunksVisible() {
@@ -441,6 +540,11 @@ void CCPanoramaRenderer::UpdateFullChunksVisible() {
             }
         }
     }
+}
+void CCPanoramaRenderer::UpdateFlatModelMinMax(float orthoSize) {
+    FlatModelMin = glm::vec2(-((1.0f - orthoSize) / 2.0f), -((1.0f - orthoSize) / 4.0f));
+    FlatModelMax = glm::vec2((1.0f - orthoSize) / 2.0f, (1.0f - orthoSize) / 4.0f);
+    MoveModelForce(0, 0);
 }
 
 bool CCPanoramaRenderer::IsInView(glm::vec3 worldPos)

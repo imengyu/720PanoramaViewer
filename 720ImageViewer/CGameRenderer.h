@@ -16,9 +16,11 @@
 //全景模式
 enum PanoramaMode {
 	PanoramaSphere,
+	PanoramaCylinder,
 	PanoramaAsteroid,
 	PanoramaOuterBall,
-	PanoramaCylinder,
+	PanoramaFullOrginal,
+	PanoramaModeMax,
 	PanoramaMercator,
 	PanoramaFull360,
 };
@@ -56,6 +58,8 @@ private:
 	void Resize(int Width, int Height) override;
 	void Destroy() override;
 
+	char* GetPanoramaModeStr(PanoramaMode mode);
+
 	//全景模式
 	PanoramaMode mode = PanoramaMode::PanoramaSphere;
 	CCPanoramaCamera*camera = nullptr;
@@ -64,7 +68,7 @@ private:
 	CAppUIWapper*uiWapper = nullptr;
 	CCTextureLoadQueue*texLoadQueue = nullptr;
 
-	char* GetCurrentPanoramaModeStr();
+	void ShowErrorDialog();
 
 	//UI控制
 
@@ -86,14 +90,18 @@ private:
 	bool render_dialog_active = false;
 	bool loading_dialog_active = false;
 	bool welecome_dialog_active = true;
+	bool image_err_dialog_active = false;
 	bool reg_dialog_showed = false;
 	bool file_opened = false;
+
+	std::string last_image_error;
 
 	float current_fps = 0;
 	DWORD current_draw_time = 0;
 
 	int zoom_slider_value = 50;
 
+	bool render_init_finish = false;
 	bool should_open_file = false;
 	bool should_close_file = false;
 	bool delete_after_close = false;
@@ -110,6 +118,7 @@ private:
 	static TextureLoadQueueDataResult* LoadTexCallback(TextureLoadQueueInfo* info, CCTexture* texture, void* data);
 	static void FileCloseCallback(void* data);
 	static void CameraFOVChanged(void* data, float fov);
+	static void CameraOrthoSizeChanged(void* data, float fov);
 	static void CameraRotate(void* data, CCPanoramaCamera* cam);
 	static void BeforeQuitCallback(COpenGLView* view);
 

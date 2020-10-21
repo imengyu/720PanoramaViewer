@@ -152,9 +152,9 @@ void COpenGLView::InitImgui() {
 	ImFontGlyphRangesBuilder myGlyph;
 
 	myGlyph.AddText(u8"1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,./<>?;:\"'{}[]|\\+_-=()：；\
-*&^%$#@!~`，。《》￥ 关于文件修这是一个简易删除它的全景期图查看软件染支持多种投影方式可快速打开您浏览程序信息好欢迎使用请先提渲\
-示确定设置模式帮日助能全屏未调试退出显示控制台配使用球栏面平小行星水晶球单闭当前载入中稍后此案像该球体轴分段失败误错不灰度色或位格\
-非常大很抱歉我们改暂时加缩细放更器帧率限需要重新启动才生效视暂停状态工其他具＋－─");
+*&^%$#@!~`，。《》￥ 关于文件修这是一个简易删除它的全景期图查看无软件染支持多种投影方式回可快速打开您浏览程序信息好欢迎使用请先提渲\
+示确定设置模入帮日助能全屏未调试退返出显示控制前载台配使用球栏面平小行星水晶球单闭当中稍后此案像该球体轴分段失败误错不灰度色或位格\
+非常大很抱歉我们改暂时加缩细放更器帧率限需要重新损坏启动才生效视暂停状态工其他具无法深颜类型已经原始＋－─");
 	//
 	myGlyph.BuildRanges(&myRange);
 
@@ -349,7 +349,10 @@ void COpenGLView::CalcMainCameraProjection(CCShader* shader)
 		//摄像机投影
 		Camera->projection = Camera->Projection == CCameraProjection::Perspective ?
 			glm::perspective(glm::radians(Camera->FiledOfView), (float)Width / (float)Height, Camera->ClippingNear, Camera->ClippingFar) :
-			glm::ortho(-(float)Width / (float)Height, (float)Width / (float)Height, Camera->OrthographicSize, 0.0f, Camera->ClippingNear, Camera->ClippingFar);
+			glm::ortho(-Camera->OrthographicSize / 2,  Camera->OrthographicSize / 2, 
+				-(Camera->OrthographicSize / 2),
+				(Camera->OrthographicSize / 2),
+				Camera->ClippingNear, Camera->ClippingFar);
 		glUniformMatrix4fv(shader->projectionLoc, 1, GL_FALSE, glm::value_ptr(Camera->projection));
 	}
 }

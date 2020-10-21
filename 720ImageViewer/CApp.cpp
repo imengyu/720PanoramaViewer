@@ -53,7 +53,7 @@ LRESULT CALLBACK  CApp::mainWndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM
 		if (SystemHelper::ChooseOneFile(hWnd, NULL, L"请选择一个全景图", L"图片文件\0*.jpg;*.png;*.bmp\0所有文件(*.*)\0*.*\0\0\0",
 			strFilename, NULL, strFilename, MAX_PATH)) {
 			Instance->gameRenderer->SetOpenFilePath(strFilename);
-			Instance->gameRenderer->DoOpenFile();
+			Instance->gameRenderer->MarkShouldOpenFile();
 		}
 		break;
 	}
@@ -70,7 +70,7 @@ LRESULT CALLBACK  CApp::mainWndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM
 			if ((dwAttribute & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 			{
 				Instance->gameRenderer->SetOpenFilePath(szFileName);
-				Instance->gameRenderer->DoOpenFile();
+				Instance->gameRenderer->MarkShouldOpenFile();
 			}
 		}
 
@@ -81,7 +81,7 @@ LRESULT CALLBACK  CApp::mainWndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM
 		std::wstring path = Instance->settings->GetSettingStr(L"NextOpenFilePath", L"", 512);
 		if (_waccess_s(path.c_str(), 0) == 0) {
 			Instance->gameRenderer->SetOpenFilePath(path.c_str());
-			Instance->gameRenderer->DoOpenFile();
+			Instance->gameRenderer->MarkShouldOpenFile();
 		}
 		break;
 	}

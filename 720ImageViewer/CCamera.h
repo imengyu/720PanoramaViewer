@@ -33,7 +33,7 @@ public:
 	// 摄像机FOV
 	float FiledOfView = DEF_FOV;
 	//正交投影摄像机视图垂直方向的大小
-	float OrthographicSize = 5.0f;
+	float OrthographicSize = 1.0f;
 	//剪裁平面近端
 	float ClippingNear = 0.1f;
 	//剪裁平面远端
@@ -49,6 +49,7 @@ public:
 	glm::mat4 GetViewMatrix();
 
 	void SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data);
+	void SetOrthoSizeChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data);
 
 	void SetPosItion(glm::vec3 position);
 	void SetRotation(glm::vec3 rotation);
@@ -110,5 +111,6 @@ protected:
 
 	CCPanoramaCameraFovChangedCallback fovChangedCallback = nullptr;
 	void* fovChangedCallbackData = nullptr;
-
+	CCPanoramaCameraFovChangedCallback orthoSizeChangedCallback = nullptr;
+	void* orthoSizeChangedCallbackData = nullptr;
 };

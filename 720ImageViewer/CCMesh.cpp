@@ -14,6 +14,12 @@ CCMesh::~CCMesh()
 
 void CCMesh::GenerateBuffer()
 {
+	//VBO
+	glGenBuffers(1, &MeshVBO);
+	ReBufferData();
+}
+void CCMesh::ReBufferData()
+{
 	size_t indices_size = indices.size();
 	size_t positions_size = positions.size();
 	size_t normals_size = normals.size();
@@ -36,11 +42,8 @@ void CCMesh::GenerateBuffer()
 		vertices_temp.push_back(texCoord.y);
 	}
 
-	//VBO
-
-	glGenBuffers(1, &MeshVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, MeshVBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices_temp.size() * sizeof(GLfloat), &vertices_temp[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices_temp.size() * sizeof(GLfloat), &vertices_temp[0], DrawType);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 void CCMesh::ReleaseBuffer()

@@ -8,6 +8,21 @@ CAppUIWapper::~CAppUIWapper()
 {
 }
 
+void CAppUIWapper::MessageBeep(CAppUIMessageBoxIcon ico)
+{
+	switch (ico)
+	{
+	case IconInfo:
+		::MessageBeep(MB_ICONINFORMATION);
+		break;
+	case IconWarning:
+		::MessageBeep(MB_ICONEXCLAMATION);
+		break;
+	case IconError:
+		::MessageBeep(MB_ICONERROR);
+		break;
+	}
+}
 void CAppUIWapper::ShowMessageBox(const wchar_t* str, const wchar_t* title)
 {
 	MessageBox(view->GetHWND(), str, title, MB_OK);

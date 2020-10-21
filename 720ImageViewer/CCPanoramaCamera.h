@@ -6,7 +6,8 @@
 enum class CCPanoramaCameraMode {
 	CenterRoate,
 	OutRoataround,
-	Static = 3,
+	Static,
+	OrthoZoom,
 };
 //摄像机移动选项
 enum class CCameraMovement {
@@ -54,6 +55,9 @@ public:
 	float MovementSpeed = DEF_SPEED;
 	float RoateSpeed = DEF_ROATE_SPEED;
 	float MouseSensitivity = DEF_SENSITIVITY;
+	float OrthoSizeMin = 0.2f;
+	float OrthoSizeMax = 1.0f;
+	float OrthoSizeZoomSpeed = 0.001f;
 
 private:
 	CCPanoramaCameraCallback rotateCallback = nullptr;

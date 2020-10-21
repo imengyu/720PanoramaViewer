@@ -26,13 +26,13 @@ void CGameRenderer::DoOpenFile()
     loading_dialog_active = true;
     if (fileManager->DoOpenFile(currentOpenFilePath.c_str())) {
 
-        if (fileManager->ImageRatioNotStandard) {
+        if (fileManager->ImageRatioNotStandard && mode <= PanoramaMode::PanoramaOuterBall) {
             if (uiWapper->ShowConfirmBox(L"看起来这张图片的长宽比不是 2:1，不是标准的720度全景图像，如果要显示此图像，可能会导致图像变形，是否继续？", 
                 L"提示", L"", L"", CAppUIMessageBoxIcon::IconWarning) == CAppUIMessageBoxResult::ResultCancel)
             {
                 welecome_dialog_active = true;
                 file_opened = false;
-                renderer->renderNoPanoramaSmall = true;
+                renderer->renderOn = false;
                 loading_dialog_active = false;
                 return;
             }
@@ -49,15 +49,20 @@ void CGameRenderer::DoOpenFile()
         needTestImageAndSplit = true;
         welecome_dialog_active = false;
         file_opened = true;
-        renderer->renderNoPanoramaSmall = false;
+        renderer->renderOn = true;
     }
     else {
-        welecome_dialog_active = true;
-        file_opened = false;
-        renderer->renderNoPanoramaSmall = true;
-        loading_dialog_active = false;
-        uiWapper->ShowMessageBox(fileManager->GetLastError(), L"打开文件失败", IconWarning);
+        last_image_error = StringHlp::UnicodeToUtf8(std::wstring(fileManager->GetLastError()));
+        ShowErrorDialog();
     }
+}
+void CGameRenderer::ShowErrorDialog() {
+    welecome_dialog_active = false;
+    image_err_dialog_active = true;
+    file_opened = false;
+    renderer->renderOn = false;
+    loading_dialog_active = false;
+    uiWapper->MessageBeep(CAppUIMessageBoxIcon::IconWarning);
 }
 void CGameRenderer::LoadImageInfo() {
     //获取图片信息
@@ -96,6 +101,9 @@ void CGameRenderer::TestSplitImageAndLoadTexture() {
         renderer->sphereFullSegmentY = renderer->sphereSegmentY + (renderer->sphereSegmentY % chunkHi);
         renderer->GenerateFullModel(chunkWi, chunkHi);
     }
+    else {
+        uiInfo->currentImageAllChunks = 0;
+    }
 
     SwitchMode(mode);
 }
@@ -115,6 +123,7 @@ bool CGameRenderer::Init()
     texLoadQueue->SetLoadHandle(LoadTexCallback, this);
     camera->SetMode(CCPanoramaCameraMode::CenterRoate);
     camera->SetFOVChangedCallback(CameraFOVChanged, this);
+    camera->SetOrthoSizeChangedCallback(CameraOrthoSizeChanged, this);
     camera->SetRotateCallback(CameraRotate, this);
     camera->Background = CColor::FromString("#FFFFFF");
     fileManager->SetOnCloseCallback(FileCloseCallback, this);
@@ -125,13 +134,14 @@ bool CGameRenderer::Init()
     View->SetScrollCallback(ScrollCallback);
 
     LoadSettings();
-    SwitchMode(PanoramaMode::PanoramaSphere);
+    SwitchMode(mode);
 
     //renderer->renderPanoramaFullTest = true;
     //renderer->renderPanoramaFullRollTest = true;
     //renderer->renderPanoramaATest = true;
     //TestSplitImageAndLoadTexture();
 
+    render_init_finish = true;
 	return true;
 }
 void CGameRenderer::Destroy()
@@ -164,7 +174,7 @@ void CGameRenderer::Destroy()
         renderer = nullptr;
     }
 }
-char* CGameRenderer::GetCurrentPanoramaModeStr()
+char* CGameRenderer::GetPanoramaModeStr(PanoramaMode mode)
 {
     switch (mode)
     {
@@ -180,6 +190,8 @@ char* CGameRenderer::GetCurrentPanoramaModeStr()
         return (char*)u8"全景";
     case PanoramaFull360:
         return (char*)u8"360度全景";
+    case PanoramaFullOrginal:
+        return (char*)u8"原始图像";
     default:
         break;
     }
@@ -226,15 +238,21 @@ void CGameRenderer::MouseCallback(COpenGLView* view, float xpos, float ypos, int
             renderer->lastY = ypos;
 
             //旋转球体
-            if (renderer->mode == PanoramaMode::PanoramaOuterBall || renderer->mode == PanoramaMode::PanoramaSphere
-                || renderer->mode == PanoramaMode::PanoramaAsteroid || renderer->mode == PanoramaMode::PanoramaCylinder) {
+            if (renderer->mode <= PanoramaMode::PanoramaOuterBall) {
                 float xoffset = -renderer->xoffset * renderer->MouseSensitivity;
                 float yoffset = -renderer->yoffset * renderer->MouseSensitivity;
                 renderer->renderer->RotateModel(xoffset, yoffset);
             }
             //全景模式是更改U偏移和纬度偏移
+            else if(renderer->mode == PanoramaMode::PanoramaMercator) {
 
-
+            }
+            else if (renderer->mode == PanoramaMode::PanoramaFull360 
+                || renderer->mode == PanoramaMode::PanoramaFullOrginal) {
+                float xoffset = -renderer->xoffset * renderer->MouseSensitivity;
+                float yoffset = -renderer->yoffset * renderer->MouseSensitivity;
+                renderer->renderer->MoveModel(xoffset, yoffset);
+            }
         }
 
         renderer->main_menu_active = ypos < 100 || ypos >  renderer->View->Height - 70;
@@ -242,30 +260,43 @@ void CGameRenderer::MouseCallback(COpenGLView* view, float xpos, float ypos, int
 }
 void CGameRenderer::ScrollCallback(COpenGLView* view, float x, float yoffset, int button, int type) {
     CGameRenderer* renderer = (CGameRenderer*)view->GetRenderer();
-    if (renderer->mode <= PanoramaMode::PanoramaCylinder) {
-        renderer->camera->ProcessMouseScroll(yoffset);
-    }
+    renderer->camera->ProcessMouseScroll(yoffset);
 }
 void CGameRenderer::KeyMoveCallback(CCameraMovement move) {
-    if (mode == PanoramaMode::PanoramaOuterBall || mode == PanoramaMode::PanoramaSphere
-        || mode == PanoramaMode::PanoramaAsteroid || mode == PanoramaMode::PanoramaCylinder) {
+    if (mode <= PanoramaMode::PanoramaOuterBall) {
         switch (move)
         {
         case CCameraMovement::ROATE_UP:
-            renderer->mainModel->Rotation.z -= RoateSpeed * View->GetDeltaTime();
-            renderer->mainModel->UpdateVectors();
+            renderer->RotateModelForce(0, -RoateSpeed * View->GetDeltaTime());
             break;
         case CCameraMovement::ROATE_DOWN:
-            renderer->mainModel->Rotation.z += RoateSpeed * View->GetDeltaTime();
-            renderer->mainModel->UpdateVectors();
+            renderer->RotateModelForce(0, RoateSpeed * View->GetDeltaTime());
             break;
         case CCameraMovement::ROATE_LEFT:
-            renderer->mainModel->Rotation.y -= RoateSpeed * View->GetDeltaTime();
-            renderer->mainModel->UpdateVectors();
+            renderer->RotateModelForce(-RoateSpeed * View->GetDeltaTime(), 0);
             break;
         case CCameraMovement::ROATE_RIGHT:
-            renderer->mainModel->Rotation.y += RoateSpeed * View->GetDeltaTime();
-            renderer->mainModel->UpdateVectors();
+            renderer->RotateModelForce(RoateSpeed * View->GetDeltaTime(), 0);
+            break;
+        }
+    }
+    else if (mode == PanoramaMode::PanoramaMercator) {
+
+    }
+    else if (mode == PanoramaMode::PanoramaFull360 || mode == PanoramaMode::PanoramaFullOrginal) {
+        switch (move)
+        {
+        case CCameraMovement::ROATE_UP:
+            renderer->MoveModelForce(0, MouseSensitivity * View->GetDeltaTime());
+            break;
+        case CCameraMovement::ROATE_DOWN:
+            renderer->MoveModelForce(0, -MouseSensitivity * View->GetDeltaTime());
+            break;
+        case CCameraMovement::ROATE_LEFT:
+            renderer->MoveModelForce(-MouseSensitivity * View->GetDeltaTime(), 0);
+            break;
+        case CCameraMovement::ROATE_RIGHT:
+            renderer->MoveModelForce(MouseSensitivity * View->GetDeltaTime(), 0);
             break;
         }
     }
@@ -286,6 +317,7 @@ void CGameRenderer::LoadSettings()
     renderer->renderDebugVector = settings->GetSettingBool(L"renderDebugVector", false);
     renderer->sphereSegmentX = settings->GetSettingInt(L"sphereSegmentX", renderer->sphereSegmentX);
     renderer->sphereSegmentY = settings->GetSettingInt(L"sphereSegmentY", renderer->sphereSegmentY);
+    mode = (PanoramaMode)settings->GetSettingInt(L"LastMode", mode);
     View->IsFullScreen = settings->GetSettingBool(L"FullScreen", false);
     View->Width = settings->GetSettingInt(L"Width", 1024);
     View->Height = settings->GetSettingInt(L"Height", 768);
@@ -308,6 +340,7 @@ void CGameRenderer::SaveSettings()
     settings->SetSettingInt(L"Height", View->Height);
     settings->SetSettingInt(L"sphereSegmentX", renderer->sphereSegmentX);
     settings->SetSettingInt(L"sphereSegmentY", renderer->sphereSegmentY);
+    settings->SetSettingInt(L"LastMode", mode);
     settings->SetSettingBool(L"ShowFps", show_fps);
     settings->SetSettingBool(L"ShowStatusBar", show_status_bar);
 }
@@ -331,6 +364,11 @@ void CGameRenderer::Render(float FrameTime)
     //===========================
 
     texLoadQueue->ResolveRender();
+
+    if (should_open_file && render_init_finish) {
+        should_open_file = false;
+        DoOpenFile();
+    }
 
     if (needTestImageAndSplit) {
         needTestImageAndSplit = false;
@@ -385,12 +423,12 @@ void CGameRenderer::RenderUI()
                 if (file_opened) {
                     if (ImGui::BeginMenu(u8"模式"))
                     {
-                        if (ImGui::RadioButton(u8"球面", mode == PanoramaMode::PanoramaSphere)) SwitchMode(PanoramaMode::PanoramaSphere);
-                        if (ImGui::RadioButton(u8"平面", mode == PanoramaMode::PanoramaCylinder))  SwitchMode(PanoramaMode::PanoramaCylinder);
-                        if (ImGui::RadioButton(u8"小行星", mode == PanoramaMode::PanoramaAsteroid)) SwitchMode(PanoramaMode::PanoramaAsteroid);
-                        if (ImGui::RadioButton(u8"水晶球", mode == PanoramaMode::PanoramaOuterBall))  SwitchMode(PanoramaMode::PanoramaOuterBall);
-                        //if (ImGui::RadioButton(u8"全景", mode == PanoramaMode::PanoramaMercator))  SwitchMode(PanoramaMode::PanoramaMercator);
-                        //if (ImGui::RadioButton(u8"360全景", mode == PanoramaMode::PanoramaFull360))  SwitchMode(PanoramaMode::PanoramaFull360);
+                        for (int i = 0; i < PanoramaModeMax; i++) {
+                            if (ImGui::RadioButton(GetPanoramaModeStr((PanoramaMode)i), mode == (PanoramaMode)i)) {
+                                SwitchMode((PanoramaMode)i);
+                                ImGui::CloseCurrentPopup();
+                            }
+                        }
                         ImGui::EndMenu();
                     }
                     if (ImGui::MenuItem(u8"重置视图", "F10")) renderer->ResetModel();
@@ -480,7 +518,7 @@ void CGameRenderer::RenderUI()
         if (show_status_bar && file_opened) {
             //底栏左
             ImGui::SetNextWindowPos(ImVec2(0.0f, io.DisplaySize.y - 23.0f));
-            ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x - 260.0f, 23.0f));
+            ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x - 330.0f, 23.0f));
             ImGui::SetNextWindowBgAlpha(0.6f);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
@@ -532,8 +570,8 @@ void CGameRenderer::RenderUI()
             }
 
             //底栏右
-            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 260.0f, io.DisplaySize.y - 23.0f));
-            ImGui::SetNextWindowSize(ImVec2(260.0f, 23.0f));
+            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 330.0f, io.DisplaySize.y - 23.0f));
+            ImGui::SetNextWindowSize(ImVec2(330.0f, 23.0f));
             ImGui::SetNextWindowBgAlpha(0.6f);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
@@ -545,39 +583,22 @@ void CGameRenderer::RenderUI()
             if (open)
             {
                 //更改模式
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                ImGui::Button(u8"模式:"); ImGui::SameLine();
+                ImGui::PopStyleColor(1);
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.9f, 1.0f, 1.0f));
-                if (ImGui::Button(GetCurrentPanoramaModeStr()))
+                if (ImGui::Button(GetPanoramaModeStr(mode)))
                     ImGui::OpenPopup("mode_popup");
                 else if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
                     ImGui::SetTooltip(u8"更改全景模式");
                 if (ImGui::BeginPopup("mode_popup"))
                 {
-                    if (ImGui::RadioButton(u8"球面", mode == PanoramaMode::PanoramaSphere)) {
-                        SwitchMode(PanoramaMode::PanoramaSphere);
-                        ImGui::CloseCurrentPopup();
+                    for (int i = 0; i < PanoramaModeMax; i++) {
+                        if (ImGui::RadioButton(GetPanoramaModeStr((PanoramaMode)i), mode == (PanoramaMode)i)) {
+                            SwitchMode((PanoramaMode)i);
+                            ImGui::CloseCurrentPopup();
+                        }
                     }
-                    if (ImGui::RadioButton(u8"平面", mode == PanoramaMode::PanoramaCylinder)) {
-                        SwitchMode(PanoramaMode::PanoramaCylinder);
-                        ImGui::CloseCurrentPopup();
-                    }
-                    if (ImGui::RadioButton(u8"小行星", mode == PanoramaMode::PanoramaAsteroid)) {
-                        SwitchMode(PanoramaMode::PanoramaAsteroid);
-                        ImGui::CloseCurrentPopup();
-                    }
-                    if (ImGui::RadioButton(u8"水晶球", mode == PanoramaMode::PanoramaOuterBall)) {
-                        SwitchMode(PanoramaMode::PanoramaOuterBall);
-                        ImGui::CloseCurrentPopup();
-                    }
-                    /*
-                    if (ImGui::RadioButton(u8"全景", mode == PanoramaMode::PanoramaMercator)) {
-                        SwitchMode(PanoramaMode::PanoramaMercator);
-                        ImGui::CloseCurrentPopup();
-                    }
-                    if (ImGui::RadioButton(u8"360全景", mode == PanoramaMode::PanoramaFull360)) {
-                        SwitchMode(PanoramaMode::PanoramaFull360);
-                        ImGui::CloseCurrentPopup();
-                    }
-                    */
                     ImGui::EndMenu();
                 }
 
@@ -594,7 +615,7 @@ void CGameRenderer::RenderUI()
                 ImGui::SameLine();
 
                 //缩放工具
-                if (mode <= PanoramaMode::PanoramaCylinder) {
+                if (mode <= PanoramaMode::PanoramaOuterBall) {
                     if (ImGui::Button(u8"─"))
                         camera->ProcessMouseScroll(-120);
                     else  if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
@@ -605,6 +626,26 @@ void CGameRenderer::RenderUI()
                     ImGui::SetNextItemWidth(100.0f);
                     if (ImGui::SliderInt("", &zoom_slider_value, 0, 100, u8"缩放: %d%%"))
                         camera->SetFOV((1.0f - (zoom_slider_value / 100.0f)) * (camera->FovMax - camera->FovMin) + camera->FovMin);
+                    ImGui::SameLine();
+
+                    if (ImGui::Button(u8"＋"))
+                        camera->ProcessMouseScroll(120);
+                    else if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
+                        ImGui::SetTooltip(u8"放大");
+
+                    ImGui::SameLine();
+                }
+                else if(mode == PanoramaMode::PanoramaFull360 || mode == PanoramaMode::PanoramaFullOrginal) {
+                    if (ImGui::Button(u8"─"))
+                        camera->ProcessMouseScroll(-120);
+                    else  if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
+                        ImGui::SetTooltip(u8"缩小");
+
+                    ImGui::SameLine();
+
+                    ImGui::SetNextItemWidth(100.0f);
+                    if (ImGui::SliderInt("", &zoom_slider_value, 0, 100, u8"缩放: %d%%"))
+                        camera->SetFOV((1.0f - (zoom_slider_value / 100.0f)) * (camera->OrthoSizeMax - camera->OrthoSizeMin) + camera->OrthoSizeMin);
                     ImGui::SameLine();
 
                     if (ImGui::Button(u8"＋"))
@@ -655,35 +696,50 @@ void CGameRenderer::RenderUI()
 
         if (debug_tool_active_tab == 1) {
 
-            if (ImGui::SliderFloat3("Camera pos", glm::value_ptr(camera->Position), -5.0f, 5.0f)) camera->ForceUpdate();
-            if (ImGui::SliderFloat3("Camera roate", glm::value_ptr(camera->Rotate), -180.0f, 180.0f)) camera->ForceUpdate();
-            if (ImGui::SliderFloat("Camera fov", &camera->FiledOfView, 0.0f, 179.0f)) camera->ForceUpdate();
+            if (ImGui::CollapsingHeader("Camera")) {
 
-            ImGui::Separator();
+                if (ImGui::SliderFloat3("Pos", glm::value_ptr(camera->Position), -5.0f, 5.0f)) camera->ForceUpdate();
+                if (ImGui::SliderFloat3("Roate", glm::value_ptr(camera->Rotate), -180.0f, 180.0f)) camera->ForceUpdate();
+                if (ImGui::SliderFloat("Fov", &camera->FiledOfView, 0.0f, 179.0f)) camera->ForceUpdate();
+                ImGui::SliderFloat("OrthographicSize", &camera->OrthographicSize, 0.0f, 10.0f);
 
-            ImGui::SliderFloat("RoateSpeed", &camera->RoateSpeed, 0.0f, 40.0f);
-            ImGui::SliderFloat("MovementSpeed", &camera->MovementSpeed, 0.0f, 40.0f);
-            ImGui::SliderFloat("MouseSensitivity", &camera->MouseSensitivity, 0.0f, 1.0f);
+                const char* itemsProjection[] = { "Perspective", "Orthographic" };
+                ImGui::Combo("Projection", (int*)&camera->Projection, itemsProjection, IM_ARRAYSIZE(itemsProjection));
+            }
+            if (ImGui::CollapsingHeader("Camera Move")) {
+
+                ImGui::SliderFloat("RoateSpeed", &camera->RoateSpeed, 0.0f, 40.0f);
+                ImGui::SliderFloat("MovementSpeed", &camera->MovementSpeed, 0.0f, 40.0f);
+                ImGui::SliderFloat("MouseSensitivity", &camera->MouseSensitivity, 0.0f, 1.0f);
+            }
         }
         else if (debug_tool_active_tab == 2) {
-            ImGui::SliderFloat3("Model pos", glm::value_ptr(renderer->mainModel->Positon), -180.0f, 180.0f);
-            if (ImGui::SliderFloat3("Model roate", glm::value_ptr(renderer->mainModel->Rotation), -180.0f, 180.0f)) 
+            ImGui::SliderFloat3("Model pos", glm::value_ptr(renderer->mainModel->Positon), -8.0f, 8.0f);
+            if (ImGui::SliderFloat3("Model roate", glm::value_ptr(renderer->mainModel->Rotation), -8.0f, 8.0f)) 
                 renderer->mainModel->UpdateVectors();
         }
         else if (debug_tool_active_tab == 3) {
+            ImGui::SliderFloat2("FlatModelMin", glm::value_ptr(renderer->FlatModelMin), -1.0f, 1.0f);
+            ImGui::SliderFloat2("FlatModelMax", glm::value_ptr(renderer->FlatModelMax), -1.0f, 1.0f);
         }
         else if (debug_tool_active_tab == 4) {
             ImGui::InputInt("FullTestIndex", &renderer->renderPanoramaFullTestIndex);
             ImGui::Checkbox("Full Test", &renderer->renderPanoramaFullTest);
             ImGui::Checkbox("Full Roll Test", &renderer->renderPanoramaFullRollTest);
             ImGui::Checkbox("Full Test Auto loop", &renderer->renderPanoramaFullTestAutoLoop);
-            
+
             ImGui::Separator();
-            ImGui::Checkbox("RenderTest modul", &renderer->renderPanoramaATest);
+            ImGui::Checkbox("Render On", &renderer->renderOn);
+
             ImGui::Separator();
             ImGui::Checkbox("Render full", &renderer->renderPanoramaFull);
             ImGui::Checkbox("No Panorama Small", &renderer->renderNoPanoramaSmall);
-            
+            ImGui::Checkbox("Render Flat", &renderer->renderPanoramaFlat);
+
+            ImGui::Separator();
+            ImGui::Checkbox("RenderTest modul", &renderer->renderPanoramaATest);
+            ImGui::Separator();
+            ImGui::Checkbox("welecome_dialog_active", &welecome_dialog_active);
         }
         ImGui::End();
     }
@@ -739,7 +795,8 @@ void CGameRenderer::RenderUI()
         ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_None, ImVec2(0.5f, 0.5f));
         if (ImGui::Begin("loading_box", 0, overlay_window_flags))
         {
-            ImGui::Text(u8"图像载入中，请稍后...");
+            float precent = fileManager->CurrentFileLoader ? fileManager->CurrentFileLoader->GetLoadingPrecent()  : 0 ;
+            ImGui::Text(u8"图像载入中 %d%% ，请稍后...", (int)(precent * 100));
             ImGui::End();
         }
     }
@@ -767,6 +824,34 @@ void CGameRenderer::RenderUI()
         }
         ImGui::PopStyleVar(4);
     }
+
+    //错误对话框
+    if(image_err_dialog_active) {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+        ImGui::SetNextWindowBgAlpha(0.0f);
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_None, ImVec2(0.5f, 0.5f));
+        if (ImGui::Begin("image_err_box", 0, overlay_window_flags))
+        {
+            ImGui::Image((ImTextureID)renderer->uiFailedTex->texture, ImVec2(60, 60));
+            ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();ImGui::Spacing();
+            ImGui::Spacing();
+            ImGui::Text(u8"我们无法打开此图像，%s", last_image_error.c_str());
+            ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+            ImGui::Spacing();
+            //ImGui::SameLine(97);
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
+            if (ImGui::Button(u8"返回")) {
+                image_err_dialog_active = false;
+                welecome_dialog_active = true;
+            }
+            ImGui::PopStyleVar(1);
+            ImGui::End();
+        }
+        ImGui::PopStyleVar(4);
+    }
 }
 void CGameRenderer::Update()
 {
@@ -774,11 +859,6 @@ void CGameRenderer::Update()
     //===========================
 
     texLoadQueue->ResolveMain();
-
-    if (should_open_file) {
-        should_open_file = false;
-        DoOpenFile();
-    }
 
     //按键检测
     //===========================
@@ -812,6 +892,9 @@ void CGameRenderer::Update()
 //逻辑控制
 
 TextureLoadQueueDataResult* CGameRenderer::LoadChunkTexCallback(TextureLoadQueueInfo* info, CCTexture* texture) {
+
+    if (!file_opened)
+        return nullptr;
 
     auto imgSize = fileManager->CurrentFileLoader->GetImageSize();
     int chunkW = (int)imgSize.x / renderer->panoramaFullSplitW;
@@ -847,6 +930,14 @@ TextureLoadQueueDataResult* CGameRenderer::LoadTexCallback(TextureLoadQueueInfo*
         //Load full main tex
         TextureLoadQueueDataResult* result = new TextureLoadQueueDataResult();
         result->buffer = ptr->fileManager->CurrentFileLoader->GetAllImageData();
+        if (!result->buffer) {
+            ptr->last_image_error = StringHlp::UnicodeToUtf8(std::wstring(L"图像可能已经损坏，错误信息：") + std::wstring(ptr->fileManager->CurrentFileLoader->GetLastError()));
+            ptr->ShowErrorDialog();
+            ptr->logger->LogError2(L"Load tex main buffer failed : %s", ptr->fileManager->CurrentFileLoader->GetLastError());
+            delete result;
+            return nullptr;
+        }
+
         result->size = ptr->fileManager->CurrentFileLoader->GetFullDataSize();
         result->compoents = ptr->fileManager->CurrentFileLoader->GetImageDepth();
         glm::vec2 size = ptr->fileManager->CurrentFileLoader->GetImageScaledSize();
@@ -854,14 +945,14 @@ TextureLoadQueueDataResult* CGameRenderer::LoadTexCallback(TextureLoadQueueInfo*
         result->height = (int)size.y;
         result->success = true;
 
-        ptr->logger->Log2(L"Load tex buffer: w: %d h: %d (%d)  Buffer Size: %d", (int)size.x, (int)size.y, result->compoents, result->size);
+        ptr->logger->Log(L"Load tex buffer: w: %d h: %d (%d)  Buffer Size: %d", (int)size.x, (int)size.y, result->compoents, result->size);
         ptr->loading_dialog_active = false;
         ptr->uiInfo->currentImageLoading = false;
 
         return result;
     }
     else {
-        ptr->logger->Log2(L"Load block tex : x: %d y: %d id: %d", info->x, info->y, info->id);
+        ptr->logger->Log(L"Load block tex : x: %d y: %d id: %d", info->x, info->y, info->id);
         return ptr->LoadChunkTexCallback(info, texture);
     }
     return nullptr;
@@ -874,7 +965,7 @@ void CGameRenderer::FileCloseCallback(void* data) {
     ptr->renderer->ReleaseFullModel();
     ptr->renderer->UpdateMainModelTex();
     ptr->uiInfo->currentImageOpened = false;
-    ptr->renderer->renderNoPanoramaSmall = true;
+    ptr->renderer->renderOn = false;
     ptr->welecome_dialog_active = true;
     ptr->file_opened = false;
 }
@@ -886,6 +977,12 @@ void CGameRenderer::CameraFOVChanged(void* data, float fov) {
         if(ptr->renderer->renderPanoramaFull) ptr->renderer->UpdateFullChunksVisible();
     }
 }
+void CGameRenderer::CameraOrthoSizeChanged(void* data, float fov) {
+    CGameRenderer* ptr = (CGameRenderer*)data;
+    ptr->zoom_slider_value = (int)((1.0f - (fov - ptr->camera->OrthoSizeMin) / (ptr->camera->OrthoSizeMax - ptr->camera->OrthoSizeMin)) * 100);
+    ptr->renderer->UpdateFlatModelMinMax(fov);
+}
+
 void CGameRenderer::CameraRotate(void* data, CCPanoramaCamera* cam)
 {
     CGameRenderer* ptr = (CGameRenderer*)data;
@@ -907,50 +1004,77 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
     switch (mode)
     {
     case PanoramaMercator:
+        camera->Projection = CCameraProjection::Orthographic;
         camera->SetMode(CCPanoramaCameraMode::Static);
         renderer->ResetModel();
+        renderer->renderPanoramaFlat = true;
         renderer->renderPanoramaFull = false;
-        MouseSensitivity = 0.01f;
+        renderer->renderNoPanoramaSmall = true;
+        MouseSensitivity = 0.002f;
+        break;
+    case PanoramaFullOrginal:
+        camera->SetMode(CCPanoramaCameraMode::OrthoZoom);
+        camera->Projection = CCameraProjection::Orthographic;
+        renderer->ResetModel();
+        renderer->renderPanoramaFull = false;
+        renderer->renderPanoramaFlat = true;
+        renderer->renderNoPanoramaSmall = true;
+        MouseSensitivity = 0.002f;
         break;
     case PanoramaFull360:
-        camera->SetMode(CCPanoramaCameraMode::Static);
+        camera->SetMode(CCPanoramaCameraMode::OrthoZoom);
+        camera->Projection = CCameraProjection::Orthographic;
         renderer->ResetModel();
         renderer->renderPanoramaFull = false;
-        MouseSensitivity = 0.01f;
+        renderer->renderPanoramaFlat = true;
+        renderer->renderNoPanoramaSmall = true;
+        MouseSensitivity = 0.002f;
         break;
     case PanoramaAsteroid:
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
+        camera->Projection = CCameraProjection::Perspective;
         camera->Position.z = 1.0f;
         camera->FiledOfView = 135.0f;
         camera->FovMin = 35.0f;
         camera->FovMax = 135.0f;
         MouseSensitivity = 0.1f;
+        renderer->renderNoPanoramaSmall = false;
+        renderer->renderPanoramaFlat = false;
         break;
     case PanoramaCylinder:
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
+        camera->Projection = CCameraProjection::Perspective;
         camera->Position.z = 0.0f;
         camera->FiledOfView = 70.0f;
         camera->FovMin = 5.0f;
         camera->FovMax = 120.0f;
         renderer->renderPanoramaFull = SplitFullImage && camera->FiledOfView < 30;
+        renderer->renderNoPanoramaSmall = false;
+        renderer->renderPanoramaFlat = false;
         MouseSensitivity = 0.1f;
         break;
     case PanoramaSphere:
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
+        camera->Projection = CCameraProjection::Perspective;
         camera->Position.z = 0.5f;
         camera->FiledOfView = 50.0f;
         camera->FovMin = 5.0f;
         camera->FovMax = 75.0f;
         renderer->renderPanoramaFull = SplitFullImage && camera->FiledOfView < 30;
+        renderer->renderNoPanoramaSmall = false;
+        renderer->renderPanoramaFlat = false;
         MouseSensitivity = 0.1f;
         break;
     case PanoramaOuterBall:
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
+        camera->Projection = CCameraProjection::Perspective;
         camera->FiledOfView = 90.0f;
         camera->Position.z = 1.5f;
         camera->FovMin = 35.0f;
         camera->FovMax = 90.0f;
         renderer->renderPanoramaFull = false;
+        renderer->renderNoPanoramaSmall = false;
+        renderer->renderPanoramaFlat = false;
         MouseSensitivity = 0.1f;
         break;
     default:

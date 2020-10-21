@@ -21,6 +21,7 @@ public:
 	~CCMesh();
 
 	void GenerateBuffer();
+	void ReBufferData();
 	void ReleaseBuffer();
 
 	//‰÷»æMesh
@@ -32,6 +33,8 @@ public:
 	void UnLoad();
 
 	GLuint MeshVBO = 0;
+
+	GLenum DrawType = GL_STATIC_DRAW;
 
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;

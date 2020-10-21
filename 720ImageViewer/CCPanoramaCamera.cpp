@@ -115,6 +115,14 @@ void CCPanoramaCamera::ProcessMouseScroll(float yoffset)
 		if (Position.z > RoateFarMax) Position.z = RoateFarMax;
 		break;
 	}
+	case CCPanoramaCameraMode::OrthoZoom:
+		if (OrthographicSize >= OrthoSizeMin && OrthographicSize <= OrthoSizeMax)
+			OrthographicSize -= yoffset * OrthoSizeZoomSpeed;
+		if (OrthographicSize <= OrthoSizeMin) OrthographicSize = OrthoSizeMin;
+		if (OrthographicSize >= OrthoSizeMax) OrthographicSize = OrthoSizeMax;
+		if (orthoSizeChangedCallback)
+			orthoSizeChangedCallback(orthoSizeChangedCallbackData, OrthographicSize);
+		break;
 	case CCPanoramaCameraMode::Static:
 		break;
 	}
@@ -139,6 +147,11 @@ void CCPanoramaCamera::SetMode(CCPanoramaCameraMode mode)
 		break;
 	case CCPanoramaCameraMode::Static:
 		Reset();
+		break;
+	case CCPanoramaCameraMode::OrthoZoom:
+		Reset();
+		Position = glm::vec3(0.0f, 0.0f, 0.2f);
+		ForceUpdate();
 		break;
 	default:
 		break;

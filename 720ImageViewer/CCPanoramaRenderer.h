@@ -45,6 +45,7 @@ public:
 
 	CCModel* testModel = nullptr;
 	CCModel* mainModel = nullptr;
+	CCModel* mainFlatModel = nullptr;
 	std::vector<ChunkModel*> fullModels;
 
 	glm::mat4 model = glm::mat4(1.0f);
@@ -66,15 +67,21 @@ public:
 	bool renderPanoramaFullTestAutoLoop = true;
 
 	bool renderDebugWireframe = false;
-	bool renderNoPanoramaSmall = true;
-	bool renderPanoramaFull = false;
+	bool renderDebugVector = false;
+
 	bool renderPanoramaFullTest = false;
 	bool renderPanoramaFullRollTest = false;
 	bool renderPanoramaATest = false;
-	bool renderDebugVector = false;
 
+	bool renderOn = false;
+
+	bool renderNoPanoramaSmall = true;
+	bool renderPanoramaFull = false;
+	bool renderPanoramaFlat = false;
+
+
+	CCTexture* uiFailedTex = nullptr;
 	CCTexture* uiLogoTex = nullptr;
-	CCTexture* uiButtonTex = nullptr;
 	CCTexture* uiOpenButtonTex = nullptr;
 	CCTexture* uiTitleTex = nullptr;
 	std::vector<CCTexture*> staticTexPool;
@@ -89,20 +96,30 @@ public:
 
 	void ResetModel();
 	void RotateModel(float xoffset, float yoffset);
+	void RotateModelForce(float y, float z);
+	void MoveModel(float xoffset, float yoffset);
+	void MoveModelForce(float x, float y);
+
+	glm::vec2 FlatModelMax = glm::vec2(0.0f);
+	glm::vec2 FlatModelMin = glm::vec2(0.0f);
 
 	void UpdateMainModelTex();
 	void UpdateFullChunksVisible();
+	void UpdateFlatModelMinMax(float orthoSize);
 
 private:
 	CGameRenderer* Renderer = nullptr;
 
 	void CreateMainModel();
+	void CreateMainModelFlatMesh(CCMesh* mesh);
 	glm::vec3  CreateFullModelSphereMesh(ChunkModel* info, int segXStart, int segYStart, int segXEnd, int segYEnd);
 	void CreateMainModelSphereMesh(CCMesh* mesh);
 
 	void LoadBuiltInResources();
-	void RenderThumbnail(bool wireframe = false);
+
+	void RenderThumbnail();
 	void RenderFullChunks(float deltaTime);
+	void RenderFlat();
 
 	bool IsInView(glm::vec3 worldPos);
 

@@ -19,7 +19,7 @@ BYTE* CPngLoader::GetAllImageData()
         {
             SetLoadingPrecent(i / (float)height);
 
-            const unsigned int row = height - i - 1;
+            const unsigned int row = i;//height - i - 1;
             memcpy(data + (row * stride), row_pointers[i], stride);
         }
 

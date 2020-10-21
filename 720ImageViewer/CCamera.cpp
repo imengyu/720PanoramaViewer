@@ -43,6 +43,12 @@ void CCamera::SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback,
 	fovChangedCallbackData = data;
 }
 
+void CCamera::SetOrthoSizeChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data)
+{
+	orthoSizeChangedCallback = callback;
+	orthoSizeChangedCallbackData = data;
+}
+
 void CCamera::ForceUpdate() {
 	updateCameraVectors();
 }
