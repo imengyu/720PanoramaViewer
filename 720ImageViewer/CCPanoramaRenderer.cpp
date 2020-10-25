@@ -428,6 +428,7 @@ void CCPanoramaRenderer::GenerateFullModel(int chunkW, int chunkH)
 void CCPanoramaRenderer::ResetModel()
 {
     mainModel->Reset();
+    mainFlatModel->Material->offest.x = 0.0f;
 }
 void CCPanoramaRenderer::RotateModel(float xoffset, float yoffset)
 {
@@ -447,23 +448,70 @@ void CCPanoramaRenderer::RotateModelForce(float y, float z)
 }
 void CCPanoramaRenderer::MoveModel(float xoffset, float yoffset)
 {
-    mainModel->Positon.x -= xoffset;
-    mainModel->Positon.y -= yoffset;
-
-    if (mainModel->Positon.x < FlatModelMin.x) mainModel->Positon.x = FlatModelMin.x;
+    if (renderPanoramaFlatXLoop) {
+        float v = mainFlatModel->Material->offest.x + xoffset;
+        if (v < 0) v += 1.0f;
+        else if (v > 1.0f) v -= 1.0f;
+        mainFlatModel->Material->offest.x = v;
+    }
+    else {
+        mainModel->Positon.x -= xoffset * FlatModelMoveRato;
+        if (mainModel->Positon.x < FlatModelMin.x) mainModel->Positon.x = FlatModelMin.x;
+        if (mainModel->Positon.x > FlatModelMax.x) mainModel->Positon.x = FlatModelMax.x;
+    }
+    
+    mainModel->Positon.y -= yoffset * FlatModelMoveRato;
     if (mainModel->Positon.y < FlatModelMin.y) mainModel->Positon.y = FlatModelMin.y;
-    if (mainModel->Positon.x > FlatModelMax.x) mainModel->Positon.x = FlatModelMax.x;
     if (mainModel->Positon.y > FlatModelMax.y) mainModel->Positon.y = FlatModelMax.y;
 }
 void CCPanoramaRenderer::MoveModelForce(float x, float y)
 {
-    mainModel->Positon.y += y;
-    mainModel->Positon.x += x;
+    if (renderPanoramaFlatXLoop) {
+        float v = mainFlatModel->Material->offest.x + x;
+        if (v < 0) v += 1.0f;
+        else if (v > 1.0f) v -= 1.0f;
+        mainFlatModel->Material->offest.x = v;
+    }
+    else {
+        mainModel->Positon.x -= x * FlatModelMoveRato;
+        if (mainModel->Positon.x < FlatModelMin.x) mainModel->Positon.x = FlatModelMin.x;
+        if (mainModel->Positon.x > FlatModelMax.x) mainModel->Positon.x = FlatModelMax.x;
+    }
 
-    if (mainModel->Positon.x < FlatModelMin.x) mainModel->Positon.x = FlatModelMin.x;
+    mainModel->Positon.y += y * FlatModelMoveRato;
     if (mainModel->Positon.y < FlatModelMin.y) mainModel->Positon.y = FlatModelMin.y;
-    if (mainModel->Positon.x > FlatModelMax.x) mainModel->Positon.x = FlatModelMax.x;
     if (mainModel->Positon.y > FlatModelMax.y) mainModel->Positon.y = FlatModelMax.y;
+}
+void CCPanoramaRenderer::UpdateMercatorControl() {
+    //PrecalcMercator();
+
+    CCMesh* mesh = mainFlatModel->Mesh;
+    mesh->texCoords.clear();
+
+    float ustep = 1.0f / sphereSegmentX, vstep = 1.0f / sphereSegmentY;
+    float u = 0, v = 0;
+
+    for (int j = 0; j <= sphereSegmentY; j++, v += vstep) {
+        u = 0;
+        for (int i = 0; i <= sphereSegmentX; i++, u += ustep) 
+            mesh->texCoords.push_back(GetMercatorUVPoint(1.0 - u, v));
+    }
+
+    mesh->ReBufferData();
+}
+void CCPanoramaRenderer::ResetMercatorControl() {
+    CCMesh* mesh = mainFlatModel->Mesh;
+    mesh->texCoords.clear();
+
+    float ustep = 1.0f / sphereSegmentX, vstep = 1.0f / sphereSegmentY;
+    float u = 0, v = 0;
+
+    for (int j = 0; j <= sphereSegmentY; j++, v += vstep) {
+        u = 0;
+        for (int i = 0; i <= sphereSegmentX; i++, u += ustep)
+            mesh->texCoords.push_back(glm::vec2(1.0 - u, v));
+    }
+    mesh->ReBufferData();
 }
 
 //äÖÈ¾
@@ -544,6 +592,7 @@ void CCPanoramaRenderer::UpdateFullChunksVisible() {
 void CCPanoramaRenderer::UpdateFlatModelMinMax(float orthoSize) {
     FlatModelMin = glm::vec2(-((1.0f - orthoSize) / 2.0f), -((1.0f - orthoSize) / 4.0f));
     FlatModelMax = glm::vec2((1.0f - orthoSize) / 2.0f, (1.0f - orthoSize) / 4.0f);
+    FlatModelMoveRato = orthoSize / 1.0f;
     MoveModelForce(0, 0);
 }
 
@@ -570,4 +619,48 @@ glm::vec3 CCPanoramaRenderer::GetSpherePoint(float u, float v, float r)
     float y = r * glm::cos(PI * v);
     float z = r * glm::sin(PI * v) * glm::cos(PI * u * 2);
     return glm::vec3(x, y, z);
+}
+glm::vec2 CCPanoramaRenderer::GetMercatorUVPoint(float u, float v)
+{
+    constexpr float PI = glm::pi<float>();
+
+    float ¦Ë0 = MercatorControlPoint0.x * PI;
+    float  ¦Ë = u * PI;
+    float  §æ = v * PI;
+
+    float y = glm::atanh(glm::sin(§æ));
+    return glm::vec2(¦Ë - ¦Ë0, y);
+
+    /*
+    float ¦Ë0 = MercatorControlPoint0.x * PI;
+    float  ¦Ë = u * PI;
+    float  §æ = v * PI;
+    float  ¦Ëp = Mercator_¦Ëp;
+    float  §æp = Mercator_§æp;
+    float A = glm::sin(§æp) * glm::sin(§æ) - glm::cos(§æp) * glm::cos(§æ) * glm::sin(¦Ë - ¦Ë0);
+
+    float x = glm::atan(
+        (glm::tan(§æ) * glm::cos(§æp) + glm::sin(§æp) - glm::sin(¦Ë - ¦Ë0)) /
+        (glm::cos(¦Ë - ¦Ë0))
+    );
+    float y = glm::atan(A);
+    return glm::vec2(x, y);
+    */
+}
+void CCPanoramaRenderer::PrecalcMercator() {
+    constexpr float PI = glm::pi<float>();
+
+    float ¦Ë0 = MercatorControlPoint0.x * PI;
+    float ¦Ë1 = MercatorControlPoint1.x * PI;
+    float ¦Ë2 = MercatorControlPoint2.x * PI;
+    float §æ1 = MercatorControlPoint1.y * PI;
+    float §æ2 = MercatorControlPoint2.y * PI;
+
+    Mercator_¦Ëp = glm::atan(
+        (glm::cos(§æ1) * glm::sin(§æ2) * glm::cos(¦Ë1) - glm::sin(§æ1) * glm::cos(§æ2) * glm::cos(¦Ë2)) /
+        (glm::sin(§æ1) * glm::cos(§æ2) * glm::sin(¦Ë2) - glm::cos(§æ1) * glm::sin(§æ2) * glm::sin(¦Ë1))
+    );
+    Mercator_§æp = glm::atan(
+        -((glm::cos(Mercator_¦Ëp - ¦Ë1)) / glm::tan(§æ1))
+    );
 }

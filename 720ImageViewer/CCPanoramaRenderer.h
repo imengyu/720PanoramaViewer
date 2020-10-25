@@ -69,6 +69,8 @@ public:
 	bool renderDebugWireframe = false;
 	bool renderDebugVector = false;
 
+	bool renderPanoramaFlatXLoop = false;
+
 	bool renderPanoramaFullTest = false;
 	bool renderPanoramaFullRollTest = false;
 	bool renderPanoramaATest = false;
@@ -99,9 +101,17 @@ public:
 	void RotateModelForce(float y, float z);
 	void MoveModel(float xoffset, float yoffset);
 	void MoveModelForce(float x, float y);
+	void UpdateMercatorControl();
+	void ResetMercatorControl();
+
 
 	glm::vec2 FlatModelMax = glm::vec2(0.0f);
 	glm::vec2 FlatModelMin = glm::vec2(0.0f);
+	float FlatModelMoveRato = 1.0f;
+
+	glm::vec2 MercatorControlPoint0 = glm::vec2(0.0f);
+	glm::vec2 MercatorControlPoint1 = glm::vec2(0.0f);
+	glm::vec2 MercatorControlPoint2 = glm::vec2(0.0f);
 
 	void UpdateMainModelTex();
 	void UpdateFullChunksVisible();
@@ -127,6 +137,11 @@ private:
 	glm::vec2 GetSphereUVPoint(float u, float v, short i);
 	//获取球面上的点
 	glm::vec3 GetSpherePoint(float u, float v, float r);
+	glm::vec2 GetMercatorUVPoint(float u, float v);
+	void PrecalcMercator();
+
+	float Mercator_фp;
+	float Mercator_λp;
 };
 
 

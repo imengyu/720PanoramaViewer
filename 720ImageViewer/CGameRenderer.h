@@ -14,15 +14,15 @@
 #include <vector>
 
 //È«¾°Ä£Ê½
-enum PanoramaMode {
+enum PanoramaMode : int16_t {
 	PanoramaSphere,
 	PanoramaCylinder,
 	PanoramaAsteroid,
 	PanoramaOuterBall,
-	PanoramaFullOrginal,
-	PanoramaModeMax,
 	PanoramaMercator,
 	PanoramaFull360,
+	PanoramaFullOrginal,
+	PanoramaModeMax,
 };
 
 class CImageLoader;
@@ -129,6 +129,7 @@ private:
 
 	float MouseSensitivity = 0.1f;
 	float RoateSpeed = 20.0f;
+	float MoveSpeed = 0.3f;
 
 	bool SplitFullImage = true;
 

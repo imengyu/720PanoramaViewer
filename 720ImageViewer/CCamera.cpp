@@ -37,6 +37,14 @@ void CCamera::SetFOV(float fov)
 	}
 }
 
+void CCamera::SetOrthoSize(float o)
+{
+	if (OrthographicSize != o) {
+		OrthographicSize = o;
+		if (orthoSizeChangedCallback)
+			orthoSizeChangedCallback(orthoSizeChangedCallbackData, FiledOfView);
+	}
+}
 void CCamera::SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data)
 {
 	fovChangedCallback = callback;
@@ -60,6 +68,7 @@ void CCamera::Reset()
 	Front = glm::vec3(0.0f, 0.0f, -1.0f);
 	Rotate = glm::vec3(DEF_YAW, DEF_PITCH, 0.0f);
 	FiledOfView = DEF_FOV;
+	OrthographicSize = 1.0f;
 	updateCameraVectors();
 }
 

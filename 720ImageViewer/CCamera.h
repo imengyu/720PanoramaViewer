@@ -48,6 +48,8 @@ public:
 	// 返回使用欧拉角和LookAt矩阵计算的view矩阵
 	glm::mat4 GetViewMatrix();
 
+	void SetOrthoSize(float o);
+
 	void SetFOVChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data);
 	void SetOrthoSizeChangedCallback(CCPanoramaCameraFovChangedCallback callback, void* data);
 

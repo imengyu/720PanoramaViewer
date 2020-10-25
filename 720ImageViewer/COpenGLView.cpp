@@ -350,8 +350,8 @@ void COpenGLView::CalcMainCameraProjection(CCShader* shader)
 		Camera->projection = Camera->Projection == CCameraProjection::Perspective ?
 			glm::perspective(glm::radians(Camera->FiledOfView), (float)Width / (float)Height, Camera->ClippingNear, Camera->ClippingFar) :
 			glm::ortho(-Camera->OrthographicSize / 2,  Camera->OrthographicSize / 2, 
-				-(Camera->OrthographicSize / 2),
-				(Camera->OrthographicSize / 2),
+				-((float)Height / (float)Width * Camera->OrthographicSize / 2),
+				((float)Height / (float)Width * Camera->OrthographicSize / 2),
 				Camera->ClippingNear, Camera->ClippingFar);
 		glUniformMatrix4fv(shader->projectionLoc, 1, GL_FALSE, glm::value_ptr(Camera->projection));
 	}

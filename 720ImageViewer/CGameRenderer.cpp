@@ -2,6 +2,7 @@
 #include "COpenGLView.h"
 #include "CImageLoader.h"
 #include "CCRenderGlobal.h"
+#include "CCMaterial.h"
 #include "CCursor.h"
 #include "CApp.h"
 #include "StringHlp.h"
@@ -287,16 +288,16 @@ void CGameRenderer::KeyMoveCallback(CCameraMovement move) {
         switch (move)
         {
         case CCameraMovement::ROATE_UP:
-            renderer->MoveModelForce(0, MouseSensitivity * View->GetDeltaTime());
+            renderer->MoveModelForce(0, -MoveSpeed * View->GetDeltaTime());
             break;
         case CCameraMovement::ROATE_DOWN:
-            renderer->MoveModelForce(0, -MouseSensitivity * View->GetDeltaTime());
+            renderer->MoveModelForce(0, MoveSpeed * View->GetDeltaTime());
             break;
         case CCameraMovement::ROATE_LEFT:
-            renderer->MoveModelForce(-MouseSensitivity * View->GetDeltaTime(), 0);
+            renderer->MoveModelForce(-MoveSpeed * View->GetDeltaTime(), 0);
             break;
         case CCameraMovement::ROATE_RIGHT:
-            renderer->MoveModelForce(MouseSensitivity * View->GetDeltaTime(), 0);
+            renderer->MoveModelForce(MoveSpeed * View->GetDeltaTime(), 0);
             break;
         }
     }
@@ -417,7 +418,7 @@ void CGameRenderer::RenderUI()
             }
             if (ImGui::BeginMenu(u8"视图"))
             {
-                if (ImGui::MenuItem((View->IsFullScreen ? u8"退出全屏" : u8"全屏"), "F11", &View->IsFullScreen))
+                if (ImGui::MenuItem((u8"全屏"), "F11", &View->IsFullScreen))
                     View->UpdateFullScreenState();
 
                 if (file_opened) {
@@ -645,7 +646,7 @@ void CGameRenderer::RenderUI()
 
                     ImGui::SetNextItemWidth(100.0f);
                     if (ImGui::SliderInt("", &zoom_slider_value, 0, 100, u8"缩放: %d%%"))
-                        camera->SetFOV((1.0f - (zoom_slider_value / 100.0f)) * (camera->OrthoSizeMax - camera->OrthoSizeMin) + camera->OrthoSizeMin);
+                        camera->SetOrthoSize((1.0f - (zoom_slider_value / 100.0f)) * (camera->OrthoSizeMax - camera->OrthoSizeMin) + camera->OrthoSizeMin);
                     ImGui::SameLine();
 
                     if (ImGui::Button(u8"＋"))
@@ -719,8 +720,23 @@ void CGameRenderer::RenderUI()
                 renderer->mainModel->UpdateVectors();
         }
         else if (debug_tool_active_tab == 3) {
-            ImGui::SliderFloat2("FlatModelMin", glm::value_ptr(renderer->FlatModelMin), -1.0f, 1.0f);
-            ImGui::SliderFloat2("FlatModelMax", glm::value_ptr(renderer->FlatModelMax), -1.0f, 1.0f);
+            if (ImGui::CollapsingHeader("Flat Normal")) {
+                ImGui::SliderFloat2("FlatModelMin", glm::value_ptr(renderer->FlatModelMin), -1.0f, 1.0f);
+                ImGui::SliderFloat2("FlatModelMax", glm::value_ptr(renderer->FlatModelMax), -1.0f, 1.0f);
+                if (renderer->mainFlatModel && renderer->mainFlatModel->Material)
+                    ImGui::SliderFloat2("FlatModel Material offest", glm::value_ptr(renderer->mainFlatModel->Material->offest), -1.0f, 1.0f);
+            }
+            if (ImGui::CollapsingHeader("Flat Mercator")) {
+                ImGui::Separator();
+                ImGui::InputFloat2("ControlPoint0", glm::value_ptr(renderer->MercatorControlPoint0));
+                ImGui::InputFloat2("ControlPoint1", glm::value_ptr(renderer->MercatorControlPoint1));
+                ImGui::InputFloat2("ControlPoint2", glm::value_ptr(renderer->MercatorControlPoint2));
+
+
+                if (ImGui::Button("UpdateMercatorControl")) {
+                    renderer->UpdateMercatorControl();
+                }
+            }
         }
         else if (debug_tool_active_tab == 4) {
             ImGui::InputInt("FullTestIndex", &renderer->renderPanoramaFullTestIndex);
@@ -1006,33 +1022,40 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
     case PanoramaMercator:
         camera->Projection = CCameraProjection::Orthographic;
         camera->SetMode(CCPanoramaCameraMode::Static);
+        camera->Position.z = 0.2f;
         renderer->ResetModel();
         renderer->renderPanoramaFlat = true;
         renderer->renderPanoramaFull = false;
         renderer->renderNoPanoramaSmall = true;
-        MouseSensitivity = 0.002f;
+        renderer->renderPanoramaFlatXLoop = false;
+        renderer->UpdateMercatorControl();
+        MouseSensitivity = 0.001f;
         break;
     case PanoramaFullOrginal:
-        camera->SetMode(CCPanoramaCameraMode::OrthoZoom);
         camera->Projection = CCameraProjection::Orthographic;
+        camera->SetMode(CCPanoramaCameraMode::OrthoZoom);
         renderer->ResetModel();
         renderer->renderPanoramaFull = false;
         renderer->renderPanoramaFlat = true;
         renderer->renderNoPanoramaSmall = true;
-        MouseSensitivity = 0.002f;
+        renderer->renderPanoramaFlatXLoop = false;
+        renderer->ResetMercatorControl();
+        MouseSensitivity = 0.001f;
         break;
     case PanoramaFull360:
-        camera->SetMode(CCPanoramaCameraMode::OrthoZoom);
         camera->Projection = CCameraProjection::Orthographic;
+        camera->SetMode(CCPanoramaCameraMode::OrthoZoom);
         renderer->ResetModel();
         renderer->renderPanoramaFull = false;
         renderer->renderPanoramaFlat = true;
         renderer->renderNoPanoramaSmall = true;
-        MouseSensitivity = 0.002f;
+        renderer->renderPanoramaFlatXLoop = true;
+        renderer->ResetMercatorControl();
+        MouseSensitivity = 0.001f;
         break;
     case PanoramaAsteroid:
-        camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Projection = CCameraProjection::Perspective;
+        camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Position.z = 1.0f;
         camera->FiledOfView = 135.0f;
         camera->FovMin = 35.0f;
@@ -1042,8 +1065,8 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
         renderer->renderPanoramaFlat = false;
         break;
     case PanoramaCylinder:
-        camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Projection = CCameraProjection::Perspective;
+        camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Position.z = 0.0f;
         camera->FiledOfView = 70.0f;
         camera->FovMin = 5.0f;
@@ -1054,8 +1077,8 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
         MouseSensitivity = 0.1f;
         break;
     case PanoramaSphere:
-        camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Projection = CCameraProjection::Perspective;
+        camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Position.z = 0.5f;
         camera->FiledOfView = 50.0f;
         camera->FovMin = 5.0f;
@@ -1066,8 +1089,8 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
         MouseSensitivity = 0.1f;
         break;
     case PanoramaOuterBall:
-        camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->Projection = CCameraProjection::Perspective;
+        camera->SetMode(CCPanoramaCameraMode::CenterRoate);
         camera->FiledOfView = 90.0f;
         camera->Position.z = 1.5f;
         camera->FovMin = 35.0f;

@@ -156,6 +156,14 @@ void CCPanoramaCamera::SetMode(CCPanoramaCameraMode mode)
 	default:
 		break;
 	}
+	if (Projection == CCameraProjection::Orthographic) {
+		if (orthoSizeChangedCallback)
+			orthoSizeChangedCallback(orthoSizeChangedCallbackData, OrthographicSize);
+	}
+	else {
+		if (fovChangedCallback)
+			fovChangedCallback(fovChangedCallbackData, FiledOfView);
+	}
 }
 
 void CCPanoramaCamera::SetRotateCallback(CCPanoramaCameraCallback callback, void* data)
