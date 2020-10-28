@@ -494,7 +494,7 @@ void CCPanoramaRenderer::UpdateMercatorControl() {
     for (int j = 0; j <= sphereSegmentY; j++, v += vstep) {
         u = 0;
         for (int i = 0; i <= sphereSegmentX; i++, u += ustep) 
-            mesh->texCoords.push_back(GetMercatorUVPoint(1.0 - u, v));
+            mesh->texCoords.push_back(GetMercatorUVPoint(1.0f - u, v));
     }
 
     mesh->ReBufferData();

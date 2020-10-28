@@ -425,7 +425,8 @@ void CGameRenderer::RenderUI()
                     if (ImGui::BeginMenu(u8"ģʽ"))
                     {
                         for (int i = 0; i < PanoramaModeMax; i++) {
-                            if (ImGui::RadioButton(GetPanoramaModeStr((PanoramaMode)i), mode == (PanoramaMode)i)) {
+                            if ((PanoramaMode)i != PanoramaMode::PanoramaMercator 
+                                && ImGui::RadioButton(GetPanoramaModeStr((PanoramaMode)i), mode == (PanoramaMode)i)) {
                                 SwitchMode((PanoramaMode)i);
                                 ImGui::CloseCurrentPopup();
                             }
@@ -595,7 +596,8 @@ void CGameRenderer::RenderUI()
                 if (ImGui::BeginPopup("mode_popup"))
                 {
                     for (int i = 0; i < PanoramaModeMax; i++) {
-                        if (ImGui::RadioButton(GetPanoramaModeStr((PanoramaMode)i), mode == (PanoramaMode)i)) {
+                        if ((PanoramaMode)i != PanoramaMode::PanoramaMercator 
+                            &&  ImGui::RadioButton(GetPanoramaModeStr((PanoramaMode)i), mode == (PanoramaMode)i)) {
                             SwitchMode((PanoramaMode)i);
                             ImGui::CloseCurrentPopup();
                         }

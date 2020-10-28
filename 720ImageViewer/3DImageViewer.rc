@@ -57,7 +57,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "确定",IDOK,207,208,50,14
     CONTROL         IDB_ABOUT_TOP,IDC_STATIC,"Static",SS_BITMAP,0,0,267,101
-    LTEXT           "Version: 1.0 Build 2  2020/09/29",IDC_STATIC,83,106,105,8
+    LTEXT           "Version: 1.3 Build 1  2020/09/29",IDC_STATIC,83,106,105,8
     LTEXT           "Copyright (C) 2020  By imengyu",IDC_STATIC,83,115,102,8
     LTEXT           "使用的开源组件",IDC_STATIC,7,135,57,8
     LTEXT           "The OpenGL Extension Wrangler Library (GLEW)",IDC_STATIC,7,148,155,8
@@ -173,8 +173,8 @@ IDI_HELP                ICON                    "help.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,3,0,1
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -191,12 +191,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "imengyu.top"
             VALUE "FileDescription", "720 Image Viewer"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileVersion", "1.3.0.1"
             VALUE "InternalName", "720IV.exe"
             VALUE "LegalCopyright", "Copyright (C) 2020"
             VALUE "OriginalFilename", "720IV.exe"
             VALUE "ProductName", "720 Image Viewer"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductVersion", "1.0.0.0"
         END
     END
     BLOCK "VarFileInfo"
