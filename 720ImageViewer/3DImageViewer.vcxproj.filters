@@ -87,9 +87,6 @@
     <ClCompile Include="Logger.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="StringHlp.cpp">
-      <Filter>源文件\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>源文件\Imgui</Filter>
     </ClCompile>
@@ -116,9 +113,6 @@
     </ClCompile>
     <ClCompile Include="CBMPLoader.cpp">
       <Filter>源文件\ImageLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="SettingHlp.cpp">
-      <Filter>源文件\Utils</Filter>
     </ClCompile>
     <ClCompile Include="720ImageViewer.cpp">
       <Filter>源文件</Filter>
@@ -396,13 +390,7 @@
     <ClCompile Include="CCPanoramaRenderer.cpp">
       <Filter>源文件\Render</Filter>
     </ClCompile>
-    <ClCompile Include="CGameRenderer.cpp">
-      <Filter>源文件\Render</Filter>
-    </ClCompile>
     <ClCompile Include="COpenGLRenderer.cpp">
-      <Filter>源文件\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="COpenGLView.cpp">
       <Filter>源文件\Render</Filter>
     </ClCompile>
     <ClCompile Include="CCPanoramaCamera.cpp">
@@ -465,15 +453,33 @@
     <ClCompile Include="CRegDialog.cpp">
       <Filter>源文件\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="CCAssetsManager.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CStringHlp.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CWindowsOpenGLView.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="COpenGLView.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CWindowsGameRenderer.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingHlp.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCSmartPtr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="StringSplit.h">
-      <Filter>头文件\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHlp.h">
       <Filter>头文件\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Logger.h">
@@ -677,13 +683,7 @@
     <ClInclude Include="CCPanoramaRenderer.h">
       <Filter>头文件\Render</Filter>
     </ClInclude>
-    <ClInclude Include="CGameRenderer.h">
-      <Filter>头文件\Render</Filter>
-    </ClInclude>
     <ClInclude Include="COpenGLRenderer.h">
-      <Filter>头文件\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="COpenGLView.h">
       <Filter>头文件\Render</Filter>
     </ClInclude>
     <ClInclude Include="CCPanoramaCamera.h">
@@ -745,6 +745,33 @@
     </ClInclude>
     <ClInclude Include="CRegDialog.h">
       <Filter>头文件\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="CCAssetsManager.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="type-defines.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="api-defines.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CStringHlp.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CWindowsOpenGLView.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="COpenGLView.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CWindowsGameRenderer.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCSmartPtr.hpp">
+      <Filter>头文件\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

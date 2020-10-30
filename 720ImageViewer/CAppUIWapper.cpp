@@ -1,4 +1,5 @@
 #include "CAppUIWapper.h"
+#include "CWindowsOpenGLView.h"
 
 CAppUIWapper::CAppUIWapper(COpenGLView* view)
 {
@@ -25,23 +26,23 @@ void CAppUIWapper::MessageBeep(CAppUIMessageBoxIcon ico)
 }
 void CAppUIWapper::ShowMessageBox(const wchar_t* str, const wchar_t* title)
 {
-	MessageBox(view->GetHWND(), str, title, MB_OK);
+	MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_OK);
 }
 void CAppUIWapper::ShowMessageBox(const wchar_t* str, const wchar_t* title, CAppUIMessageBoxIcon ico)
 {
 	switch (ico)
 	{
 	case IconNone:
-		MessageBox(view->GetHWND(), str, title, MB_OK);
+		MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_OK);
 		break;
 	case IconInfo:
-		MessageBox(view->GetHWND(), str, title, MB_ICONINFORMATION);
+		MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_ICONINFORMATION);
 		break;
 	case IconWarning:
-		MessageBox(view->GetHWND(), str, title, MB_ICONEXCLAMATION);
+		MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_ICONEXCLAMATION);
 		break;
 	case IconError:
-		MessageBox(view->GetHWND(), str, title, MB_ICONERROR);
+		MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_ICONERROR);
 		break;
 	}
 }
@@ -52,16 +53,16 @@ CAppUIMessageBoxResult CAppUIWapper::ShowConfirmBox(const wchar_t* str, const wc
 	switch (ico)
 	{
 	case IconNone:
-		result = MessageBox(view->GetHWND(), str, title, MB_YESNO);
+		result = MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_YESNO);
 		break;
 	case IconInfo:
-		result = MessageBox(view->GetHWND(), str, title, MB_ICONINFORMATION | MB_YESNO);
+		result = MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_ICONINFORMATION | MB_YESNO);
 		break;
 	case IconWarning:
-		result = MessageBox(view->GetHWND(), str, title, MB_ICONEXCLAMATION | MB_YESNO);
+		result = MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_ICONEXCLAMATION | MB_YESNO);
 		break;
 	case IconError:
-		result = MessageBox(view->GetHWND(), str, title, MB_ICONERROR | MB_YESNO);
+		result = MessageBox(((CWindowsOpenGLView*)view)->GetHWND(), str, title, MB_ICONERROR | MB_YESNO);
 		break;
 	}
 	switch (result)

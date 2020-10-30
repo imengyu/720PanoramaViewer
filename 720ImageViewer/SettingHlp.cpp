@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "SettingHlp.h"
-#include "StringHlp.h"
+#include "CStringHlp.h"
 
 SettingHlpInternal::SettingHlpInternal(LPCWSTR setttingFilePath)
 {
@@ -14,14 +14,14 @@ bool SettingHlpInternal::GetSettingBool(LPCWSTR key, bool defaultValue, LPCWSTR 
 {
 	WCHAR w[16];
 	GetPrivateProfileString(appKey, key, defaultValue ? L"TRUE" : L"FALSE", w, 16, setttingFilePath);
-	return StringHlp::StrToBoolW(w);
+	return CStringHlp::StrToBoolW(w);
 }
 int SettingHlpInternal::GetSettingInt(LPCWSTR key, int defaultValue, LPCWSTR appKey)
 {
 	WCHAR w[32];
 	swprintf_s(w, L"%d", defaultValue);
 	GetPrivateProfileString(appKey, key, w, w, 32, setttingFilePath);
-	return StringHlp::StrToIntW(w);
+	return CStringHlp::StrToIntW(w);
 }
 std::wstring SettingHlpInternal::GetSettingStr(LPCWSTR key, LPCWSTR defaultValue, size_t bufferSize, LPCWSTR appKey)
 {
@@ -37,7 +37,7 @@ bool SettingHlpInternal::SetSettingBool(LPCWSTR key, bool value, LPCWSTR appKey)
 }
 bool SettingHlpInternal::SetSettingInt(LPCWSTR key, int value, LPCWSTR appKey)
 {
-	LPCWSTR intStr = StringHlp::IntToStrW(value);
+	LPCWSTR intStr = CStringHlp::IntToStrW(value);
 	bool rs =  WritePrivateProfileString(appKey, key, intStr, setttingFilePath);
 	delete intStr;
 	return rs;

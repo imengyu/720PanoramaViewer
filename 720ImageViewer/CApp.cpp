@@ -1,14 +1,15 @@
 #include "CApp.h"
 #include "CCursor.h"
 #include "CCMeshLoader.h"
-#include "COpenGLView.h"
-#include "CGameRenderer.h"
+#include "CWindowsOpenGLView.h"
+#include "CWindowsGameRenderer.h"
 #include "CAboutDialog.h"
 #include "CHelpDialog.h"
 #include "CRegDialog.h"
+#include "CStringHlp.h"
 #include "SystemHelper.h"
 #include "StringSplit.h"
-#include "StringHlp.h"
+
 #include <shellapi.h>
 #include <Shlwapi.h>
 
@@ -105,9 +106,7 @@ int CApp::Run()
 	GetModuleFileName(NULL, currentPath, MAX_PATH);
 	wcscpy_s(currentDir, currentPath);
 	PathRemoveFileSpec(currentDir);
-	char* currentDirAb = StringHlp::UnicodeToAnsi(currentDir);
-	strcpy_s(currentDirA, currentDirAb);
-	StringHlp::FreeStringPtr(currentDirAb);
+	strcpy_s(currentDirA, CStringHlp::UnicodeToAnsi(currentDir).c_str());
 
 	appArgList = CommandLineToArgvW(GetCommandLine(), &appArgCount);
 	if (appArgList == NULL)
@@ -116,11 +115,14 @@ int CApp::Run()
 		return -1;
 	}
 
-	logger = new LoggerInternal();
+	CCPtrPool::InitPool();
+
+	Logger::InitConst();
+	Logger *logger = Logger::GetStaticInstance();
 	logger->SetLogLevel(LogLevel::LogLevelText);
 	logger->SetLogOutPut(LogOutPut::LogOutPutConsolne);
 
-	settings = new SettingHlpInternal(FormatString(L"%s\\config\\config.ini", currentDir).c_str());
+	settings = new SettingHlpInternal(CStringHlp::FormatString(L"%s\\config\\config.ini", currentDir).c_str());
 
 	CCursor::Init(hInst);
 	CCMeshLoader::Init();
@@ -167,10 +169,10 @@ int CApp::Run()
 
 	logger->InitLogConsoleStdHandle();
 
-	gameRenderer = new CGameRenderer();
-	mainView = new COpenGLView(gameRenderer);
+	gameRenderer = new CWindowsGameRenderer();
+	mainView = new CWindowsOpenGLView(hInst, APP_TITLE, 1024, 768, (WNDPROC)mainWndProc, gameRenderer);
 
-	if (mainView->Init(hInst, APP_TITLE, 1024, 768, (WNDPROC)mainWndProc))
+	if (mainView->Init())
 	{
 		if (hasInputFile) {
 			logger->Log(L"Command input file %hs", filePath.c_str());
@@ -209,12 +211,13 @@ QUIT_AND_DESTROY:
 	fclose(file);
 	fclose(fileErr);
 
+	Logger::DestroyConst();
 	CCursor::Destroy();
 	CCMeshLoader::Destroy();
+	CCPtrPool::ReleasePool();
 	delete settings;
 	delete gameRenderer;
 	delete mainView;
-	delete logger;
 
     return result;
 }
@@ -222,10 +225,6 @@ QUIT_AND_DESTROY:
 HINSTANCE CApp::GetHInstance()
 {
 	return hInst;
-}
-LoggerInternal* CApp::GetLogger()
-{
-	return logger;
 }
 SettingHlp* CApp::GetSettings()
 {

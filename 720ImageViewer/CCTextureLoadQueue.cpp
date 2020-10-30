@@ -3,7 +3,7 @@
 
 CCTextureLoadQueue::CCTextureLoadQueue()
 {
-	logger = CApp::Instance->GetLogger();
+	logger = Logger::GetStaticInstance();
 	loadHandle = nullptr;
 	loadHandleData = nullptr;
 }

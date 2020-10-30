@@ -1,94 +1,138 @@
 #include "stdafx.h"
-#include "StringHlp.h"
+#include "CStringHlp.h"
 #include <string>
 
-std::string & FormatString(std::string & _str, const char * _Format, ...) {
+
+std::string& FormatString(std::string& _str, const char* format, ...) {
 	std::string tmp;
 
-	va_list marker = NULL;
-	va_start(marker, _Format);
+	va_list marker = nullptr;
+	va_start(marker, format);
 
-	size_t num_of_chars = _vscprintf(_Format, marker);
-
+#ifdef _MSC_VER
+	size_t num_of_chars = _vscprintf(format, marker);
+#else
+	size_t num_of_chars = vsprintf(nullptr, format, marker);
+#endif
 	if (num_of_chars > tmp.capacity()) {
 		tmp.resize(num_of_chars + 1);
 	}
-
-	vsprintf_s((char *)tmp.data(), tmp.capacity(), _Format, marker);
+#if defined(_MSC_VER) && _MSC_VER > 1600
+	vsprintf_s((char*)tmp.data(), tmp.capacity(), format, marker);
+#else
+	vsprintf(nullptr, format, marker);
+#endif
 
 	va_end(marker);
 
 	_str = tmp.c_str();
 	return _str;
 }
-std::wstring & FormatString(std::wstring & _str, const wchar_t * _Format, ...) {
+std::wstring& FormatString(std::wstring& _str, const wchar_t* format, ...) {
 	std::wstring tmp;
 	va_list marker = NULL;
-	va_start(marker, _Format);
-	size_t num_of_chars = _vscwprintf(_Format, marker);
-
+	va_start(marker, format);
+#ifdef _MSC_VER
+	size_t num_of_chars = _vscwprintf(format, marker);
+#else
+	size_t num_of_chars = vswprintf(nullptr, 0, format, marker);
+#endif
 	if (num_of_chars > tmp.capacity()) {
 		tmp.resize(num_of_chars + 1);
 	}
-	vswprintf_s((wchar_t *)tmp.data(), tmp.capacity(), _Format, marker);
+#if defined(_MSC_VER) && _MSC_VER > 1600
+	vswprintf_s((wchar_t*)tmp.data(), tmp.capacity(), format, marker);
+#else
+	vswprintf((wchar_t*)tmp.data(), tmp.capacity(), format, marker);
+#endif
+
 	va_end(marker);
 	_str = tmp.c_str();
 	return _str;
 }
-std::wstring FormatString(const wchar_t *_Format, va_list marker)
+std::wstring FormatString(const wchar_t* format, va_list marker)
 {
 	std::wstring tmp;
-	size_t num_of_chars = _vscwprintf(_Format, marker);
-
+#ifdef _MSC_VER
+	size_t num_of_chars = _vscwprintf(format, marker);
+#else
+	size_t num_of_chars = vswprintf(nullptr, 0, format, marker);
+#endif
 	if (num_of_chars > tmp.capacity()) {
 		tmp.resize(num_of_chars + 1);
 	}
-	vswprintf_s((wchar_t *)tmp.data(), tmp.capacity(), _Format, marker);
+#if defined(_MSC_VER) && _MSC_VER > 1600
+	vswprintf_s((wchar_t*)tmp.data(), tmp.capacity(), format, marker);
+#else
+	vswprintf((wchar_t*)tmp.data(), tmp.capacity(), format, marker);
+#endif
 	std::wstring  _str = tmp.c_str();
 	return _str;
 }
-std::string FormatString(const char *_Format, va_list marker)
+std::string FormatString(const char* format, va_list marker)
 {
 	std::string tmp;
-	size_t num_of_chars = _vscprintf(_Format, marker);
-
+#ifdef _MSC_VER
+	size_t num_of_chars = _vscprintf(format, marker);
+#else
+	size_t num_of_chars = vsprintf(nullptr, format, marker);
+#endif
 	if (num_of_chars > tmp.capacity()) {
 		tmp.resize(num_of_chars + 1);
 	}
 
-	vsprintf_s((char *)tmp.data(), tmp.capacity(), _Format, marker);
+#if defined(_MSC_VER) && _MSC_VER > 1600
+	vsprintf_s((char*)tmp.data(), tmp.capacity(), format, marker);
+#else
+	vsprintf(nullptr, format, marker);
+#endif
 	std::string _str = tmp.c_str();
 	return _str;
 }
-std::wstring FormatString(const wchar_t *_Format, ...)
+std::wstring FormatString(const wchar_t* format, ...)
 {
 	std::wstring tmp;
 	va_list marker = NULL;
-	va_start(marker, _Format);
-	size_t num_of_chars = _vscwprintf(_Format, marker);
+	va_start(marker, format);
+#ifdef _MSC_VER
+	size_t num_of_chars = _vscwprintf(format, marker);
+#else
+	size_t num_of_chars = vswprintf(nullptr, 0, format, marker);
+#endif
 
 	if (num_of_chars > tmp.capacity()) {
 		tmp.resize(num_of_chars + 1);
 	}
-	vswprintf_s((wchar_t *)tmp.data(), tmp.capacity(), _Format, marker);
+#if defined(_MSC_VER) && _MSC_VER > 1600
+	vswprintf_s((wchar_t*)tmp.data(), tmp.capacity(), format, marker);
+#else
+	vswprintf((wchar_t*)tmp.data(), tmp.capacity(), format, marker);
+#endif
 	va_end(marker);
 	std::wstring  _str = tmp.c_str();
 	return _str;
 }
-std::string FormatString(const char *_Format, ...)
+std::string FormatString(const char* format, ...)
 {
 	std::string tmp;
 
 	va_list marker = NULL;
-	va_start(marker, _Format);
+	va_start(marker, format);
 
-	size_t num_of_chars = _vscprintf(_Format, marker);
-
+#ifdef _MSC_VER
+	size_t num_of_chars = _vscprintf(format, marker);
+#else
+	size_t num_of_chars = vsprintf(nullptr, format, marker);
+#endif
 	if (num_of_chars > tmp.capacity()) {
 		tmp.resize(num_of_chars + 1);
 	}
 
-	vsprintf_s((char *)tmp.data(), tmp.capacity(), _Format, marker);
+#if defined(_MSC_VER) && _MSC_VER > 1600
+	vsprintf_s((char*)tmp.data(), tmp.capacity(), format, marker);
+#else
+	vsprintf(nullptr, format, marker);
+#endif
 
 	va_end(marker);
 
@@ -250,7 +294,6 @@ std::string  StringHlp::UnicodeToAnsi(std::wstring szStr)
 	WideCharToMultiByte(CP_ACP, 0, szStr.c_str(), -1, (LPSTR)pResult.data(), nLen, NULL, NULL);
 	return pResult;
 }
-
 std::string StringHlp::UnicodeToUtf8(std::wstring unicode)
 {
 	int len;

@@ -5,8 +5,8 @@
 
 #define APP_TITLE L"720 Image Viewer"
 
-class COpenGLView;
-class CGameRenderer;
+class CWindowsOpenGLView;
+class CWindowsGameRenderer;
 class CApp
 {
 public:
@@ -14,7 +14,6 @@ public:
 	int Run();
 
 	HINSTANCE GetHInstance();
-	LoggerInternal* GetLogger();
 	SettingHlp* GetSettings();
 	LPWSTR GetCurrentDir();
 	LPCSTR GetCurrentDirA();
@@ -27,9 +26,8 @@ private:
 	LPWSTR* appArgList = nullptr;
 	int appArgCount = 0;
 	HINSTANCE hInst = nullptr;
-	LoggerInternal *logger = nullptr;
-	COpenGLView* mainView = nullptr;
-	CGameRenderer* gameRenderer = nullptr;
+	CWindowsOpenGLView* mainView = nullptr;
+	CWindowsGameRenderer* gameRenderer = nullptr;
 	SettingHlp* settings = nullptr;
 	WCHAR currentDir[MAX_PATH];
 	CHAR currentDirA[MAX_PATH];

@@ -1,28 +1,29 @@
-#include "CGameRenderer.h"
-#include "COpenGLView.h"
+#include "CWindowsGameRenderer.h"
+#include "CWindowsOpenGLView.h"
 #include "CImageLoader.h"
 #include "CCRenderGlobal.h"
 #include "CCMaterial.h"
 #include "CCursor.h"
 #include "CApp.h"
-#include "StringHlp.h"
+#include "CStringHlp.h"
 #include "SettingHlp.h"
+#include "imgui/imgui.h"
 #include <Shlwapi.h>
 #include <time.h>
 
-CGameRenderer::CGameRenderer()
+CWindowsGameRenderer::CWindowsGameRenderer()
 {
-    logger = CApp::Instance->GetLogger();
+    logger = Logger::GetStaticInstance();
 }
-CGameRenderer::~CGameRenderer()
+CWindowsGameRenderer::~CWindowsGameRenderer()
 {
 }
 
-void CGameRenderer::SetOpenFilePath(const wchar_t* path)
+void CWindowsGameRenderer::SetOpenFilePath(const wchar_t* path)
 {
 	currentOpenFilePath = path;
 }
-void CGameRenderer::DoOpenFile()
+void CWindowsGameRenderer::DoOpenFile()
 {
     loading_dialog_active = true;
     if (fileManager->DoOpenFile(currentOpenFilePath.c_str())) {
@@ -53,11 +54,11 @@ void CGameRenderer::DoOpenFile()
         renderer->renderOn = true;
     }
     else {
-        last_image_error = StringHlp::UnicodeToUtf8(std::wstring(fileManager->GetLastError()));
+        last_image_error = CStringHlp::UnicodeToUtf8(std::wstring(fileManager->GetLastError()));
         ShowErrorDialog();
     }
 }
-void CGameRenderer::ShowErrorDialog() {
+void CWindowsGameRenderer::ShowErrorDialog() {
     welecome_dialog_active = false;
     image_err_dialog_active = true;
     file_opened = false;
@@ -65,21 +66,21 @@ void CGameRenderer::ShowErrorDialog() {
     loading_dialog_active = false;
     uiWapper->MessageBeep(CAppUIMessageBoxIcon::IconWarning);
 }
-void CGameRenderer::LoadImageInfo() {
+void CWindowsGameRenderer::LoadImageInfo() {
     //获取图片信息
     auto loader = fileManager->CurrentFileLoader;
     auto imgSize = loader->GetImageSize();
     auto imgFileInfo = loader->GetImageFileInfo();
 
     uiInfo->currentImageType = fileManager->CurrenImageType;
-    uiInfo->currentImageName = StringHlp::UnicodeToUtf8(fileManager->GetCurrentFileName());
-    uiInfo->currentImageImgSize = StringHlp::FormatString("%dx%dx%db", (int)imgSize.x, (int)imgSize.y, loader->GetImageDepth());
-    uiInfo->currentImageSize = StringHlp::GetFileSizeStringAuto(imgFileInfo->fileSize);
+    uiInfo->currentImageName = CStringHlp::UnicodeToUtf8(fileManager->GetCurrentFileName());
+    uiInfo->currentImageImgSize = CStringHlp::FormatString("%dx%dx%db", (int)imgSize.x, (int)imgSize.y, loader->GetImageDepth());
+    uiInfo->currentImageSize = CStringHlp::GetFileSizeStringAuto(imgFileInfo->fileSize);
     uiInfo->currentImageChangeDate = imgFileInfo->Write;
 
     uiInfo->currentImageOpened = true;
 }
-void CGameRenderer::TestSplitImageAndLoadTexture() {
+void CWindowsGameRenderer::TestSplitImageAndLoadTexture() {
     glm::vec2 size = fileManager->CurrentFileLoader->GetImageSize();
     SplitFullImage = size.x > 4096 || size.y > 2048;
     if (SplitFullImage) {
@@ -109,7 +110,7 @@ void CGameRenderer::TestSplitImageAndLoadTexture() {
     SwitchMode(mode);
 }
 
-bool CGameRenderer::Init()
+bool CWindowsGameRenderer::Init()
 {
     CCursor::SetViewCursur(View, CCursor::Default);
 
@@ -145,7 +146,7 @@ bool CGameRenderer::Init()
     render_init_finish = true;
 	return true;
 }
-void CGameRenderer::Destroy()
+void CWindowsGameRenderer::Destroy()
 {
     destroying = true;
     if (uiInfo != nullptr) {
@@ -175,7 +176,7 @@ void CGameRenderer::Destroy()
         renderer = nullptr;
     }
 }
-char* CGameRenderer::GetPanoramaModeStr(PanoramaMode mode)
+char* CWindowsGameRenderer::GetPanoramaModeStr(PanoramaMode mode)
 {
     switch (mode)
     {
@@ -198,15 +199,15 @@ char* CGameRenderer::GetPanoramaModeStr(PanoramaMode mode)
     }
     return nullptr;
 }
-void CGameRenderer::Resize(int Width, int Height)
+void CWindowsGameRenderer::Resize(int Width, int Height)
 {
     glViewport(0, 0, Width, Height);
 }
 
 //输入处理
 
-void CGameRenderer::MouseCallback(COpenGLView* view, float xpos, float ypos, int button, int type) {
-    CGameRenderer* renderer = (CGameRenderer*)view->GetRenderer();
+void CWindowsGameRenderer::MouseCallback(COpenGLView* view, float xpos, float ypos, int button, int type) {
+    CWindowsGameRenderer* renderer = (CWindowsGameRenderer*)view->GetRenderer();
 
     if (type == ViewMouseEventType::ViewMouseMouseDown) {
         if ((button & MK_LBUTTON) == MK_LBUTTON) {
@@ -259,11 +260,11 @@ void CGameRenderer::MouseCallback(COpenGLView* view, float xpos, float ypos, int
         renderer->main_menu_active = ypos < 100 || ypos >  renderer->View->Height - 70;
     }
 }
-void CGameRenderer::ScrollCallback(COpenGLView* view, float x, float yoffset, int button, int type) {
-    CGameRenderer* renderer = (CGameRenderer*)view->GetRenderer();
+void CWindowsGameRenderer::ScrollCallback(COpenGLView* view, float x, float yoffset, int button, int type) {
+    CWindowsGameRenderer* renderer = (CWindowsGameRenderer*)view->GetRenderer();
     renderer->camera->ProcessMouseScroll(yoffset);
 }
-void CGameRenderer::KeyMoveCallback(CCameraMovement move) {
+void CWindowsGameRenderer::KeyMoveCallback(CCameraMovement move) {
     if (mode <= PanoramaMode::PanoramaOuterBall) {
         switch (move)
         {
@@ -305,11 +306,11 @@ void CGameRenderer::KeyMoveCallback(CCameraMovement move) {
 
 //Settings
 
-void CGameRenderer::LoadSettings()
+void CWindowsGameRenderer::LoadSettings()
 {
     settings = CApp::Instance->GetSettings();
 
-    View->ShowInfoOverlay = settings->GetSettingBool(L"ShowInfoOverlay", false);
+    ((CWindowsOpenGLView*)View)->ShowInfoOverlay = settings->GetSettingBool(L"ShowInfoOverlay", false);
     show_console = settings->GetSettingBool(L"ShowConsole", false);
     show_fps = settings->GetSettingBool(L"ShowFps", show_fps);
     show_status_bar = settings->GetSettingBool(L"ShowStatusBar", show_status_bar);
@@ -329,9 +330,9 @@ void CGameRenderer::LoadSettings()
 
     UpdateConsoleState();
 }
-void CGameRenderer::SaveSettings()
+void CWindowsGameRenderer::SaveSettings()
 {
-    settings->SetSettingBool(L"ShowInfoOverlay", View->ShowInfoOverlay);
+    settings->SetSettingBool(L"ShowInfoOverlay", ((CWindowsOpenGLView*)View)->ShowInfoOverlay);
     settings->SetSettingBool(L"DebugTool", debug_tool_active);
     settings->SetSettingBool(L"ShowConsole", show_console);
     settings->SetSettingBool(L"renderDebugWireframe", renderer->renderDebugWireframe);
@@ -348,7 +349,7 @@ void CGameRenderer::SaveSettings()
 
 //绘制
 
-void CGameRenderer::Render(float FrameTime)
+void CWindowsGameRenderer::Render(float FrameTime)
 {
     //渲染
     //===========================
@@ -388,7 +389,7 @@ void CGameRenderer::Render(float FrameTime)
             DeleteFile(path.c_str());
     }
 }
-void CGameRenderer::RenderUI()
+void CWindowsGameRenderer::RenderUI()
 {
     const  ImGuiWindowFlags overlay_window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
     const ImGuiIO& io = ImGui::GetIO();
@@ -452,7 +453,7 @@ void CGameRenderer::RenderUI()
                 if (ImGui::BeginMenu(u8"调试"))
                 {
                     ImGui::MenuItem("Debug tool", "", &debug_tool_active);
-                    ImGui::MenuItem("Info Overlay", "", &View->ShowInfoOverlay);
+                    ImGui::MenuItem("Info Overlay", "", &((CWindowsOpenGLView*)View)->ShowInfoOverlay);
 
                     if (ImGui::BeginMenu(u8"Debug render"))
                     {
@@ -681,7 +682,7 @@ void CGameRenderer::RenderUI()
             ImGui::EndMenuBar();
         }
 
-        ImGui::SliderFloat("Limit fps", &View->LimitFps, 1.0f, 120.0f);
+        ImGui::SliderFloat("Limit fps", &((CWindowsOpenGLView*)View)->LimitFps, 1.0f, 120.0f);
 
         ImGui::Separator();
 
@@ -717,7 +718,7 @@ void CGameRenderer::RenderUI()
             }
         }
         else if (debug_tool_active_tab == 2) {
-            ImGui::SliderFloat3("Model pos", glm::value_ptr(renderer->mainModel->Positon), -8.0f, 8.0f);
+            ImGui::SliderFloat3("Model pos", glm::value_ptr(renderer->mainModel->Position), -8.0f, 8.0f);
             if (ImGui::SliderFloat3("Model roate", glm::value_ptr(renderer->mainModel->Rotation), -8.0f, 8.0f)) 
                 renderer->mainModel->UpdateVectors();
         }
@@ -725,7 +726,7 @@ void CGameRenderer::RenderUI()
             if (ImGui::CollapsingHeader("Flat Normal")) {
                 ImGui::SliderFloat2("FlatModelMin", glm::value_ptr(renderer->FlatModelMin), -1.0f, 1.0f);
                 ImGui::SliderFloat2("FlatModelMax", glm::value_ptr(renderer->FlatModelMax), -1.0f, 1.0f);
-                if (renderer->mainFlatModel && renderer->mainFlatModel->Material)
+                if (renderer->mainFlatModel && !renderer->mainFlatModel->Material.IsNullptr())
                     ImGui::SliderFloat2("FlatModel Material offest", glm::value_ptr(renderer->mainFlatModel->Material->offest), -1.0f, 1.0f);
             }
             if (ImGui::CollapsingHeader("Flat Mercator")) {
@@ -779,7 +780,7 @@ void CGameRenderer::RenderUI()
     if (render_dialog_active) {
         if (ImGui::Begin(u8"渲染配置", &render_dialog_active)) {
 
-            ImGui::SliderFloat(u8"帧率限制", &View->LimitFps, 1.0f, 30.0f);
+            ImGui::SliderFloat(u8"帧率限制", &((CWindowsOpenGLView*)View)->LimitFps, 1.0f, 30.0f);
             ImGui::Separator();
 
             ImGui::SliderInt(u8"球体 X  轴分段", &renderer->sphereSegmentX, 10, 90);
@@ -871,7 +872,7 @@ void CGameRenderer::RenderUI()
         ImGui::PopStyleVar(4);
     }
 }
-void CGameRenderer::Update()
+void CWindowsGameRenderer::Update()
 {
     //加载队列处理
     //===========================
@@ -909,7 +910,7 @@ void CGameRenderer::Update()
 
 //逻辑控制
 
-TextureLoadQueueDataResult* CGameRenderer::LoadChunkTexCallback(TextureLoadQueueInfo* info, CCTexture* texture) {
+TextureLoadQueueDataResult* CWindowsGameRenderer::LoadChunkTexCallback(TextureLoadQueueInfo* info, CCTexture* texture) {
 
     if (!file_opened)
         return nullptr;
@@ -937,8 +938,8 @@ TextureLoadQueueDataResult* CGameRenderer::LoadChunkTexCallback(TextureLoadQueue
 
     return result;
 }
-TextureLoadQueueDataResult* CGameRenderer::LoadTexCallback(TextureLoadQueueInfo* info, CCTexture* texture, void* data) {
-    CGameRenderer* ptr = (CGameRenderer*)data;
+TextureLoadQueueDataResult* CWindowsGameRenderer::LoadTexCallback(TextureLoadQueueInfo* info, CCTexture* texture, void* data) {
+    CWindowsGameRenderer* ptr = (CWindowsGameRenderer*)data;
     if (ptr->destroying)
         return nullptr;
     if (info->id == -1) {
@@ -949,7 +950,7 @@ TextureLoadQueueDataResult* CGameRenderer::LoadTexCallback(TextureLoadQueueInfo*
         TextureLoadQueueDataResult* result = new TextureLoadQueueDataResult();
         result->buffer = ptr->fileManager->CurrentFileLoader->GetAllImageData();
         if (!result->buffer) {
-            ptr->last_image_error = StringHlp::UnicodeToUtf8(std::wstring(L"图像可能已经损坏，错误信息：") + std::wstring(ptr->fileManager->CurrentFileLoader->GetLastError()));
+            ptr->last_image_error = CStringHlp::UnicodeToUtf8(std::wstring(L"图像可能已经损坏，错误信息：") + std::wstring(ptr->fileManager->CurrentFileLoader->GetLastError()));
             ptr->ShowErrorDialog();
             ptr->logger->LogError2(L"Load tex main buffer failed : %s", ptr->fileManager->CurrentFileLoader->GetLastError());
             delete result;
@@ -975,47 +976,47 @@ TextureLoadQueueDataResult* CGameRenderer::LoadTexCallback(TextureLoadQueueInfo*
     }
     return nullptr;
 }
-void CGameRenderer::FileCloseCallback(void* data) {
-    CGameRenderer* ptr = (CGameRenderer*)data;
+void CWindowsGameRenderer::FileCloseCallback(void* data) {
+    CWindowsGameRenderer* ptr = (CWindowsGameRenderer*)data;
     ptr->renderer->panoramaThumbnailTex = nullptr;
     ptr->renderer->renderPanoramaFull = false;
-    ptr->renderer->ReleaseTexPool();
     ptr->renderer->ReleaseFullModel();
+    ptr->renderer->ReleaseTexPool();
     ptr->renderer->UpdateMainModelTex();
     ptr->uiInfo->currentImageOpened = false;
     ptr->renderer->renderOn = false;
     ptr->welecome_dialog_active = true;
     ptr->file_opened = false;
 }
-void CGameRenderer::CameraFOVChanged(void* data, float fov) {
-    CGameRenderer* ptr = (CGameRenderer*)data;
+void CWindowsGameRenderer::CameraFOVChanged(void* data, float fov) {
+    CWindowsGameRenderer* ptr = (CWindowsGameRenderer*)data;
     ptr->zoom_slider_value = (int)((1.0f - (fov - ptr->camera->FovMin) / (ptr->camera->FovMax - ptr->camera->FovMin)) * 100);
     if (ptr->mode == PanoramaSphere || ptr->mode == PanoramaCylinder) {
         ptr->renderer->renderPanoramaFull = ptr->SplitFullImage && fov < 40;
         if(ptr->renderer->renderPanoramaFull) ptr->renderer->UpdateFullChunksVisible();
     }
 }
-void CGameRenderer::CameraOrthoSizeChanged(void* data, float fov) {
-    CGameRenderer* ptr = (CGameRenderer*)data;
+void CWindowsGameRenderer::CameraOrthoSizeChanged(void* data, float fov) {
+    CWindowsGameRenderer* ptr = (CWindowsGameRenderer*)data;
     ptr->zoom_slider_value = (int)((1.0f - (fov - ptr->camera->OrthoSizeMin) / (ptr->camera->OrthoSizeMax - ptr->camera->OrthoSizeMin)) * 100);
     ptr->renderer->UpdateFlatModelMinMax(fov);
 }
 
-void CGameRenderer::CameraRotate(void* data, CCPanoramaCamera* cam)
+void CWindowsGameRenderer::CameraRotate(void* data, CCPanoramaCamera* cam)
 {
-    CGameRenderer* ptr = (CGameRenderer*)data;
+    CWindowsGameRenderer* ptr = (CWindowsGameRenderer*)data;
     if (ptr->SplitFullImage) {
     }
 }
-void CGameRenderer::BeforeQuitCallback(COpenGLView* view) {
-    CGameRenderer* renderer = (CGameRenderer*)view->GetRenderer();
+void CWindowsGameRenderer::BeforeQuitCallback(COpenGLView* view) {
+    CWindowsGameRenderer* renderer = (CWindowsGameRenderer*)view->GetRenderer();
     renderer->SaveSettings();
 }
 
-void CGameRenderer::AddTextureToQueue(CCTexture* tex, int x, int y, int id) {
+void CWindowsGameRenderer::AddTextureToQueue(CCTexture* tex, int x, int y, int id) {
     texLoadQueue->Push(tex, x, y, id);
 }
-void CGameRenderer::SwitchMode(PanoramaMode mode)
+void CWindowsGameRenderer::SwitchMode(PanoramaMode mode)
 {
     this->mode = mode;
     renderer->renderPanoramaFull = false;
@@ -1106,11 +1107,11 @@ void CGameRenderer::SwitchMode(PanoramaMode mode)
         break;
     }
 }
-void CGameRenderer::UpdateConsoleState() {
+void CWindowsGameRenderer::UpdateConsoleState() {
     ShowWindow(GetConsoleWindow(), show_console ? SW_SHOW : SW_HIDE);
     if (show_console) View->Active();
 }
-void CGameRenderer::LoadAndChechRegister() {
+void CWindowsGameRenderer::LoadAndChechRegister() {
     if (!reg_dialog_showed) {
         loopCount += View->GetDeltaTime();
         if (loopCount >= 10.0f) {

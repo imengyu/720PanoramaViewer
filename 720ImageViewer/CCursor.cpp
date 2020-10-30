@@ -1,4 +1,7 @@
 #include "CCursor.h"
+#if defined(VR720_WINDOWS)
+#include "CWindowsOpenGLView.h"
+#endif
 
 CCursor* CCursor::Default;
 CCursor* CCursor::Arrow;
@@ -21,8 +24,12 @@ void CCursor::Destroy() {
 
 void CCursor::SetViewCursur(COpenGLView* view, CCursor* cursor)
 {
-	SetClassLong(view->GetHWND(), GCL_HCURSOR, (LONG)cursor->hCursor);
+#if defined(VR720_WINDOWS)
+	SetClassLong(((CWindowsOpenGLView*)view)->GetHWND(), GCL_HCURSOR, (LONG)cursor->hCursor);
 	SetCursor(cursor->hCursor);
+#elif defined(VR720_WINDOWS)
+
+#endif
 }
 
 CCursor::CCursor(LPCWSTR type)

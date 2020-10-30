@@ -2,7 +2,7 @@
 #include "CBMPLoader.h"
 #include "CJpgLoader.h"
 #include "CPngLoader.h"
-#include "StringHlp.h"
+#include "CStringHlp.h"
 
 const BYTE pngHead[8] = { 0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a };
 const BYTE bmpHead[2] = { 0x42, 0x4d };
@@ -121,11 +121,11 @@ const wchar_t* CImageLoader::GetLastError()
 			 SystemTimeToTzSpecificLocalTime(NULL, &stUTC2, &stLocal2);
 			 SystemTimeToTzSpecificLocalTime(NULL, &stUTC3, &stLocal3);
 
-			 currentImageInfo->Create = StringHlp::FormatString("%d/%02d/%02d",
+			 currentImageInfo->Create = CStringHlp::FormatString("%d/%02d/%02d",
 				 stLocal1.wYear, stLocal1.wMonth, stLocal1.wDay);
-			 currentImageInfo->Access = StringHlp::FormatString("%d/%02d/%02d",
+			 currentImageInfo->Access = CStringHlp::FormatString("%d/%02d/%02d",
 				 stLocal2.wYear, stLocal2.wMonth, stLocal2.wDay);
-			 currentImageInfo->Write = StringHlp::FormatString("%d/%02d/%02d",
+			 currentImageInfo->Write = CStringHlp::FormatString("%d/%02d/%02d",
 				 stLocal3.wYear, stLocal3.wMonth, stLocal3.wDay);
 		 }
 	 }
@@ -159,12 +159,6 @@ void CImageLoader::SetLoadingPrecent(float v)
 void CImageLoader::SetLastError(const wchar_t* err)
 {
 	lastError = err;
-}
-void CImageLoader::SetLastError(const char* err)
-{
-	wchar_t* e = StringHlp::AnsiToUnicode(err);
-	SetLastError(e);
-	StringHlp::FreeStringPtr(e);
 }
 void CImageLoader::SetFullDataSize(unsigned long size)
 {

@@ -1,8 +1,13 @@
 #include "CCFileReader.h"
 
-CCFileReader::CCFileReader(std::wstring path)
+CCFileReader::CCFileReader() = default;
+CCFileReader::CCFileReader(vstring & path)
 {
-	_wfopen_s(&file, path.c_str(), L"r");
+#if defined(_MSC_VER) && _MSC_VER > 1600
+	_v_fopen_s(&file, path.c_str(), _vstr("r"));
+#else
+	file = _v_fopen(path.c_str(), _vstr("r"));
+#endif
 	if (file) {
 		fseek(file, 0, SEEK_END);
 		len = ftell(file);
@@ -11,7 +16,7 @@ CCFileReader::CCFileReader(std::wstring path)
 }
 CCFileReader::~CCFileReader()
 {
-	Close();
+	CloseFileHandle();
 }
 
 bool CCFileReader::Opened()
@@ -20,10 +25,7 @@ bool CCFileReader::Opened()
 }
 void CCFileReader::Close()
 {
-	if (file) {
-		fclose(file);
-		file = nullptr;
-	}
+	CloseFileHandle();
 }
 size_t CCFileReader::Length()
 {
@@ -33,19 +35,41 @@ void CCFileReader::Seek(size_t i, int seekType)
 {
 	fseek(file, i, seekType);
 }
+void CCFileReader::Seek(size_t i) {
+	fseek(file, i, SEEK_SET);
+}
 FILE* CCFileReader::Handle()
 {
 	return file;
 }
 
-void CCFileReader::Read(BYTE* arr, size_t offset, size_t count)
+void CCFileReader::Read(BYTE * arr, size_t offset, size_t count)
 {
+#if defined(_MSC_VER) && _MSC_VER > 1600
 	fread_s(arr, count, 1, count, file);
+#else
+	fread(arr, 1, count, file);
+#endif
 }
 BYTE CCFileReader::ReadByte()
 {
 	BYTE buf;
-	fread_s(&buf, 1, 1, 1, file);
+	Read(&buf, 0, 1);
 	return buf;
 }
+BYTE* CCFileReader::ReadAllByte(size_t * size) {
+	BYTE* buffer = (BYTE*)malloc(len);
+	fseek(file, 0, SEEK_SET);
+	Read(buffer, 0, len);
+	return buffer;
+}
+
+void CCFileReader::CloseFileHandle() {
+	if (file) {
+		fclose(file);
+		file = nullptr;
+	}
+}
+
+
 

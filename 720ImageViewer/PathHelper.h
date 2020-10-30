@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include <string>
-#include "StringHlp.h"
+#include "CStringHlp.h"
 #include <shlwapi.h>
 
 class Path

@@ -154,6 +154,7 @@
     <ClCompile Include="CAppUIWapper.cpp" />
     <ClCompile Include="CBMPLoader.cpp" />
     <ClCompile Include="CCamera.cpp" />
+    <ClCompile Include="CCAssetsManager.cpp" />
     <ClCompile Include="CCFileReader.cpp" />
     <ClCompile Include="CCGUInfo.cpp" />
     <ClCompile Include="CCMaterial.cpp" />
@@ -163,10 +164,11 @@
     <ClCompile Include="CCPanoramaRenderer.cpp" />
     <ClCompile Include="CCRenderGlobal.cpp" />
     <ClCompile Include="CCShader.cpp" />
+    <ClCompile Include="CCSmartPtr.cpp" />
     <ClCompile Include="CCTextureLoadQueue.cpp" />
     <ClCompile Include="CCursor.cpp" />
     <ClCompile Include="CCFileManager.cpp" />
-    <ClCompile Include="CGameRenderer.cpp" />
+    <ClCompile Include="CWindowsGameRenderer.cpp" />
     <ClCompile Include="CHelpDialog.cpp" />
     <ClCompile Include="CImageLoader.cpp" />
     <ClCompile Include="CJpgLoader.cpp" />
@@ -174,10 +176,12 @@
     <ClCompile Include="CCModel.cpp" />
     <ClCompile Include="COpenGLRenderer.cpp" />
     <ClCompile Include="COpenGLView.cpp" />
+    <ClCompile Include="CWindowsOpenGLView.cpp" />
     <ClCompile Include="CCPanoramaCamera.cpp" />
     <ClCompile Include="CPngLoader.cpp" />
     <ClCompile Include="CCTexture.cpp" />
     <ClCompile Include="CRegDialog.cpp" />
+    <ClCompile Include="CStringHlp.cpp" />
     <ClCompile Include="GlUtils.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -258,7 +262,6 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="PathHelper.cpp" />
     <ClCompile Include="SettingHlp.cpp" />
-    <ClCompile Include="StringHlp.cpp" />
     <ClCompile Include="StringSplit.cpp" />
     <ClCompile Include="SystemHelper.cpp" />
     <ClCompile Include="zlib\adler32.c" />
@@ -278,11 +281,13 @@
     <ClCompile Include="zlib\zutil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="api-defines.h" />
     <ClInclude Include="CAboutDialog.h" />
     <ClInclude Include="CApp.h" />
     <ClInclude Include="CAppUIWapper.h" />
     <ClInclude Include="CBMPLoader.h" />
     <ClInclude Include="CCamera.h" />
+    <ClInclude Include="CCAssetsManager.h" />
     <ClInclude Include="CCFileReader.h" />
     <ClInclude Include="CCGUInfo.h" />
     <ClInclude Include="CCMaterial.h" />
@@ -292,21 +297,25 @@
     <ClInclude Include="CCPanoramaRenderer.h" />
     <ClInclude Include="CCRenderGlobal.h" />
     <ClInclude Include="CCShader.h" />
+    <ClInclude Include="CCSmartPtr.hpp" />
     <ClInclude Include="CCTextureLoadQueue.h" />
     <ClInclude Include="CCursor.h" />
     <ClInclude Include="CCFileManager.h" />
-    <ClInclude Include="CGameRenderer.h" />
+    <ClInclude Include="CWindowsGameRenderer.h" />
     <ClInclude Include="CHelpDialog.h" />
     <ClInclude Include="CImageLoader.h" />
     <ClInclude Include="CJpgLoader.h" />
     <ClInclude Include="CCMesh.h" />
     <ClInclude Include="CCModel.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="COpenGLRenderer.h" />
     <ClInclude Include="COpenGLView.h" />
+    <ClInclude Include="CWindowsOpenGLView.h" />
     <ClInclude Include="CCPanoramaCamera.h" />
     <ClInclude Include="CPngLoader.h" />
     <ClInclude Include="CCTexture.h" />
     <ClInclude Include="CRegDialog.h" />
+    <ClInclude Include="CStringHlp.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl3.h" />
@@ -356,9 +365,9 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SettingHlp.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="StringHlp.h" />
     <ClInclude Include="StringSplit.h" />
     <ClInclude Include="SystemHelper.h" />
+    <ClInclude Include="type-defines.h" />
     <ClInclude Include="zlib\crc32.h" />
     <ClInclude Include="zlib\deflate.h" />
     <ClInclude Include="zlib\gzguts.h" />

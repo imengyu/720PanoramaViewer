@@ -26,11 +26,11 @@ enum PanoramaMode : int16_t {
 };
 
 class CImageLoader;
-class CGameRenderer : public COpenGLRenderer
+class CWindowsGameRenderer : public COpenGLRenderer
 {
 public:
-	CGameRenderer();
-	~CGameRenderer();
+	CWindowsGameRenderer();
+	~CWindowsGameRenderer();
 
 	void SetOpenFilePath(const wchar_t* path);
 	void DoOpenFile();
@@ -46,7 +46,7 @@ public:
 
 private:
 
-	LoggerInternal* logger;
+	Logger* logger;
 
 	std::wstring currentOpenFilePath;
 	bool fileOpened = false;
@@ -97,7 +97,7 @@ private:
 	std::string last_image_error;
 
 	float current_fps = 0;
-	DWORD current_draw_time = 0;
+	float current_draw_time = 0;
 
 	int zoom_slider_value = 50;
 

@@ -6,6 +6,7 @@
 //加载贴图回调
 typedef void (*CCFileManagerOnCloseCallback)(void* data);
 
+//文件打开管理
 class COpenGLRenderer;
 class CCFileManager
 {
@@ -13,17 +14,16 @@ public:
 
 	CCFileManager(COpenGLRenderer *render);
 
-	void OpenFile();
-	void CloseFile();
+#if defined(VR720_WINDOWS)
+	bool DoOpenFile(const vchar* path);
 	void DeleteCurrentFile();
 	void OpenCurrentFileAs();
-	std::wstring  GetCurrentFileName();
-	bool DoOpenFile(const wchar_t* path);
-
-	static const std::wstring GetResourcePath(const wchar_t* typeName, const wchar_t* name);
-	static const std::wstring GetDirResourcePath(const wchar_t* dirName, const wchar_t* name);
-	static const std::string GetResourcePath(const char* typeName, const char* name);
-	static const std::string GetDirResourcePath(const char* dirName, const char* name);
+	void OpenFile();
+#else
+	bool OpenFile(const vchar* path);
+#endif
+	void CloseFile();
+	vstring GetCurrentFileName();
 
 	CImageLoader* CurrentFileLoader = nullptr;
 	ImageType CurrenImageType = ImageType::Unknow;
@@ -35,11 +35,11 @@ public:
 
 	bool ImageRatioNotStandard = false;
 
-	const wchar_t* GetLastError();
+	const vchar* GetLastError();
 private:
 
 	Logger* logger = nullptr;
-	std::wstring lastErr;
+	vstring lastErr;
 	COpenGLRenderer* Render = nullptr;
 
 	CCFileManagerOnCloseCallback onCloseCallback = nullptr;

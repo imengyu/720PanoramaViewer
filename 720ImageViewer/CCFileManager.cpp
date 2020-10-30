@@ -69,42 +69,6 @@ bool CCFileManager::DoOpenFile(const wchar_t* path) {
     ImageRatioNotStandard = (glm::abs(size.x / size.y - 2.0f) > 0.2f);
     return true;
 }
-const std::wstring CCFileManager::GetResourcePath(const wchar_t* typeName, const wchar_t* name)
-{
-    std::wstring str(CApp::Instance->GetCurrentDir());
-    str += L"\\resources\\";
-    str += typeName;
-    str += L"\\";
-    str += name;
-    return str;
-}
-const std::wstring CCFileManager::GetDirResourcePath(const wchar_t* dirName, const wchar_t* name)
-{
-    std::wstring str(CApp::Instance->GetCurrentDir());
-    str += L"\\";
-    str += dirName;
-    str += L"\\";
-    str += name;
-    return str;
-}
-const std::string CCFileManager::GetResourcePath(const char* typeName, const char* name)
-{
-    std::string str(CApp::Instance->GetCurrentDirA());
-    str += "\\resources\\";
-    str += typeName;
-    str += "\\";
-    str += name;
-    return str;
-}
-const std::string CCFileManager::GetDirResourcePath(const char* dirName, const char* name)
-{
-    std::string str(CApp::Instance->GetCurrentDirA());
-    str += "\\";
-    str += dirName;
-    str += "\\";
-    str += name;
-    return str;
-}
 const wchar_t* CCFileManager::GetLastError()
 {
     return lastErr.c_str();
@@ -112,6 +76,6 @@ const wchar_t* CCFileManager::GetLastError()
 
 CCFileManager::CCFileManager(COpenGLRenderer* render)
 {
-    logger = CApp::Instance->GetLogger();
+    logger = Logger::GetStaticInstance();
     Render = render;
 }

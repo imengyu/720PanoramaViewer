@@ -1,5 +1,6 @@
 #include "CJpgLoader.h"
 #include "CApp.h"
+#include "CStringHlp.h"
 
 char jpeg_last_err[JMSG_LENGTH_MAX];
 
@@ -10,7 +11,7 @@ void jpeg_error_exit(j_common_ptr cinfo) {
 void jpeg_output_message(j_common_ptr cinfo) {
     char buffer[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message) (cinfo, buffer);
-    CApp::Instance->GetLogger()->Log2(L"%hs", buffer);
+    Logger::GetStaticInstance()->Log2(L"%hs", buffer);
     strcpy_s(jpeg_last_err, buffer);
 }
 
@@ -42,7 +43,7 @@ BYTE* CJpgLoader::GetAllImageData()
             jerr.output_message = jpeg_output_message;
             jpeg_stdio_src(&cinfo, file);
             if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) {
-                SetLastError("Bad jpeg header");
+                SetLastError(L"Bad jpeg header");
                 return nullptr;
             }
 
@@ -54,12 +55,12 @@ BYTE* CJpgLoader::GetAllImageData()
                 cinfo.scale_denom = rat;
             }
             else if (rat > 16) {
-                SetLastError( "Too big image");
+                SetLastError(L"Too big image");
                 return nullptr;
             }
 
             if (width <= 0 || height <= 0) {
-                SetLastError("Bad image size");
+                SetLastError(L"Bad image size");
                 return nullptr;
             }
 
@@ -100,7 +101,7 @@ BYTE* CJpgLoader::GetAllImageData()
             return t_buffer;
         }
 
-        SetLastError("File not exists");
+        SetLastError(L"File not exists");
         return nullptr;
     }
     return nullptr;
@@ -123,7 +124,7 @@ BYTE* CJpgLoader::GetImageChunkData(int x, int y, int chunkW, int chunkH)
         jerr.output_message = jpeg_output_message;
         jpeg_stdio_src(&cinfo, file);
         if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) {
-            SetLastError("Bad jpeg header");
+            SetLastError(L"Bad jpeg header");
             return nullptr;
         }
 
@@ -215,7 +216,7 @@ BYTE* CJpgLoader::GetImageChunkData(int x, int y, int chunkW, int chunkH)
         return t_fix_buffer;
     }
 
-    SetLastError("File not exists");
+    SetLastError(L"File not exists");
     return nullptr;
 }
 
@@ -237,7 +238,7 @@ bool CJpgLoader::Load(const wchar_t* path)
             jerr.output_message = jpeg_output_message;
             jpeg_stdio_src(&cinfo, file);
             if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) {
-                SetLastError(jpeg_last_err);
+                SetLastError(CStringHlp::AnsiToUnicode(jpeg_last_err).c_str());
                 fclose(file);
                 return false;
             }

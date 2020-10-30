@@ -38,8 +38,7 @@ public:
 	void SetLoadingPrecent(float v);
 
 protected:
-	void SetLastError(const wchar_t*err);
-	void SetLastError(const char* err);
+	void SetLastError(const wchar_t* err);
 	void SetFullDataSize(unsigned long size);
 	void SetChunkDataSize(unsigned long size);
 

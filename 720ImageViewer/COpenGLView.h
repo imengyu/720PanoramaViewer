@@ -1,8 +1,6 @@
 #pragma once
 #include "COpenGLRenderer.h"
 
-#include <imgui.h>
-
 typedef void(*ViewMouseCallback)(COpenGLView* view, float xpos, float ypos, int button, int type);
 typedef void(*BeforeQuitCallback)(COpenGLView* view);
 
@@ -14,144 +12,207 @@ enum ViewMouseEventType {
 	ViewMouseMouseMove,
 	ViewMouseMouseWhell,
 };
+
 class CCamera;
 class CCShader;
 class CCRenderGlobal;
+//OpenGL 视图抽象类
 class COpenGLView
 {
+public:
+	COpenGLView(COpenGLRenderer *renderer);
+	virtual ~COpenGLView();
+
+	//视图高度
+	int Width = 800;
+	//视图宽度
+	int Height = 600;
+
+	/**
+	 * 初始化
+	 * @return 返回是否成功
+	 */
+	virtual bool Init() { return false; }
+	/**
+	 * 释放
+	 */
+	virtual void Destroy() {}
+
+#if defined(VR720_ANDROID)
+
+	/**
+	 * 手动更新视图大小
+	 * @param w 宽度
+	 * @param h 高度
+	 */
+	virtual void Resize(int w, int h);
+
+#elif defined(VR720_WINDOWS) || defined(VR720_LINUX)
+
+	//获取或设置窗口是否全屏
+	bool IsFullScreen = false;
+
+	/**
+	 * 更新窗口是否全屏的状态
+	 */
+	virtual void UpdateFullScreenState() {}
+	/**
+	 * 设置窗口是否全屏
+	 * @param full 是否全屏
+	 */
+	virtual void SetFullScreen(bool full) {}
+	/**
+	 * 获取窗口是否全屏
+	 * @return
+	 */
+	virtual bool GetIsFullScreen() { return IsFullScreen; }
+
+	/**
+	 * 显示窗口
+	 * @param Maximized 是否最大化
+	 */
+	virtual void Show(bool Maximized = false) {}
+	//激活窗口
+	virtual void Active() {}
+	//运行窗口消息循环（仅Windows）
+	virtual void MessageLoop() {}
+	/**
+	 * 调整窗口大小
+	 * @param w 宽度
+	 * @param h 高度
+	 * @param moveToCenter 是否移动到屏幕中央
+	 */
+	virtual void Resize(int w, int h, bool moveToCenter);
+
+	//关闭窗口
+	virtual void CloseView() {}
+	//等待渲染线程退出
+	virtual void WaitDestroyComplete() {}
+
+	//设置为低FPS模式
+	virtual void SetToLowerFpsMode() {}
+	//退出为低FPS模式
+	virtual void QuitLowerFpsMode() {}
+
+	//开始窗口鼠标捕捉
+	virtual void MouseCapture() {}
+	//释放窗口鼠标捕捉
+	virtual void ReleaseCapture() {}
+
+	/**
+	 * 设置当前窗口的文字
+	 * @param text 文字
+	 */
+	virtual void SetViewText(const vchar * text) {}
+
+	/**
+	 * 设置当窗口关闭前回调
+	 */
+	void SetBeforeQuitCallback(BeforeQuitCallback beforeQuitCallback);
+	/**
+	 * 设置鼠标事件回调
+	 */
+	void SetMouseCallback(ViewMouseCallback mouseCallback);
+	/**
+	 * 设置鼠标滚动事件回调
+	 */
+	void SetScrollCallback(ViewMouseCallback mouseCallback);
+
+#endif
+
+#if defined(VR720_WINDOWS)
+	/**
+	 * 发送Windows消息至窗口
+	 */
+	virtual LRESULT SendWindowsMessage(UINT Msg, WPARAM wParam, LPARAM lParam) { return 0; }
+#endif
+
+	//摄像机
+	//**********************
+
+	/**
+	 * 计算当前主摄像机的矩阵映射
+	 * @param shader 使用的程序
+	 */
+	void CalcMainCameraProjection(CCShader* shader);
+	/**
+	 * 计算无摄像机时的矩阵映射
+	 * @param shader 使用的程序
+	 */
+	void CalcNoMainCameraProjection(CCShader* shader);
+	/**
+	 * 计算当前主摄像机的矩阵映射
+	 * @param shader 使用的程序
+	 */
+	void CalcCameraProjection(CCamera* camera, CCShader* shader);
+
+	//当前主摄像机
+	CCamera* Camera = nullptr;
+
+	/**
+	 * 设置当前主摄像机
+	 * @param camera 摄像机
+	 */
+	virtual void SetCamera(CCamera* camera);
+
+	//时间
+	//**********************
+
+	/**
+	 * 获取当前程序绘制总时间
+	 * @return
+	 */
+	virtual float GetTime() { return 0; }
+	/**
+	 * 获取当前FPS
+	 * @return
+	 */
+	virtual float GetCurrentFps() { return 0; }
+	/**
+	 * 获取绘制时间
+	 * @return
+	 */
+	virtual float GetDrawTime() { return 0; }
+	/**
+	 * 获取增量时间
+	 * @return
+	 */
+	virtual float GetDeltaTime() { return 0; }
+
+	//按键
+	//**********************
+
+	/**
+	 * 获取是否有键按下
+	 * @param code 按键键值
+	 * @return
+	 */
+	virtual bool GetKeyPress(int code) { return false; }
+	/**
+	 * 获取是否有键正在按下
+	 * @param code 按键键值
+	 * @return
+	 */
+	virtual bool GetKeyDown(int code) { return false; }
+	/**
+	 * 获取是否有键放开
+	 * @param code 按键键值
+	 * @return
+	 */
+	virtual bool GetKeyUp(int code) { return false; }
+
+	/**
+	 * 获取当前渲染器
+	 * @return
+	 */
+	COpenGLRenderer * GetRenderer();
+
 protected:
-	LPCWSTR Title = L"";
-	HWND hWnd = NULL;
-	HDC hDC = NULL;
-	HGLRC hGLRC = NULL;
-	COpenGLRenderer *OpenGLRenderer = NULL;
-	HANDLE hThreadRender = NULL;
-	HANDLE hThreadMain = NULL;
-	float currentFps = 0.0f;
-	float currentMaxFps = 0.0f;
 
-private:
-	DWORD startTime = 0;
-	DWORD currentTime = 0;
-	DWORD lastTime = 0;
-	DWORD time = 0;
-	DWORD drawTime = 0;
-	DWORD drawTimeReal = 0;
-	DWORD drawLastTime = 0;
-	double lastSleepTime = 0;
-
-	std::string imguiIniPath;
-
-	bool inited = false;
-	char SizeText[250];
-	float TextPadding = 0;
-	bool Rendering = false;
-	bool RenderThreadRunning = false;
-	bool Destroying = false;
-	WNDPROC CustomWndProc = nullptr;
-	glm::vec2 lastSize;
-
-	int DownedKeys[MAX_KEY_LIST];
-	int UpedKeys[MAX_KEY_LIST];
-
-	bool ViewportChanged = false;
-	bool UpdateTicked = false;
-
-	LoggerInternal* logger = nullptr;
+	COpenGLRenderer * OpenGLRenderer = NULL;
 
 	ViewMouseCallback scrollCallback = nullptr;
 	ViewMouseCallback mouseCallback = nullptr;
 	BeforeQuitCallback beforeQuitCallback = nullptr;
-
-	bool CreateViewWindow(HINSTANCE hInstance);
-	bool InitGl();
-	void InitImgui();
-	void DrawNoCameraOverlay();
-	void DrawViewInfoOverlay(bool* p_open);
-	void DestroyRender();
-public:
-	COpenGLView(COpenGLRenderer *renderer);
-	~COpenGLView();
-
-	int Width = 800, Height = 600;
-
-	bool Init(HINSTANCE hInstance, LPCWSTR Title, int Width, int Height, WNDPROC wndproc);
-	void Show(bool Maximized = false);
-	void Active();
-	void MessageLoop();
-	void Destroy();
-	void Render();
-	void RenderUI();
-
-	void SetViewText(const char * text);
-	void SetViewText(const wchar_t* text);
-
-	void CalcMainCameraProjection(CCShader* shader);
-	void CalcNoMainCameraProjection(CCShader* shader);
-
-	static LRESULT __stdcall WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
-	static DWORD WINAPI RenderThread(LPVOID lpParam);
-	static DWORD __stdcall MainThread(LPVOID lpParam);
-
-	void CallMouseCallback(WPARAM wParam, LPARAM lParam, ViewMouseEventType type);
-	void OnSize(int Width, int Height);
-
-	glm::vec2  ViewportPosToGLPos(glm::vec2 pos);
-	glm::vec2 GLPosToViewportPos(glm::vec2 pos);
-
-	CCamera* Camera = nullptr; 
-
-	float LimitFps = 25.0f;
-	float FixedTimeStep = 10.0f;
-
-	float GetTime();
-	float GetCurrentFps();
-	DWORD GetDrawTime();
-	float GetDeltaTime();
-
-	void SetCamera(CCamera* Camera);
-
-	void CloseView();
-	void MarkDestroyComplete();
-	void WaitDestroyComplete();
-
-	bool ShowInfoOverlay = true;
-	bool IsFullScreen = false;
-
-	bool GetKeyPress(int code);
-	bool GetKeyDown(int code);
-	bool GetKeyUp(int code);
-
-	void Resize(int w, int h, bool moveToCenter);
-	void UpdateFullScreenState();
-	void SetFullScreen(bool full);
-	bool GetIsFullScreen();
-
-	void SetToLowerFpsMode();
-	void QuitLowerFpsMode();
-
-	LRESULT SendWindowsMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
-
-	void MouseCapture();
-	void ReleaseCapture();
-
-	COpenGLRenderer * GetRenderer();
-
-	HWND GetHWND();
-
-	void SetBeforeQuitCallback(BeforeQuitCallback beforeQuitCallback);
-	void SetMouseCallback(ViewMouseCallback mouseCallback);
-	void SetScrollCallback(ViewMouseCallback mouseCallback);
-private:
-
-	bool closeActived = false;
-	float lastSetFps = 0;
-
-	int AddKeyInKeyList(int* list, int code);
-	int IsKeyInKeyListExists(int* list, int code);
-	void HandleDownKey(int code);
-	void HandleUpKey(int code);
-
-
 };
 

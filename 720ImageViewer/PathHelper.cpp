@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "PathHelper.h"
-#include "StringHlp.h"
+#include "CStringHlp.h"
 #include <shlwapi.h>
 
 #define DirectorySeparatorChar L'\\'
@@ -72,7 +72,7 @@ bool Path::CheckInvalidPathChars(std::wstring path)
 }
 std::wstring Path::GetExtension(std::wstring path)
 {
-	if (StringHlp::StrEmeptyW(path.c_str()))	return std::wstring();
+	if (path.empty())	return std::wstring();
 	if(Path::CheckInvalidPathChars(path))	return std::wstring();
 	size_t length = path.size();
 	size_t num = length;
@@ -94,7 +94,7 @@ std::wstring Path::GetExtension(std::wstring path)
 }
 bool Path::IsPathRooted(std::wstring path)
 {
-	if (!StringHlp::StrEmeptyW(path.c_str())) 
+	if (!path.empty()) 
 	{
 		if (Path::CheckInvalidPathChars(path)) return false;
 		size_t length = path.size();
@@ -107,7 +107,7 @@ bool Path::IsPathRooted(std::wstring path)
 }
 bool Path::HasExtension(std::wstring path)
 {
-	if (!StringHlp::StrEmeptyW(path.c_str()))
+	if (!path.empty())
 	{
 		if(Path::CheckInvalidPathChars(path)) 	return false;
 		size_t num = path.size();
@@ -129,7 +129,7 @@ bool Path::HasExtension(std::wstring path)
 std::wstring Path::GetFileNameWithoutExtension(std::wstring path)
 {
 	path = Path::GetFileName(path);
-	if (StringHlp::StrEmeptyW(path.c_str()))
+	if (path.empty())
 		return std::wstring();
 	size_t length;
 	if ((length = path.find_last_of(L'.')) == -1)
@@ -138,7 +138,7 @@ std::wstring Path::GetFileNameWithoutExtension(std::wstring path)
 }
 std::wstring Path::GetFileName(std::wstring path)
 {
-	if (!StringHlp::StrEmeptyW(path.c_str()))
+	if (!path.empty())
 	{
 		size_t length = path.size();
 		size_t num = length;
@@ -153,7 +153,7 @@ std::wstring Path::GetFileName(std::wstring path)
 }
 std::wstring Path::GetDirectoryName(std::wstring path)
 {
-	if (!StringHlp::StrEmeptyW(path.c_str())) {
+	if (!path.empty()) {
 		TCHAR exeFullPath[MAX_PATH];
 		wcscpy_s(exeFullPath, path.c_str());
 		PathRemoveFileSpec(exeFullPath);
