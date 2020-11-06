@@ -1,0 +1,821 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="源文件\Utils">
+      <UniqueIdentifier>{a5051253-8932-40a7-9bba-7b90088556ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Utils">
+      <UniqueIdentifier>{d93fc43e-6116-4e27-9709-45607393a655}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Imgui">
+      <UniqueIdentifier>{1aafddb6-cd66-4c42-9f17-52482c6ce847}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Imgui">
+      <UniqueIdentifier>{61731035-2086-4c94-92da-ff7fee7ab9cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\ImageLoader">
+      <UniqueIdentifier>{8b947b6f-35b1-495e-905e-2a65319f66de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\ImageLoader">
+      <UniqueIdentifier>{a840a425-2bfa-48eb-ac12-b2d6d0337150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Dialogs">
+      <UniqueIdentifier>{ebceb831-5735-43d4-afa8-5a17912c9fe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Dialogs">
+      <UniqueIdentifier>{5ae91501-1cf3-4d49-9556-9f2dcd974a59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Lib">
+      <UniqueIdentifier>{4f615027-921a-45c2-b682-dfe62f217728}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Lib">
+      <UniqueIdentifier>{c9eb94d4-2f8e-4bf3-94c8-7ee33a7316f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Lib\LibPng">
+      <UniqueIdentifier>{efc0eb2c-3523-4f69-8f8d-b92151a7ce37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Lib\LibJpeg">
+      <UniqueIdentifier>{711a120b-3de4-48c3-a66f-8497097017c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Lib\LibPng">
+      <UniqueIdentifier>{a732f69b-47c7-4f13-8dff-d56f3d933036}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Lib\LibJpeg">
+      <UniqueIdentifier>{161a9fb4-fe32-48a8-ad54-499792fd4e72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Lib\Zlib">
+      <UniqueIdentifier>{a1f3bb2e-7260-4497-bf0b-3ee5cf0df36a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Lib\Zlib">
+      <UniqueIdentifier>{bb0ed34f-cc00-4f0b-9842-83abf3dbfe5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Render">
+      <UniqueIdentifier>{09020316-f6f6-4a49-b171-456c684ff65d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Render">
+      <UniqueIdentifier>{e8fbc6df-e3bd-4257-b989-a3a99062e5dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\App">
+      <UniqueIdentifier>{b5f33dc6-d851-4516-a1aa-e84ff7e6b132}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\App">
+      <UniqueIdentifier>{a1497307-8c2a-4378-b214-d2076bc13564}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\MeshLoader">
+      <UniqueIdentifier>{90dc4533-4e8b-4ee6-8f32-a6b48542ba6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\MeshLoader">
+      <UniqueIdentifier>{657d0a25-2599-4df8-87cf-85a895569eee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StringSplit.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <Filter>源文件\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>源文件\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <Filter>源文件\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <Filter>源文件\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
+      <Filter>源文件\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_win32.cpp">
+      <Filter>源文件\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="CImageLoader.cpp">
+      <Filter>源文件\ImageLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemHelper.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CBMPLoader.cpp">
+      <Filter>源文件\ImageLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="CAboutDialog.cpp">
+      <Filter>源文件\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="CHelpDialog.cpp">
+      <Filter>源文件\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="CJpgLoader.cpp">
+      <Filter>源文件\ImageLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jaricom.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcapimin.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcapistd.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcarith.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jccoefct.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jccolor.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcdctmgr.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jchuff.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcicc.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcinit.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcmainct.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcmarker.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcmaster.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcomapi.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcparam.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcphuff.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcprepct.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcsample.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jcstest.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jctrans.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdapimin.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdapistd.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdarith.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdatadst.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdatadst-tj.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdatasrc.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdatasrc-tj.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdcoefct.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdcolor.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jddctmgr.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdhuff.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdicc.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdinput.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdmainct.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdmarker.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdmaster.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdmerge.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdphuff.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdpostct.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdsample.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jdtrans.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jerror.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jfdctflt.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jfdctfst.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jfdctint.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jidctflt.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jidctfst.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jidctint.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jidctred.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jmemmgr.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jmemnobs.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jquant1.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jquant2.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jsimd_none.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="jpeg-turbo\jutils.c">
+      <Filter>源文件\Lib\LibJpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\png.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngerror.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngget.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngmem.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngpread.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngread.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngrio.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngrtran.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngrutil.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngset.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngtrans.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngwio.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngwrite.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngwtran.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="libpng\pngwutil.c">
+      <Filter>源文件\Lib\LibPng</Filter>
+    </ClCompile>
+    <ClCompile Include="CPngLoader.cpp">
+      <Filter>源文件\ImageLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\compress.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\crc32.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\deflate.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\gzclose.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\gzlib.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\gzread.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\gzwrite.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\infback.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\inffast.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\inflate.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\inftrees.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\trees.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\uncompr.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\zutil.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zlib\adler32.c">
+      <Filter>源文件\Lib\Zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="CCamera.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCPanoramaRenderer.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="COpenGLRenderer.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCPanoramaCamera.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCursor.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCTexture.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CColor.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCModel.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCMesh.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCFileManager.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCFileReader.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CApp.cpp">
+      <Filter>源文件\App</Filter>
+    </ClCompile>
+    <ClCompile Include="CAppUIWapper.cpp">
+      <Filter>源文件\App</Filter>
+    </ClCompile>
+    <ClCompile Include="CCTextureLoadQueue.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCRenderGlobal.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCMaterial.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCMeshLoader.cpp">
+      <Filter>源文件\MeshLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="CCShader.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CCObjLoader.cpp">
+      <Filter>源文件\MeshLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="GlUtils.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PathHelper.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCGUInfo.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CRegDialog.cpp">
+      <Filter>源文件\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="CCAssetsManager.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CStringHlp.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CWindowsOpenGLView.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="COpenGLView.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="CWindowsGameRenderer.cpp">
+      <Filter>源文件\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingHlp.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CCSmartPtr.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="720Core.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StringSplit.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imconfig.h">
+      <Filter>头文件\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui.h">
+      <Filter>头文件\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_internal.h">
+      <Filter>头文件\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_rectpack.h">
+      <Filter>头文件\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_textedit.h">
+      <Filter>头文件\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_truetype.h">
+      <Filter>头文件\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_opengl3.h">
+      <Filter>头文件\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_win32.h">
+      <Filter>头文件\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="messages.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CImageLoader.h">
+      <Filter>头文件\ImageLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="CBMPLoader.h">
+      <Filter>头文件\ImageLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingHlp.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CAboutDialog.h">
+      <Filter>头文件\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="CHelpDialog.h">
+      <Filter>头文件\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemHelper.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CJpgLoader.h">
+      <Filter>头文件\ImageLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\cderror.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\cdjpeg.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\cmyk.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jchuff.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jconfig.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jdcoefct.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jdct.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jdhuff.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jdmainct.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jdmaster.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jdmerge.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jdsample.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jerror.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jinclude.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jmemsys.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jmorecfg.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jpeg_nbits_table.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jpegcomp.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jpegint.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jpeglib.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jsimd.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jsimddct.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jversion.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\tjutil.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\transupp.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\turbojpeg.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="jpeg-turbo\jconfigint.h">
+      <Filter>头文件\Lib\LibJpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libpng\png.h">
+      <Filter>头文件\Lib\LibPng</Filter>
+    </ClInclude>
+    <ClInclude Include="libpng\pngconf.h">
+      <Filter>头文件\Lib\LibPng</Filter>
+    </ClInclude>
+    <ClInclude Include="libpng\pngdebug.h">
+      <Filter>头文件\Lib\LibPng</Filter>
+    </ClInclude>
+    <ClInclude Include="libpng\pnginfo.h">
+      <Filter>头文件\Lib\LibPng</Filter>
+    </ClInclude>
+    <ClInclude Include="libpng\pngpriv.h">
+      <Filter>头文件\Lib\LibPng</Filter>
+    </ClInclude>
+    <ClInclude Include="libpng\pngstruct.h">
+      <Filter>头文件\Lib\LibPng</Filter>
+    </ClInclude>
+    <ClInclude Include="CPngLoader.h">
+      <Filter>头文件\ImageLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="libpng\pnglibconf.h">
+      <Filter>头文件\Lib\LibPng</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\crc32.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\deflate.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\gzguts.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\inffast.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\inffixed.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\inflate.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\inftrees.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\trees.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\zconf.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\zlib.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib\zutil.h">
+      <Filter>头文件\Lib\Zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="CCamera.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCPanoramaRenderer.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="COpenGLRenderer.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCPanoramaCamera.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCursor.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCTexture.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CColor.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCModel.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCMesh.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCFileReader.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCFileManager.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CApp.h">
+      <Filter>头文件\App</Filter>
+    </ClInclude>
+    <ClInclude Include="CAppUIWapper.h">
+      <Filter>头文件\App</Filter>
+    </ClInclude>
+    <ClInclude Include="CCTextureLoadQueue.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCRenderGlobal.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCMaterial.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCMeshLoader.h">
+      <Filter>头文件\MeshLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="CCShader.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCObjLoader.h">
+      <Filter>头文件\MeshLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="GlUtils.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PathHelper.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCGUInfo.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CRegDialog.h">
+      <Filter>头文件\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="CCAssetsManager.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CStringHlp.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CWindowsOpenGLView.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="COpenGLView.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CWindowsGameRenderer.h">
+      <Filter>头文件\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CCSmartPtr.hpp">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="720Core.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="3DImageViewer.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cur\01_normal_select.cur">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="cur\05_precision_select.cur">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="cur\13_move.cur">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="cur\15_link_select.cur">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="cur\bin2.bin">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\soui_res.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="logo.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="help.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="logo.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="logo-small.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="help.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="about.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="uires\image\soui.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="not use code.txt">
+      <Filter>源文件</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

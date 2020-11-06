@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<skin>
+  <imglist name="skin_btn_close"  src="img:btn_close" states="3" autoFit="1" />
+  <imglist name="skin_btn_max"  src="img:btn_max" states="3" autoFit="1" />
+  <imglist name="skin_btn_restore"  src="img:btn_restore" states="3" autoFit="1" />
+  <imglist name="skin_btn_min"  src="img:btn_min" states="3" autoFit="1" />
+  <imglist name="skin_btn_menu"  src="img:btn_menu" states="3" autoFit="1" />
+  <imglist name="skin_btn_fullscreen"  src="img:btn_fullscreen" states="3" autoFit="1" />
+  <imgframe name="skin_window_bkgnd"  src="img:window_bkgnd" left="5" right="5" top="40" bottom="40"/>
+  <imglist name="skin_btn_delete"  src="img:btn_delete" states="4" autoFit="1" />
+  <imglist name="skin_btn_left"  src="img:btn_left" states="4" autoFit="1" />
+  <imglist name="skin_btn_right"  src="img:btn_right" states="4" autoFit="1" />
+  <imglist name="skin_btn_scale_100"  src="img:btn_scale_100" states="4" autoFit="1" />
+  <imglist name="skin_btn_scale_org"  src="img:btn_scale_org" states="4" autoFit="1" />
+  <imglist name="skin_btn_btn_tools"  src="img:btn_tools" states="4" autoFit="1" />
+  <imglist name="skin_btn_zoom_in"  src="img:btn_zoom_in" states="4" autoFit="1" />
+  <imglist name="skin_btn_zoom_out"  src="img:btn_zoom_out" states="4" autoFit="1" />
+  <imglist name="skin_btn_open"  src="img:btn_open" states="4" autoFit="1" />
+  <imglist name="skin_btn_info"  src="img:btn_info" states="4" autoFit="1" />
+</skin>

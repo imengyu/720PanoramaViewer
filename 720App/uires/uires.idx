@@ -1,0 +1,37 @@
+﻿<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"/>
+  </UIDEF>
+  <LAYOUT>
+    <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
+  </LAYOUT>
+  
+  <values>
+  	<file name="string" path="values\string.xml"/>
+  	<file name="color" path="values\color.xml"/>
+  	<file name="skin" path="values\skin.xml"/>
+  </values>
+
+  <IMG>
+    <file name="btn_close" path="image\btn_close.png"/>
+    <file name="btn_delete" path="image\btn_delete.png"/>
+    <file name="btn_fullscreen" path="image\btn_fullscreen.png"/>
+    <file name="btn_left" path="image\btn_left.png"/>
+    <file name="btn_max" path="image\btn_max.png"/>
+    <file name="btn_menu" path="image\btn_menu.png"/>
+    <file name="btn_min" path="image\btn_min.png"/>
+    <file name="btn_right" path="image\btn_right.png"/>
+    <file name="btn_restore" path="image\btn_restore.png"/>
+    <file name="btn_scale_100" path="image\btn_scale_100.png"/>
+    <file name="btn_scale_org" path="image\btn_scale_org.png"/>
+    <file name="btn_tools" path="image\btn_tools.png"/>
+    <file name="btn_zoom_in" path="image\btn_zoom_in.png"/>
+    <file name="btn_zoom_out" path="image\btn_zoom_out.png"/>
+    <file name="btn_open" path="image\btn_open.png"/>
+    <file name="btn_info" path="image\btn_info.png"/>
+    <file name="window_bkgnd" path="image\window_bkgnd.png"/>
+  </IMG>
+  <ICON>
+    <file name="ICON_LOGO"  path="image\logo.ico"/>
+  </ICON>
+</resource>

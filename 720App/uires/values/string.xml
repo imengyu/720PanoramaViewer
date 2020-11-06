@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+  <string>
+    <title value="720 Panorama Viewer"/>
+    <close value="关闭"/>
+    <minimize value="最小化"/>
+    <maximize value="最大化"/>
+    <menu value="菜单"/>
+    <restore value="还原"/>
+    <fullscreen value="全屏"/>
+    <ver value="1.0"/>
+  </string>
