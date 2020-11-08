@@ -24,7 +24,12 @@ enum PanoramaMode : int16_t {
 	PanoramaModeMax,
 };
 
-class VR720_EXP CWindowsGameRenderer : public COpenGLRenderer
+#define GAME_FILE_OK 2
+#define GAME_FILE_OPEN_FAILED 3
+
+typedef void(*CGameFileStatusChangedCallback)(void* data, bool isOpen, int status);
+
+class CWindowsGameRenderer : public COpenGLRenderer
 {
 public:
 	CWindowsGameRenderer() {}
@@ -39,10 +44,26 @@ public:
 	virtual void AddTextureToQueue(CCTexture* tex, int x, int y, int id) { }
 	virtual CCGUInfo* GetGUInfo() { return nullptr; }
 	virtual PanoramaMode GetMode() { return PanoramaMode::PanoramaModeMax; }
-	virtual void SwitchMode(PanoramaMode mode) { }
+	virtual void SetMode(PanoramaMode mode) { }
+	virtual const wchar_t* GetFileLastError() { return nullptr; }
+
+	virtual void ZoomIn() { }
+	virtual void ZoomOut() { }
+	virtual void ZoomReset() { }
+	virtual void ZoomBest() { }
+	virtual void OpenFileAs() { }
+
+	virtual void SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void*data) {}
 };
 
 #ifdef VR720_EXPORTS
+
+struct FileStatusChangedCallbackData {
+	bool isOpen;
+	int status;
+	void* data;
+	CGameFileStatusChangedCallback callback;
+};
 
 class CImageLoader;
 class CWindowsGameRendererInternal : public CWindowsGameRenderer
@@ -63,7 +84,17 @@ public:
 	void AddTextureToQueue(CCTexture* tex, int x, int y, int id);
 	CCGUInfo* GetGUInfo() { return uiInfo; }
 	PanoramaMode GetMode() { return mode; }
-	void SwitchMode(PanoramaMode mode);
+	void SetMode(PanoramaMode mode) { SwitchMode(mode); }
+	const wchar_t* GetFileLastError() { return fileManager->GetLastError(); }
+
+	void ZoomIn();
+	void ZoomOut();
+	void ZoomReset();
+	void ZoomBest();
+	void OpenFileAs();
+
+	void SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void* data);
+
 
 private:
 
@@ -115,12 +146,11 @@ private:
 	bool reg_dialog_showed = false;
 	bool file_opened = false;
 
-	std::string last_image_error;
-
 	float current_fps = 0;
 	float current_draw_time = 0;
 
 	int zoom_slider_value = 50;
+	float best_zoom = 0;
 
 	bool render_init_finish = false;
 	bool should_open_file = false;
@@ -146,6 +176,8 @@ private:
 	void UpdateConsoleState();
 	void LoadAndChechkRegister();
 
+	void SwitchMode(PanoramaMode mode);
+
 	float MouseSensitivity = 0.1f;
 	float RoateSpeed = 20.0f;
 	float MoveSpeed = 0.3f;
@@ -161,6 +193,8 @@ private:
 	void LoadSettings();
 	void SaveSettings();
 
+	FileStatusChangedCallbackData fileStatusChangedCallbackData;
+	void CallFileStatusChangedCallback(bool isOpen, int status);
 };
 
 #endif

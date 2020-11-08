@@ -168,6 +168,7 @@
     <ClCompile Include="CCShader.cpp" />
     <ClCompile Include="CCSmartPtr.cpp" />
     <ClCompile Include="CCTextureLoadQueue.cpp" />
+    <ClCompile Include="CCThreadMessageCenter.cpp" />
     <ClCompile Include="CCursor.cpp" />
     <ClCompile Include="CCFileManager.cpp" />
     <ClCompile Include="CWindowsGameRenderer.cpp" />
@@ -301,6 +302,7 @@
     <ClInclude Include="CCShader.h" />
     <ClInclude Include="CCSmartPtr.hpp" />
     <ClInclude Include="CCTextureLoadQueue.h" />
+    <ClInclude Include="CCThreadMessageCenter.h" />
     <ClInclude Include="CCursor.h" />
     <ClInclude Include="CCFileManager.h" />
     <ClInclude Include="CWindowsGameRenderer.h" />

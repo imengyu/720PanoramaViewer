@@ -4,12 +4,9 @@
 #include "CStringHlp.h"
 #include <shlwapi.h>
 
-class Path
+class VR720_EXP Path
 {
 public:
-	Path();
-	~Path();
-
 	static std::wstring GetFileNameWithoutExtension(std::wstring path);
 	static std::wstring GetExtension(std::wstring path);
 	static bool IsPathRooted(std::wstring path1);

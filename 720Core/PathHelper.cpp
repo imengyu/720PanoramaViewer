@@ -7,13 +7,6 @@
 #define AltDirectorySeparatorChar  L'/'
 #define VolumeSeparatorChar  L':'
 
-Path::Path()
-{
-}
-Path::~Path()
-{
-}
-
 bool Path::RemoveQuotes(LPWSTR pathBuffer, size_t bufferSize)
 {
 	if (pathBuffer[0] == L'\"')

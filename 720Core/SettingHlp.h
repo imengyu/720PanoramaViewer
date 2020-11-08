@@ -4,7 +4,7 @@
 
 #define SETTING_DAFAULT_APP_KEY L"App"
 
-class VR720_EXP SettingHlp
+class SettingHlp
 {
 public:
 	virtual bool GetSettingBool(LPCWSTR key, bool defaultValue = true, LPCWSTR appKey = SETTING_DAFAULT_APP_KEY) { return false; }

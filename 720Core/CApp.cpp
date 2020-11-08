@@ -7,8 +7,6 @@
 #include "PathHelper.h"
 #include <shellapi.h>
 
-CApp* CApp::Instance = nullptr;
-
 bool CAppInternal::Init()
 {	
 	//命令行
@@ -20,7 +18,6 @@ bool CAppInternal::Init()
 	}
 
 	//程序路径处理
-	Instance = this;
 	hInst = GetModuleHandle(NULL);
 	GetModuleFileName(NULL, currentPath, MAX_PATH);
 	wcscpy_s(currentDir, currentPath);
@@ -33,6 +30,8 @@ bool CAppInternal::Init()
 	InitConsole();
 
 	CCPtrPool::InitPool();
+
+	threadMessageCenter = new CCThreadMessageCenterInternal();
 
 	LoggerInternal::InitConst();
 
@@ -96,7 +95,7 @@ int CAppInternal::Run(int* p)
 	else
 	{
 		logger->LogError(L"Init COpenGLView failed !");
-		MessageBox(NULL, L"初始化失败！", APP_TITLE, MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"初始化失败！请尝试重新打开软件", APP_TITLE, MB_OK | MB_ICONERROR);
 		result = -1;
 	}
 
@@ -158,18 +157,19 @@ bool CAppInternal::Destroy()
 	CCMeshLoader::Destroy();
 	CCPtrPool::ReleasePool();
 	delete settings;
+	delete threadMessageCenter;
 	delete gameRenderer;
 	delete mainView;
 
 	return true;
 }
+void CAppInternal::SetAppRunCallback(void* ptr, CAppRunCallback callback)
+{
+	runCallbackData = ptr;
+	runCallback = callback;
+}
 void CAppInternal::SetCurrentHWND(HWND hWnd)
 {
 	hMain = hWnd;
 	settings->SetSettingInt(L"LastHWND", (int)hWnd);
-}
-void CApp::SetAppRunCallback(void*ptr, CAppRunCallback callback)
-{
-	runCallbackData = ptr;
-	runCallback = callback;
 }

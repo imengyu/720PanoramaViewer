@@ -54,8 +54,8 @@ void CWindowsGameRendererInternal::DoOpenFile()
         renderer->renderOn = true;
     }
     else {
-        last_image_error = CStringHlp::UnicodeToUtf8(std::wstring(fileManager->GetLastError()));
         ShowErrorDialog();
+        CallFileStatusChangedCallback(false, GAME_FILE_OPEN_FAILED);
     }
 }
 void CWindowsGameRendererInternal::ShowErrorDialog() {
@@ -127,7 +127,7 @@ bool CWindowsGameRendererInternal::Init()
     camera->SetFOVChangedCallback(CameraFOVChanged, this);
     camera->SetOrthoSizeChangedCallback(CameraOrthoSizeChanged, this);
     camera->SetRotateCallback(CameraRotate, this);
-    camera->Background = CColor::FromString("#FFFFFF");
+    camera->Background = CColor::FromRGBA(0.9529f, 0.9529f, 0.9529f);
     fileManager->SetOnCloseCallback(FileCloseCallback, this);
 
     View->SetCamera(camera);
@@ -309,7 +309,7 @@ void CWindowsGameRendererInternal::KeyMoveCallback(CCameraMovement move) {
 
 void CWindowsGameRendererInternal::LoadSettings()
 {
-    settings = CApp::Instance->GetSettings();
+    settings = AppGetAppInstance()->GetSettings();
 
     ((CWindowsOpenGLView*)View)->ShowInfoOverlay = settings->GetSettingBool(L"ShowInfoOverlay", false);
     show_console = settings->GetSettingBool(L"ShowConsole", false);
@@ -347,6 +347,7 @@ void CWindowsGameRendererInternal::SaveSettings()
     settings->SetSettingBool(L"ShowFps", show_fps);
     settings->SetSettingBool(L"ShowStatusBar", show_status_bar);
 }
+
 
 //绘制
 
@@ -397,6 +398,8 @@ void CWindowsGameRendererInternal::RenderUI()
 
     ui_update_tick += View->GetDeltaTime();
     if (ui_update_tick > 0.5f) ui_update_tick = 0.0f;
+
+    /*
 
     //顶栏
     if (main_menu_active || !View->IsFullScreen) {
@@ -666,6 +669,8 @@ void CWindowsGameRendererInternal::RenderUI()
         }
     }
 
+    */
+
     //调试工具
     if (debug_tool_active) {
         ImGui::Begin("Debug Tool", &debug_tool_active, ImGuiWindowFlags_MenuBar);
@@ -821,6 +826,7 @@ void CWindowsGameRendererInternal::RenderUI()
         }
     }
 
+    /*
     //欢迎对话框  
     if (welecome_dialog_active) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -872,6 +878,8 @@ void CWindowsGameRendererInternal::RenderUI()
         }
         ImGui::PopStyleVar(4);
     }
+    
+    */
 }
 void CWindowsGameRendererInternal::Update()
 {
@@ -951,10 +959,10 @@ TextureLoadQueueDataResult* CWindowsGameRendererInternal::LoadTexCallback(Textur
         TextureLoadQueueDataResult* result = new TextureLoadQueueDataResult();
         result->buffer = ptr->fileManager->CurrentFileLoader->GetAllImageData();
         if (!result->buffer) {
-            ptr->last_image_error = CStringHlp::UnicodeToUtf8(std::wstring(L"图像可能已经损坏，错误信息：") + std::wstring(ptr->fileManager->CurrentFileLoader->GetLastError()));
             ptr->ShowErrorDialog();
             ptr->logger->LogError2(L"Load tex main buffer failed : %s", ptr->fileManager->CurrentFileLoader->GetLastError());
             delete result;
+             ptr->CallFileStatusChangedCallback(false, GAME_FILE_OPEN_FAILED);
             return nullptr;
         }
 
@@ -965,9 +973,14 @@ TextureLoadQueueDataResult* CWindowsGameRendererInternal::LoadTexCallback(Textur
         result->height = (int)size.y;
         result->success = true;
 
+        ptr->best_zoom = ptr->camera->FovMin + (result->height > 2048 ? 1 : result->height / 2048.0f) * 
+            ((ptr->camera->FovMax - ptr->camera->FovMin) / 2);
+
         ptr->logger->Log(L"Load tex buffer: w: %d h: %d (%d)  Buffer Size: %d", (int)size.x, (int)size.y, result->compoents, result->size);
         ptr->loading_dialog_active = false;
         ptr->uiInfo->currentImageLoading = false;
+
+        ptr->CallFileStatusChangedCallback(true, GAME_FILE_OK);
 
         return result;
     }
@@ -989,6 +1002,7 @@ void CWindowsGameRendererInternal::FileCloseCallback(void* data) {
     ptr->renderer->renderOn = false;
     ptr->welecome_dialog_active = true;
     ptr->file_opened = false;
+    ptr->CallFileStatusChangedCallback(false, GAME_FILE_OK);
 }
 void CWindowsGameRendererInternal::CameraFOVChanged(void* data, float fov) {
     auto* ptr = (CWindowsGameRendererInternal*)data;
@@ -1109,6 +1123,12 @@ void CWindowsGameRendererInternal::SwitchMode(PanoramaMode mode)
         break;
     }
 }
+void CWindowsGameRendererInternal::ZoomIn() { camera->ProcessMouseScroll(-120); }
+void CWindowsGameRendererInternal::ZoomOut() { camera->ProcessMouseScroll(120); }
+void CWindowsGameRendererInternal::ZoomReset() { camera->FiledOfView = camera->FovMin; }
+void CWindowsGameRendererInternal::ZoomBest() { camera->FiledOfView = best_zoom; }
+void CWindowsGameRendererInternal::OpenFileAs() {  fileManager->OpenCurrentFileAs();  }
+
 void CWindowsGameRendererInternal::UpdateConsoleState() {
     ShowWindow(GetConsoleWindow(), show_console ? SW_SHOW : SW_HIDE);
     if (show_console) View->Active();
@@ -1137,5 +1157,30 @@ void CWindowsGameRendererInternal::LoadAndChechkRegister() {
                 View->SendWindowsMessage(WM_CUSTOM_SHOW_REG, 0, 0);
             }
         }
+    }
+}
+
+//回调设置
+//****************************************************************
+
+void CWindowsGameRendererInternal::SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void* data)
+{
+    fileStatusChangedCallbackData.callback = callback;
+    fileStatusChangedCallbackData.data = data;
+}
+
+//回调处理
+//****************************************************************
+
+void ThreadFileStatusChangedCallback(void* ptr) {
+    auto* a = (FileStatusChangedCallbackData*)ptr;
+    a->callback(a->data, a->isOpen, a->status);
+}
+void CWindowsGameRendererInternal::CallFileStatusChangedCallback(bool isOpen, int status)
+{
+    if (fileStatusChangedCallbackData.callback) {
+        fileStatusChangedCallbackData.isOpen = isOpen;
+        fileStatusChangedCallbackData.status = status;
+        AppGetAppInstance()->GetMessageCenter()->RunOnUIThread(&fileStatusChangedCallbackData, ThreadFileStatusChangedCallback);
     }
 }

@@ -1,0 +1,11 @@
+﻿<SOUI name="panoWindow" title="@string/title" wndType="normal" translucent="1"  toolWindow="1">
+  <root skin="skin_float_bg_big" size="-1,-1" padding="4,4,4,14">
+    <text align="center" font="size:12" size="126,26"  colorText="#999999">全景图模式</text>
+    <button pos="0,26" size="126,26" name="btn_pano_sphere" skin="skin_btn_small" drawFocusRect="0">球面</button>
+    <button pos="0,52" size="126,26" name="btn_pano_cylinder" skin="skin_btn_small" drawFocusRect="0">平面</button>
+    <button pos="0,78" size="126,26" name="btn_pano_asteroid" skin="skin_btn_small" drawFocusRect="0">小行星</button>
+    <button pos="0,104" size="126,26" name="btn_pano_outball" skin="skin_btn_small" drawFocusRect="0">水晶球</button>
+    <button pos="0,130" size="126,26" name="btn_pano_360" skin="skin_btn_small" drawFocusRect="0">360°全景</button>
+    <button pos="0,156" size="126,26" name="btn_pano_orginal" skin="skin_btn_small" drawFocusRect="0">原图</button>
+  </root>
+</SOUI>

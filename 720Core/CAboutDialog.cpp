@@ -5,11 +5,11 @@
 
 void CAboutDialog::Show(HWND hWnd)
 {
-    DialogBox(CApp::Instance->GetHInstance(), MAKEINTRESOURCE(IDD_ABOUT), hWnd, About);
+    DialogBox(AppGetAppInstance()->GetHInstance(), MAKEINTRESOURCE(IDD_ABOUT), hWnd, About);
 }
 void CAboutDialog::LoadReged(HWND hDlg)
 {
-    bool reged = CApp::Instance->GetSettings()->GetSettingBool(L"registered", false);
+    bool reged = AppGetAppInstance()->GetSettings()->GetSettingBool(L"registered", false);
     if (reged) {
         ShowWindow(GetDlgItem(hDlg, IDC_REGIST), SW_HIDE);
         ShowWindow(GetDlgItem(hDlg, IDC_REG_TO), SW_SHOW);
@@ -26,8 +26,8 @@ INT_PTR CAboutDialog::About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
     switch (message)
     {
     case WM_INITDIALOG: {
-        SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)LoadIcon(CApp::Instance->GetHInstance(), MAKEINTRESOURCE(IDI_APP)));
-        SendMessage(hDlg, WM_SETICON, ICON_BIG, (LPARAM)LoadIcon(CApp::Instance->GetHInstance(), MAKEINTRESOURCE(IDI_APP)));
+        SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)LoadIcon(AppGetAppInstance()->GetHInstance(), MAKEINTRESOURCE(IDI_APP)));
+        SendMessage(hDlg, WM_SETICON, ICON_BIG, (LPARAM)LoadIcon(AppGetAppInstance()->GetHInstance(), MAKEINTRESOURCE(IDI_APP)));
         LoadReged(hDlg);
         return (INT_PTR)TRUE;
     }

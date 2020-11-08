@@ -1,21 +1,74 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
 <skin>
-  <imglist name="skin_btn_close"  src="img:btn_close" states="3" autoFit="1" />
-  <imglist name="skin_btn_max"  src="img:btn_max" states="3" autoFit="1" />
-  <imglist name="skin_btn_restore"  src="img:btn_restore" states="3" autoFit="1" />
-  <imglist name="skin_btn_min"  src="img:btn_min" states="3" autoFit="1" />
-  <imglist name="skin_btn_menu"  src="img:btn_menu" states="3" autoFit="1" />
-  <imglist name="skin_btn_fullscreen"  src="img:btn_fullscreen" states="3" autoFit="1" />
-  <imgframe name="skin_window_bkgnd"  src="img:window_bkgnd" left="5" right="5" top="40" bottom="40"/>
-  <imglist name="skin_btn_delete"  src="img:btn_delete" states="4" autoFit="1" />
-  <imglist name="skin_btn_left"  src="img:btn_left" states="4" autoFit="1" />
-  <imglist name="skin_btn_right"  src="img:btn_right" states="4" autoFit="1" />
-  <imglist name="skin_btn_scale_100"  src="img:btn_scale_100" states="4" autoFit="1" />
-  <imglist name="skin_btn_scale_org"  src="img:btn_scale_org" states="4" autoFit="1" />
-  <imglist name="skin_btn_btn_tools"  src="img:btn_tools" states="4" autoFit="1" />
-  <imglist name="skin_btn_zoom_in"  src="img:btn_zoom_in" states="4" autoFit="1" />
-  <imglist name="skin_btn_zoom_out"  src="img:btn_zoom_out" states="4" autoFit="1" />
-  <imglist name="skin_btn_open"  src="img:btn_open" states="4" autoFit="1" />
-  <imglist name="skin_btn_info"  src="img:btn_info" states="4" autoFit="1" />
+  <imglist name="skin_btn_close"  src="IMGX:btn_close" states="3"/>
+  <imglist name="skin_btn_max"  src="IMGX:btn_max" states="3" scale="100"  />
+  <imglist name="skin_btn_restore"  src="IMGX:btn_restore" states="3" scale="100"  />
+  <imglist name="skin_btn_min"  src="IMGX:btn_min" states="3" scale="100"  />
+  <imglist name="skin_btn_menu"  src="IMGX:btn_menu" states="3" />
+  <imglist name="skin_btn_fullscreen"  src="IMGX:btn_fullscreen" states="3" />
+  <imglist name="skin_btn_delete"  src="IMGX:btn_delete" states="4" />
+  <imglist name="skin_btn_left"  src="IMGX:btn_left" states="4" />
+  <imglist name="skin_btn_right"  src="IMGX:btn_right" states="4"/>
+  <imglist name="skin_btn_scale_100"  src="IMGX:btn_scale_100" states="4" />
+  <imglist name="skin_btn_scale_org"  src="IMGX:btn_scale_org" states="4" />
+  <imglist name="skin_btn_btn_tools"  src="IMGX:btn_tools" states="4" />
+  <imglist name="skin_btn_tools_big"  src="IMGX:btn_tools_big" states="3" />
+  <imglist name="skin_btn_zoom_in"  src="IMGX:btn_zoom_in" states="4" />
+  <imglist name="skin_btn_zoom_out"  src="IMGX:btn_zoom_out" states="4" />
+  <imglist name="skin_btn_open"  src="IMGX:btn_open" states="4" />
+  <imglist name="skin_btn_info"  src="IMGX:btn_info" states="4" />
+
+  <imglist name="skin_btn_close"  src="IMGX:btn_close@200" states="3" scale="200" />
+  <imglist name="skin_btn_max"  src="IMGX:btn_max@200" states="3" scale="200"  />
+  <imglist name="skin_btn_restore"  src="IMGX:btn_restore@200" states="3" scale="200"  />
+  <imglist name="skin_btn_min"  src="IMGX:btn_min@200" states="3"  scale="200" />
+  <imglist name="skin_btn_menu"  src="IMGX:btn_menu@200" states="3"  scale="200" />
+  <imglist name="skin_btn_fullscreen"  src="IMGX:btn_fullscreen@200" states="3" scale="200"  />
+  <imglist name="skin_btn_delete"  src="IMGX:btn_delete@200" states="4"  scale="200" />
+  <imglist name="skin_btn_left"  src="IMGX:btn_left@200" states="4"  scale="200" />
+  <imglist name="skin_btn_right"  src="IMGX:btn_right@200" states="4"  scale="200" />
+  <imglist name="skin_btn_scale_100"  src="IMGX:btn_scale_100@200" states="4"  scale="200" />
+  <imglist name="skin_btn_scale_org"  src="IMGX:btn_scale_org@200" states="4"  scale="200" />
+  <imglist name="skin_btn_btn_tools"  src="IMGX:btn_tools@200" states="4" scale="200"   />
+  <imglist name="skin_btn_zoom_in"  src="IMGX:btn_zoom_in@200" states="4" scale="200"  />
+  <imglist name="skin_btn_zoom_out"  src="IMGX:btn_zoom_out@200" states="4" scale="200"  />
+  <imglist name="skin_btn_open"  src="IMGX:btn_open@200" states="4" scale="200"  />
+  <imglist name="skin_btn_info"  src="IMGX:btn_info@200" states="4" scale="200"  />
+  
+  <imglist name="skin_btn_open_huge"  src="IMGX:btn_open_huge" states="3" />
+  
+  <imglist name="skin_menu_icons" src="imgx:menu_icons" states="9" />
+  <imglist name="skin_menu_check" src="IMGX:menu_check" states="3" />
+  <imglist name="skin_menu_arrow" src="IMGX:menu_arrow" states="2" />
+  <imgframe name="skin_menu_sep" src="IMGX:menu_sep" left="26"/>
+  <imgframe name="skin_menu_border" src="IMGX:menu_border" margin-x="8" margin-y="8"/>
+  <imgframe name="skin_menu_skin" src="IMGX:menu_skin" states="2" margin="26,2,5,2"/>
+
+  <imgframe name="skin_window_shadow"  src="IMGX:window_shadow" left="28" right="28" top="28" bottom="28"/>
+  <imgframe name="skin_window_bkgnd"  src="IMGX:window_bkgnd" left="5" right="5" top="40" bottom="40"/>
+  <imgframe name="skin_big_title"  src="IMGX:big_title" />
+  <imgframe name="skin_file_error"  src="IMGX:file_error" />
+
+  <imglist name="skin_btn_huge" src="imgx:btn_huge" states="3" left="35" right="35" top="35" bottom="35" />
+  <imglist name="skin_btn_small" src="imgx:btn_small" states="3" left="2" right="2" top="2" bottom="2" />
+  <imglist name="skin_icon_pano_all"  src="IMGX:icon_pano_all" states="6"  />
+
+  <imglist name="skin_btn_pano_360"  src="IMGX:btn_pano_360@200" states="4"  scale="200" />
+  <imglist name="skin_btn_pano_asteroid"  src="IMGX:btn_pano_asteroid@200" states="4"  scale="200" />
+  <imglist name="skin_btn_pano_cylinder"  src="IMGX:btn_pano_cylinder@200" states="4" scale="200"  />
+  <imglist name="skin_btn_pano_orginal"  src="IMGX:btn_pano_orginal@200" states="4" scale="200"  />
+  <imglist name="skin_btn_pano_outball"  src="IMGX:btn_pano_outball@200" states="4" scale="200"  />
+  <imglist name="skin_btn_pano_sphere"  src="IMGX:btn_pano_sphere@200" states="4" scale="200"  />
+
+  <imglist name="skin_btn_pano_360"  src="IMGX:btn_pano_360" states="4"  />
+  <imglist name="skin_btn_pano_asteroid"  src="IMGX:btn_pano_asteroid" states="4"  />
+  <imglist name="skin_btn_pano_cylinder"  src="IMGX:btn_pano_cylinder" states="4"  />
+  <imglist name="skin_btn_pano_orginal"  src="IMGX:btn_pano_orginal" states="4"  />
+  <imglist name="skin_btn_pano_outball"  src="IMGX:btn_pano_outball" states="4"  />
+  <imglist name="skin_btn_pano_sphere"  src="IMGX:btn_pano_sphere" states="4"  />
+
+  <imgframe name="skin_float_bg_small"  src="IMGX:float_bg_small" left="8" right="8" top="8" bottom="14"/>
+  <imgframe name="skin_float_bg_big"  src="IMGX:float_bg_big" left="8" right="8" top="8" bottom="14"/>
+  
 </skin>

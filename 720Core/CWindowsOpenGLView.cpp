@@ -86,9 +86,10 @@ bool CWindowsOpenGLViewInternal::CreateViewWindow(HINSTANCE hInstance) {
 
 	if (isChildWindow) {
 		hWnd = CreateWindow(WndClassEx.lpszClassName, Title,
-			WS_VISIBLE | WS_CHILD,
+			WS_CLIPSIBLINGS | WS_CHILD,
 			0, 0, Width, Height, parentWindow, NULL, hInstance, NULL);
-	} else {
+	} 
+	else {
 		DWORD Style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 		hWnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_ACCEPTFILES, WndClassEx.lpszClassName, Title, Style, 0, 0, Width, Height, NULL, NULL, hInstance, NULL);
 	}
@@ -99,7 +100,7 @@ bool CWindowsOpenGLViewInternal::CreateViewWindow(HINSTANCE hInstance) {
 		return false;
 	}
 
-	SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | WS_EX_ACCEPTFILES);
+	SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | (WS_EX_ACCEPTFILES));
 	SetWindowLongW(hWnd, GWL_USERDATA, (LONG)this);
 
 	hDC = GetDC(hWnd);
@@ -228,11 +229,13 @@ void CWindowsOpenGLViewInternal::Active()
 }
 void CWindowsOpenGLViewInternal::MessageLoop()
 {
-	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+	if (!isChildWindow) {
+		MSG msg;
+		while (GetMessage(&msg, NULL, 0, 0))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 	}
 }
 void CWindowsOpenGLViewInternal::DestroyRender()
@@ -262,7 +265,7 @@ void CWindowsOpenGLViewInternal::DestroyRender()
 	}
 }
 void CWindowsOpenGLViewInternal::Render() {
-	if (Rendering)
+	if (Rendering && RenderingEnabled)
 	{
 		//»æÖÆ
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -375,7 +378,8 @@ LRESULT WINAPI CWindowsOpenGLViewInternal:: WndProc(HWND hWnd, UINT uiMsg, WPARA
 			break;
 		}
 		case WM_CLOSE: {
-			view->Destroy();
+			if (!view->isChildWindow)
+				view->Destroy();
 			break;
 		}
 		case WM_GETMINMAXINFO: {
@@ -617,6 +621,14 @@ void CWindowsOpenGLViewInternal::SetFullScreen(bool full) {
 		IsFullScreen = full;
 		UpdateFullScreenState();
 	}
+}
+void CWindowsOpenGLViewInternal::SetEnabled(bool en)
+{
+	RenderingEnabled = en;
+}
+void CWindowsOpenGLViewInternal::SetVisible(bool visible)
+{
+	ShowWindow(GetHWND(), visible ? SW_SHOW : SW_HIDE);
 }
 
 void CWindowsOpenGLViewInternal::SetToLowerFpsMode() {

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "Logger.h"
 #include "SettingHlp.h"
+#include "CCThreadMessageCenter.h"
 
 #define APP_TITLE L"720 Panorama Viewer"
 
@@ -10,11 +11,9 @@ class CWindowsGameRenderer;
 
 typedef int(*CAppRunCallback)(void* ptr, CWindowsOpenGLView* view, CWindowsGameRenderer* renderer);
 
-class VR720_EXP CApp {
+class CApp {
 
 public:
-	static CApp* Instance;
-
 	virtual bool Init() { return false; }
 	virtual int Run(int*p) { return 0; }
 	virtual bool Destroy() { return false; }
@@ -26,15 +25,14 @@ public:
 	virtual LPWSTR GetCurrentPath() { return nullptr; }
 	virtual HWND GetConsoleHWND() { return nullptr; }
 	virtual Logger* GetLogger() { return nullptr; }
+	virtual CCThreadMessageCenter * GetMessageCenter() { return nullptr;  }
 
 	virtual void SetCurrentHWND(HWND hWnd) {}
-	void SetAppRunCallback(void* ptr, CAppRunCallback callback);
+	virtual void SetAppRunCallback(void* ptr, CAppRunCallback callback) {}
 
-protected:
-
-	void* runCallbackData = nullptr;
-	CAppRunCallback runCallback = nullptr;
 };
+
+EXTERN_C VR720_EXP CApp* AppGetAppInstance();
 
 #ifdef VR720_EXPORTS 
 
@@ -45,33 +43,16 @@ public:
 	bool Init();
 	int Run(int* p);
 	bool Destroy();
-
-	HINSTANCE GetHInstance()
-	{
-		return hInst;
-	}
-	SettingHlp* GetSettings()
-	{
-		return settings;
-	}
-	LPWSTR GetCurrentDir()
-	{
-		return currentDir;
-	}
-	LPCSTR GetCurrentDirA()
-	{
-		return currentDirA;
-	}
-	LPWSTR GetCurrentPath()
-	{
-		return currentPath;
-	}
-	HWND GetConsoleHWND()
-	{
-		return hConsole;
-	}
+	
+	HINSTANCE GetHInstance() { return hInst; }
+	SettingHlp* GetSettings() { return settings; }
+	LPWSTR GetCurrentDir() { return currentDir; }
+	LPCSTR GetCurrentDirA() { return currentDirA; }
+	LPWSTR GetCurrentPath() { return currentPath; }
+	HWND GetConsoleHWND() { return hConsole; }
 	Logger* GetLogger() { return logger; }
-
+	CCThreadMessageCenter* GetMessageCenter() { return threadMessageCenter; }
+	void SetAppRunCallback(void* ptr, CAppRunCallback callback);
 	void SetCurrentHWND(HWND hWnd);
 private:
 
@@ -90,7 +71,10 @@ private:
 	FILE* file = nullptr;
 	FILE* fileErr = nullptr;
 	Logger* logger = nullptr;
+	CCThreadMessageCenter* threadMessageCenter = nullptr;
 
+	void* runCallbackData = nullptr;
+	CAppRunCallback runCallback = nullptr;
 
 	bool CheckMutex();
 	void InitConsole();

@@ -41,7 +41,7 @@ class Logger;
 EXTERN_C VR720_EXP Logger* GetLoggerStaticInstance();
 
 //ÈÕÖ¾¼ÇÂ¼
-class VR720_EXP Logger {
+class Logger {
 
 public:
 	static Logger* GetStaticInstance() { return GetLoggerStaticInstance(); }

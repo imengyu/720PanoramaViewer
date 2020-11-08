@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <UIDEF>
-  <font face="宋体" size="15"/>
+  <font face="微软雅黑" size="15"/>
 
   <string src="values:string" />
   <skin src="values:skin"/>
@@ -10,6 +10,8 @@
   <style>
     <class name="normalbtn" font="" colorText="#385e8b" colorTextDisable="#91a7c0" textMode="0x25" cursor="hand" margin-x="0"/>
     <class name="cls_btn_weblink" cursor="hand" colorText="#1e78d5" colorTextHover="#1e78d5" font="italic:1" fontHover="underline:1,italic:1" />
+    <class name="my_menu" itemSkin="skin_menu_skin" sepSkin="skin_menu_sep" checkSkin="skin_menu_check" arrowSkin="skin_menu_arrow"  ncSkin="skin_menu_border"  />
+
   </style>
 
   <objattr>

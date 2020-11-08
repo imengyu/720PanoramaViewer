@@ -4,6 +4,9 @@
   </UIDEF>
   <LAYOUT>
     <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
+    <file name="XML_SHADOWWND" path="xml\dlg_shadow.xml"/>
+    <file name="XML_TIPWND" path="xml\dlg_tip.xml"/>
+    <file name="XML_PANO_MODEWND" path="xml\dlg_pano_mode.xml"/>
   </LAYOUT>
   
   <values>
@@ -12,7 +15,7 @@
   	<file name="skin" path="values\skin.xml"/>
   </values>
 
-  <IMG>
+  <IMGX>
     <file name="btn_close" path="image\btn_close.png"/>
     <file name="btn_delete" path="image\btn_delete.png"/>
     <file name="btn_fullscreen" path="image\btn_fullscreen.png"/>
@@ -25,12 +28,67 @@
     <file name="btn_scale_100" path="image\btn_scale_100.png"/>
     <file name="btn_scale_org" path="image\btn_scale_org.png"/>
     <file name="btn_tools" path="image\btn_tools.png"/>
+    <file name="btn_tools_big" path="image\btn_tools_big.png"/> 
     <file name="btn_zoom_in" path="image\btn_zoom_in.png"/>
     <file name="btn_zoom_out" path="image\btn_zoom_out.png"/>
     <file name="btn_open" path="image\btn_open.png"/>
     <file name="btn_info" path="image\btn_info.png"/>
+    
+    <file name="btn_close@200" path="image\btn_close@200.png"/>
+    <file name="btn_delete@200" path="image\btn_delete@200.png"/>
+    <file name="btn_fullscreen@200" path="image\btn_fullscreen@200.png"/>
+    <file name="btn_left@200" path="image\btn_left@200.png"/>
+    <file name="btn_max@200" path="image\btn_max@200.png"/>
+    <file name="btn_menu@200" path="image\btn_menu@200.png"/>
+    <file name="btn_min@200" path="image\btn_min@200.png"/>
+    <file name="btn_right@200" path="image\btn_right@200.png"/>
+    <file name="btn_restore@200" path="image\btn_restore@200.png"/>
+    <file name="btn_scale_100@200" path="image\btn_scale_100@200.png"/>
+    <file name="btn_scale_org@200" path="image\btn_scale_org@200.png"/>
+    <file name="btn_tools@200" path="image\btn_tools@200.png"/>
+    <file name="btn_zoom_in@200" path="image\btn_zoom_in@200.png"/>
+    <file name="btn_zoom_out@200" path="image\btn_zoom_out@200.png"/>
+    <file name="btn_open@200" path="image\btn_open@200.png"/>
+    <file name="btn_info@200" path="image\btn_info@200.png"/>
+    <file name="btn_open_huge" path="image\btn_open_huge.png"/>
+    
+
+    <file name="menu_icons" path="image\menu_icons.png"/>
+    <file name="menu_check" path="image\menu_check.png"/>
+    <file name="menu_arrow" path="image\menu_arrow.png"/>
+    <file name="menu_sep" path="image\menu_sep.png"/>
+    <file name="menu_border" path="image\menu_border.png"/>
+    <file name="menu_skin" path="image\menu_skin.png"/>
+    
     <file name="window_bkgnd" path="image\window_bkgnd.png"/>
-  </IMG>
+    <file name="window_shadow" path="image\window_shadow.png"/>
+
+    <file name="big_title" path="image\big_title.png"/>
+    <file name="btn_huge" path="image\btn_huge.png"/>
+    <file name="btn_small" path="image\btn_small.png"/>
+    
+    <file name="btn_pano_360@200" path="image\btn_pano_360.png"/>
+    <file name="btn_pano_asteroid@200" path="image\btn_pano_asteroid@200.png"/>
+    <file name="btn_pano_cylinder@200" path="image\btn_pano_cylinder@200.png"/>
+    <file name="btn_pano_orginal@200" path="image\btn_pano_orginal@200.png"/>
+    <file name="btn_pano_outball@200" path="image\btn_pano_outball@200.png"/>
+    <file name="btn_pano_sphere@200" path="image\btn_pano_sphere@200.png"/>
+    <file name="btn_pano_360" path="image\btn_pano_360.png"/>
+    <file name="btn_pano_asteroid" path="image\btn_pano_asteroid.png"/>
+    <file name="btn_pano_cylinder" path="image\btn_pano_cylinder.png"/>
+    <file name="btn_pano_orginal" path="image\btn_pano_orginal.png"/>
+    <file name="btn_pano_outball" path="image\btn_pano_outball.png"/>
+    <file name="btn_pano_sphere" path="image\btn_pano_sphere.png"/>
+    <file name="icon_pano_all" path="image\icon_pano_all.png"/>
+
+    <file name="file_error" path="image\file_error.png"/>
+
+    <file name="float_bg_big" path="image\float_bg_big.png"/>
+    <file name="float_bg_small" path="image\float_bg_small.png"/>
+  </IMGX>
+  <SMENUEX>
+    <file name="menu_main" path="xml\menu_main.xml" />
+  </SMENUEX>
   <ICON>
     <file name="ICON_LOGO"  path="image\logo.ico"/>
   </ICON>

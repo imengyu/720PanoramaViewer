@@ -2,7 +2,7 @@
 #include "COpenGLRenderer.h"
 #include "COpenGLView.h"
 
-class VR720_EXP CWindowsOpenGLView : public COpenGLView {
+class CWindowsOpenGLView : public COpenGLView {
 
 public:
 	CWindowsOpenGLView(COpenGLRenderer* renderer) : COpenGLView(renderer) {}
@@ -32,6 +32,8 @@ public:
 	virtual void UpdateFullScreenState() {}
 	virtual void SetFullScreen(bool full) {}
 
+	virtual void SetEnabled(bool en) {}
+
 	virtual void SetToLowerFpsMode() {}
 	virtual void QuitLowerFpsMode() {}
 
@@ -41,6 +43,7 @@ public:
 	virtual void MouseCapture() {}
 	virtual void ReleaseCapture() {}
 
+	virtual void SetVisible(bool visible) { }
 	virtual HWND GetHWND() { return 0; }
 
 	//Settings
@@ -98,6 +101,8 @@ private:
 	bool ViewportChanged = false;
 	bool UpdateTicked = false;
 
+	bool RenderingEnabled = true;
+
 	Logger* logger = nullptr;
 
 	bool CreateViewWindow(HINSTANCE hInstance);
@@ -137,6 +142,8 @@ public:
 	void UpdateFullScreenState();
 	void SetFullScreen(bool full);
 
+	void SetEnabled(bool en);
+
 	void SetToLowerFpsMode();
 	void QuitLowerFpsMode();
 
@@ -147,6 +154,7 @@ public:
 	void ReleaseCapture();
 
 	HWND GetHWND();
+	void SetVisible(bool visible);
 
 private:
 

@@ -474,6 +474,9 @@
     <ClCompile Include="720Core.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CCThreadMessageCenter.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -764,9 +767,12 @@
     <ClInclude Include="720Core.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CCThreadMessageCenter.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="3DImageViewer.rc">
+    <ResourceCompile Include="720Core.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>

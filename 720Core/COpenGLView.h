@@ -17,7 +17,7 @@ class CCamera;
 class CCShader;
 class CCRenderGlobal;
 //OpenGL 视图抽象类
-class VR720_EXP COpenGLView
+class COpenGLView
 {
 public:
 	COpenGLView(COpenGLRenderer* renderer) {

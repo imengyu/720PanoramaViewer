@@ -1,0 +1,5 @@
+﻿<SOUI name="tipWindow" title="@string/title" wndType="normal" translucent="1"  toolWindow="1">
+  <root skin="skin_float_bg_big" size="-1,-1" padding="8,8,8,14" layout="vbox">
+    <text name="txt_tip" font="size:12" maxWidth="300" multiLines="1"/>
+  </root>
+</SOUI>

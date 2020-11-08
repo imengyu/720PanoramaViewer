@@ -3,7 +3,7 @@
 
 void CRegDialog::Show(HWND hWnd)
 {
-    DialogBox(CApp::Instance->GetHInstance(), MAKEINTRESOURCE(IDD_REG), hWnd, DlgProc);
+    DialogBox(AppGetAppInstance()->GetHInstance(), MAKEINTRESOURCE(IDD_REG), hWnd, DlgProc);
 }
 
 INT_PTR CRegDialog::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -33,7 +33,7 @@ INT_PTR CRegDialog::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             }
 
             if (a * 2 + 3 == b - 25 || (a == 123 && b == 45678)) {
-                CApp::Instance->GetSettings()->SetSettingBool(L"registered", true);
+                AppGetAppInstance()->GetSettings()->SetSettingBool(L"registered", true);
                 MessageBox(hDlg, L"激活成功！\n感谢您购买我们的产品.", L"提示", MB_ICONEXCLAMATION);
                 EndDialog(hDlg, LOWORD(wParam));
                 return (INT_PTR)TRUE;

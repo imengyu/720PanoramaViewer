@@ -11,7 +11,7 @@
 
 const std::wstring CCAssetsManager::GetResourcePath(const wchar_t* typeName, const wchar_t* name)
 {
-    std::wstring str(CApp::Instance->GetCurrentDir());
+    std::wstring str(AppGetAppInstance()->GetCurrentDir());
     str += L"\\resources\\";
     str += typeName;
     str += L"\\";
@@ -20,7 +20,7 @@ const std::wstring CCAssetsManager::GetResourcePath(const wchar_t* typeName, con
 }
 const std::wstring CCAssetsManager::GetDirResourcePath(const wchar_t* dirName, const wchar_t* name)
 {
-    std::wstring str(CApp::Instance->GetCurrentDir());
+    std::wstring str(AppGetAppInstance()->GetCurrentDir());
     str += L"\\";
     str += dirName;
     str += L"\\";
@@ -29,7 +29,7 @@ const std::wstring CCAssetsManager::GetDirResourcePath(const wchar_t* dirName, c
 }
 std::string CCAssetsManager::GetResourcePath(const char* typeName, const char* name)
 {
-    std::string str(CApp::Instance->GetCurrentDirA());
+    std::string str(AppGetAppInstance()->GetCurrentDirA());
     str += "\\resources\\";
     str += typeName;
     str += "\\";
@@ -38,7 +38,7 @@ std::string CCAssetsManager::GetResourcePath(const char* typeName, const char* n
 }
 std::string CCAssetsManager::GetDirResourcePath(const char* dirName, const char* name)
 {
-    std::string str(CApp::Instance->GetCurrentDirA());
+    std::string str(AppGetAppInstance()->GetCurrentDirA());
     str += "\\";
     str += dirName;
     str += "\\";

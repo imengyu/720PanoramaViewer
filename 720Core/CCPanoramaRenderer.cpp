@@ -331,19 +331,8 @@ void CCPanoramaRenderer::LoadBuiltInResources() {
     panoramaRedCheckTex = new CCTexture();
     panoramaRedCheckTex->Load(CCAssetsManager::GetResourcePath(L"textures", L"red_checker.jpg").c_str());
 
-
     uiLogoTex = new CCTexture();
     uiLogoTex->Load(CCAssetsManager::GetResourcePath(L"textures", L"logo.png").c_str());
-
-    uiFailedTex = new CCTexture();
-    uiFailedTex->Load(CCAssetsManager::GetResourcePath(L"textures", L"icon_image_error.jpg").c_str());
-
-    uiOpenButtonTex = new CCTexture();
-    uiOpenButtonTex->Load(CCAssetsManager::GetResourcePath(L"textures", L"open_file.jpg").c_str());
-
-    uiTitleTex = new CCTexture();
-    uiTitleTex->Load(CCAssetsManager::GetResourcePath(L"textures", L"title.png").c_str());
-
 }
 void CCPanoramaRenderer::ReleaseTexPool() {
     renderPanoramaFull = false;

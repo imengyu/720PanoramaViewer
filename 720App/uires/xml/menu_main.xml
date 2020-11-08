@@ -1,0 +1,28 @@
+﻿<menuRoot iconSkin="skin_menu_icons"
+      itemHeight="25" 
+      maxWidth="290" 
+      minWidth="220"
+      iconPos="7"
+      textOffset="8"
+      font="size:12"
+      itemSkin="skin_menu_skin" sepSkin="skin_menu_sep" checkSkin="skin_menu_check" 
+      arrowSkin="skin_menu_arrow"  ncSkin="skin_menu_border"
+      margin="8,8,8,8" colorBkgnd="#ffffff" >
+  <menuItem id="1" icon="3">打开全景图</menuItem>
+  <menuItem id="2">关闭当前全景图</menuItem>
+  <menuItem id="3">导入全景图</menuItem>
+  <sep/>
+  <menuItem id="4">使用其他软件打开当前图像
+  </menuItem>
+  <menuItem id="5" icon="6">截取全景图当前可见范围 (F9)</menuItem>
+  <menuItem id="11" icon="5">图像信息</menuItem>
+  <sep/>
+  <menuItem id="6" icon="4">设置</menuItem>
+  <menuItem text="帮助与反馈">
+    <menuItem id="10" icon="7">使用帮助 (F1)</menuItem>
+    <menuItem id="7" icon="1">提交反馈和建议</menuItem>
+    <menuItem id="8" icon="8">关于</menuItem>
+  </menuItem>
+  <sep/>
+  <menuItem id="9">退出程序 (Alt+F4)</menuItem>
+</menuRoot>

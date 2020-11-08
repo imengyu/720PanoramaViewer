@@ -82,11 +82,7 @@ public:
     bool renderPanoramaFull = false;
     bool renderPanoramaFlat = false;
 
-
-    CCSmartPtr<CCTexture> uiFailedTex = nullptr;
     CCSmartPtr<CCTexture> uiLogoTex = nullptr;
-    CCSmartPtr<CCTexture> uiOpenButtonTex = nullptr;
-    CCSmartPtr<CCTexture> uiTitleTex = nullptr;
     CCSmartPtr<CCTexture> panoramaRedCheckTex = nullptr;
     CCSmartPtr<CCTexture> panoramaCheckTex = nullptr;
     CCSmartPtr<CCTexture> panoramaThumbnailTex = nullptr;

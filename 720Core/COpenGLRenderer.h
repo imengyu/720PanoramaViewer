@@ -5,7 +5,7 @@ class COpenGLView;
 /**
  * 渲染器抽象类
  */
-class VR720_EXP COpenGLRenderer
+class COpenGLRenderer
 {
 protected:
 	//宽度和高度
