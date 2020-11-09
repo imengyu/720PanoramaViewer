@@ -1,4 +1,6 @@
-#include "SystemHelper.h"
+Ôªø#include "SystemHelper.h"
+#include "CStringHlp.h"
+#include "PathHelper.h"
 #include <commdlg.h>
 #include <Shlwapi.h>
 #include <shellapi.h>
@@ -25,7 +27,7 @@ bool SystemHelper::ChooseOneFile(HWND hWnd, LPCWSTR startDir, LPCWSTR title, LPC
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 		if (GetOpenFileName(&ofn))
 		{
-			//œ‘ æ—°‘ÒµƒŒƒº˛°£ szFile
+			//ÊòæÁ§∫ÈÄâÊã©ÁöÑÊñá‰ª∂„ÄÇ szFile
 			wcscpy_s((LPWSTR)strrs, bufsize, szFile);
 			return TRUE;
 		}
@@ -54,7 +56,7 @@ bool SystemHelper::ChooseOneFileA(HWND hWnd, LPCSTR startDir, LPCSTR title, LPCS
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 		if (GetOpenFileNameA(&ofn))
 		{
-			//œ‘ æ—°‘ÒµƒŒƒº˛°£ szFile
+			//ÊòæÁ§∫ÈÄâÊã©ÁöÑÊñá‰ª∂„ÄÇ szFile
 			strcpy_s((LPSTR)strrs, bufsize, szFile);
 			return TRUE;
 		}
@@ -68,15 +70,50 @@ bool SystemHelper::FileExists(LPCSTR file) {
 	return PathFileExistsA(file);
 }
 bool SystemHelper::OpenAs(LPCWSTR file) {
-	return ShellExecute(NULL, L"open", L"OpenWith.exe", file, NULL, NULL);
+	if(Path::Exists(L"C:\\Windows\\System32\\OpenWith.exe"))
+		return ShellExecute(NULL, L"open", L"OpenWith.exe", file, NULL, NULL);
+	else
+		return ShellExecute(NULL, L"open", L"rundll32", CStringHlp::FormatString(L"shell32, OpenAs_RunDLL %s", file).c_str(), NULL, NULL);
+}
+bool SystemHelper::ShowInExplorer(LPCWSTR file) {
+	return ShellExecute(NULL, L"open", L"explorer.exe", CStringHlp::FormatString(L"/select, %s", file).c_str(), NULL, NULL);
 }
 bool SystemHelper::ShellDeleteFile(HWND hWnd, LPCWSTR file) {
 	SHFILEOPSTRUCT lpfileop;
 	lpfileop.hwnd = hWnd;
-	lpfileop.wFunc = FO_DELETE;//…æ≥˝≤Ÿ◊˜
+	lpfileop.wFunc = FO_DELETE;//Âà†Èô§Êìç‰Ωú
 	lpfileop.pFrom = file;
 	lpfileop.pTo = NULL;
 	lpfileop.fFlags = FOF_ALLOWUNDO | FOF_NO_UI;
 	lpfileop.hNameMappings = NULL;
 	return SHFileOperation(&lpfileop) == 0;
+}
+bool SystemHelper::ShellCopyFile(HWND hWnd, LPCWSTR file) {
+	SHFILEOPSTRUCT lpfileop;
+	lpfileop.hwnd = hWnd;
+	lpfileop.wFunc = FO_COPY;
+	lpfileop.pFrom = file;
+	lpfileop.pTo = NULL;
+	lpfileop.hNameMappings = NULL;
+	return SHFileOperation(&lpfileop) == 0;
+}
+bool SystemHelper::CopyToClipBoard(LPCWSTR string) {
+	if (OpenClipboard(NULL))
+	{
+		size_t bufferSize = (wcslen(string) + 1) * sizeof(WCHAR);
+
+		HGLOBAL hMem = GlobalAlloc(GMEM_DDESHARE, bufferSize);
+		WCHAR* pMem = (WCHAR*)GlobalLock(hMem);
+		EmptyClipboard();
+
+		memset(pMem, 0, bufferSize);
+		memcpy(pMem, string, bufferSize);
+
+		GlobalUnlock(pMem);
+		SetClipboardData(CF_UNICODETEXT, hMem);
+		CloseClipboard();
+		GlobalFree(hMem);
+		return true;
+	}
+	return false;
 }

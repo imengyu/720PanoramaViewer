@@ -44,6 +44,15 @@
     <ClCompile Include="SImageButtonHover.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NotifyWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HelpDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="720App.rc">
@@ -70,6 +79,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SImageButtonHover.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NotifyWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HelpDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -106,11 +124,30 @@
     <Xml Include="uires\xml\dlg_pano_mode.xml">
       <Filter>SoUI Resource</Filter>
     </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="uires\image\soui.ico">
+    <Xml Include="uires\xml\menu_right.xml">
       <Filter>SoUI Resource</Filter>
-    </Image>
+    </Xml>
+    <Xml Include="uires\xml\dlg_notify.xml">
+      <Filter>SoUI Resource</Filter>
+    </Xml>
+    <Xml Include="uires\anim\alpha_in.xml">
+      <Filter>SoUI Resource</Filter>
+    </Xml>
+    <Xml Include="uires\anim\alpha_out.xml">
+      <Filter>SoUI Resource</Filter>
+    </Xml>
+    <Xml Include="uires\anim\zoom_in.xml">
+      <Filter>SoUI Resource</Filter>
+    </Xml>
+    <Xml Include="uires\anim\zoom_out.xml">
+      <Filter>SoUI Resource</Filter>
+    </Xml>
+    <Xml Include="uires\xml\dlg_help.xml">
+      <Filter>SoUI Resource</Filter>
+    </Xml>
+    <Xml Include="uires\xml\dlg_about.xml">
+      <Filter>SoUI Resource</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="uires\uires.idx">

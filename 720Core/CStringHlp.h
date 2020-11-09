@@ -8,7 +8,7 @@
 #include <vector>
 
 //×Ö·û´®°ïÖúÀà
-class VR720_EXP CStringHlp
+class CStringHlp
 {
 public:
 

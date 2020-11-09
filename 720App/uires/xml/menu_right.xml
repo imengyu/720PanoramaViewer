@@ -1,0 +1,21 @@
+﻿<menuRoot class="my_menu" iconSkin="skin_menu_icons" maxWidth="290"  minWidth="220">
+  <menuItem id="1" icon="3">打开全景图</menuItem>
+  <menuItem id="2">关闭当前全景图</menuItem>
+  <sep/>
+  <menuItem id="3">上一张</menuItem>
+  <menuItem id="4">下一张</menuItem>
+  <sep/>
+  <menuItem id="14">全屏</menuItem>
+  <sep/>
+  <menuItem id="5">复制</menuItem>
+  <menuItem id="6">复制文件路径</menuItem>
+  <menuItem id="7" icon="9">删除</menuItem>
+  <menuItem id="8" icon="11">打开文件所在文件夹</menuItem>
+  <sep/>
+  <menuItem id="9">使用其他软件打开</menuItem>
+  <menuItem id="10" icon="6">截取当前可见范围 (F9)</menuItem>
+  <menuItem id="11" icon="5">图像信息</menuItem>
+  <sep/>
+  <menuItem id="12" icon="4">程序设置</menuItem>
+  <menuItem id="13">退出程序 (Alt+F4)</menuItem>
+</menuRoot>

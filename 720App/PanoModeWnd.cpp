@@ -14,7 +14,6 @@ CPanoModeWnd::~CPanoModeWnd()
 
 BOOL CPanoModeWnd::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
-	SetWindowLong(GWL_EXSTYLE, GetWindowLong(GWL_EXSTYLE) | WS_EX_TRANSPARENT);
 	return TRUE;
 }
 

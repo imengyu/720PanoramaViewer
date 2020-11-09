@@ -181,8 +181,8 @@ void CCPanoramaRenderer::CreateMainModelFlatMesh(CCMesh* mesh) const {
         u = 0;
         for (int i = 0; i <= sphereSegmentX; i++) {
             u += ustep;
-            mesh->positions.emplace_back(glm::vec3(0.5f - u, (0.5f - v) / 2.0f, 0.0f));
-            mesh->texCoords.emplace_back(glm::vec2(1.0f - u, v));
+            mesh->positions.push_back(glm::vec3(0.5f - u, (0.5f - v) / 2.0f, 0.0f));
+            mesh->texCoords.push_back(glm::vec2(1.0f - u, v));
         }
     }
 
@@ -192,13 +192,13 @@ void CCPanoramaRenderer::CreateMainModelFlatMesh(CCMesh* mesh) const {
         int line_start_pos = (j)*vertices_line_count;
         for (int i = 0; i < sphereSegmentX; i++) {
 
-            mesh->indices.emplace_back(CCFace(line_start_pos + i, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count, 0, -1));
 
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + 1, 0, -1));
         }
     }
 
@@ -209,51 +209,51 @@ void CCPanoramaRenderer::CreateMainModelSphereMesh(CCMesh* mesh) const {
 
     float r = 1.0f;
     float ustep = 1.0f / (float)sphereSegmentX, vstep = 1.0f / (float)sphereSegmentY;
-    float u, v = 0;
+    float u = 0, v = 0;
 
     //顶点
     //=======================================================
 
     for (int j = 0; j <= sphereSegmentY; j++) {
-        v += vstep;
         u = 0;
-        for (int i = 0; i <= sphereSegmentX; i++) {
-            u += ustep;
+        for (int i = 0; i <= sphereSegmentX; i++) {         
             mesh->positions.push_back(GetSpherePoint(u, v, r));
-            mesh->texCoords.emplace_back(glm::vec2(1.0f - u, v));
+            mesh->texCoords.push_back(glm::vec2(1.0f - u, v)); 
+            u += ustep;
         }
+        v += vstep;
     }
 
     //顶点索引
     //=======================================================
 
     int vertices_line_count = sphereSegmentX + 1;
-    int line_start_pos = vertices_line_count;
+    int line_start_pos = 0;
 
     for (int i = 0; i < sphereSegmentX; i++) {
-        mesh->indices.emplace_back(CCFace(line_start_pos + i + 1, 0, -1));
-        mesh->indices.emplace_back(CCFace(line_start_pos + i, 0, -1));
-        mesh->indices.emplace_back(CCFace(i, 0, -1));
+        mesh->indices.push_back(CCFace(line_start_pos + i + 1 + vertices_line_count));
+        mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count));
+        mesh->indices.push_back(CCFace(line_start_pos + i));
     }
-    for (int j = 0; j < sphereSegmentY - 1; j++) {
-        line_start_pos = (j + 1) * vertices_line_count;
+    for (int j = 1; j < sphereSegmentY - 1; j++) {
+        line_start_pos = j * vertices_line_count;
         for (int i = 0; i < sphereSegmentX; i++) {
 
-            mesh->indices.emplace_back(CCFace(line_start_pos + i, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count + 1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count));
 
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count + 1));
+            mesh->indices.push_back(CCFace(line_start_pos + i));
+            mesh->indices.push_back(CCFace(line_start_pos + i + 1));
         }
     }
 
-    line_start_pos = vertices_line_count * sphereSegmentY;
+    line_start_pos = (sphereSegmentY - 1) * vertices_line_count;
     for (int i = 0; i < sphereSegmentX; i++) {
-        mesh->indices.emplace_back(CCFace(line_start_pos + i, 0, -1));
-        mesh->indices.emplace_back(CCFace(line_start_pos + i + 1, 0, -1));
-        mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count, 0, -1));
+        mesh->indices.push_back(CCFace(line_start_pos + i));
+        mesh->indices.push_back(CCFace(line_start_pos + i + 1));
+        mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count));
     }
 
     //创建缓冲区
@@ -289,7 +289,7 @@ glm::vec3 CCPanoramaRenderer::CreateFullModelSphereMesh(ChunkModel* info, int se
             u += ustep;
             cu -= custep;
             mesh->positions.push_back(GetSpherePoint(u, v, r));
-            mesh->texCoords.emplace_back(glm::vec2(cu, cv));
+            mesh->texCoords.push_back(glm::vec2(cu, cv));
         }
     }
 
@@ -298,13 +298,13 @@ glm::vec3 CCPanoramaRenderer::CreateFullModelSphereMesh(ChunkModel* info, int se
         int line_start_pos = (j)*vertices_line_count;
         for (int i = 0; i < segXEnd - segXStart; i++) {
 
-            mesh->indices.emplace_back(CCFace(line_start_pos + i, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count, 0, -1));
 
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i, 0, -1));
-            mesh->indices.emplace_back(CCFace(line_start_pos + i + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + vertices_line_count + 1, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i, 0, -1));
+            mesh->indices.push_back(CCFace(line_start_pos + i + 1, 0, -1));
         }
     }
 
@@ -480,7 +480,7 @@ void CCPanoramaRenderer::ResetMercatorControl() const {
         u = 0;
         for (int i = 0; i <= sphereSegmentX; i++) {
             u += ustep;
-            mesh->texCoords.emplace_back(1.0 - u, v);
+            mesh->texCoords.push_back(glm::vec2(1.0 - u, v));
         }
     }
     mesh->ReBufferData();
@@ -553,7 +553,7 @@ void CCPanoramaRenderer::UpdateFullChunksVisible() {
                     m->model->Material->diffuse = tex;
                     m->model->Material->tilling = glm::vec2(1.0f, 1.0f);
                     Renderer->AddTextureToQueue(tex, m->chunkX, m->chunkY, m->chunkY * m->chunkX + m->chunkX);//MainTex
-                    panoramaTexPool.emplace_back(tex);
+                    panoramaTexPool.push_back(tex);
                 }
             }
         }

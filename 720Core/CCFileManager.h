@@ -31,11 +31,13 @@ public:
 
 	bool ImageRatioNotStandard = false;
 
+	const wchar_t* GetCurrentFileInfoTitle();
 	const wchar_t* GetLastError();
 private:
 
 	Logger* logger = nullptr;
 	std::wstring lastErr;
+	std::wstring imageInfoTitle;
 	COpenGLRenderer* Render = nullptr;
 
 	CCFileManagerOnCloseCallback onCloseCallback = nullptr;

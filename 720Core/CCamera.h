@@ -55,6 +55,8 @@ public:
 	//摄像机背景颜色
 	CColor Background = CColor::Black;
 
+	bool ZoomReachedLimit = false;
+
 	//摄像机视图矩阵
 	glm::mat4 view = glm::mat4(1.0f);
 	//摄像机透视矩阵

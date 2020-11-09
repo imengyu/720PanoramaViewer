@@ -50,7 +50,7 @@ class CCThreadMessageHandlerInternal : public CCThreadMessageHandler
 {
 public:
 	CCThreadMessageHandlerInternal(int id) : CCThreadMessageHandler(id) {}
-	~CCThreadMessageHandlerInternal() {}
+	~CCThreadMessageHandlerInternal();
 
 	bool RunNext();
 	void AddRun(CCThreadMessageRunData* run);

@@ -6,42 +6,42 @@
   <root skin="skin_window_bkgnd" cache="1"  width="800" height="600" colorBkgnd="#ffffff">
     <caption pos="0,0,-0,36" show="1">
       <icon pos="10,11" src="ICON_LOGO:16"/>
-      <text pos="32,9" font="size:13">@string/title</text>
+      <text pos="32,9" font="size:13" name="text_title">@string/title</text>
       <imgbtn name="btn_close" skin="skin_btn_close"  pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1"/>
       <imgbtn name="btn_max" skin="skin_btn_max"  pos="-70dp,0" size="35dp,36dp" tip="@string/maximize" animate="1" />
       <imgbtn name="btn_restore" skin="skin_btn_restore"  pos="-70dp,0" size="35dp,36dp" tip="@string/restore" show="0" animate="1" />
       <imgbtn name="btn_min" skin="skin_btn_min" pos="-105dp,0" size="35dp,36dp" tip="@string/minimize" animate="1" />
       <imgbtn name="btn_menu" skin="skin_btn_menu" pos="-140dp,0" size="35dp,36dp" animate="0" />
-      <imgbtn name="btn_fullscreen" skin="skin_btn_fullscreen" pos="-175dp,0" size="35dp,36dp" tip="@string/fullscreen" animate="0" />
+      <imgbtn name="btn_fullscreen_menu" skin="skin_btn_fullscreen" pos="-175dp,0" size="35dp,36dp" tip="@string/fullscreen" show="0" animate="0" />
     </caption>
     <window pos="2,[2,-2,-2">
 
       <window id="1" pos="0,36" size="full,full" show="1">
-          <img pos="|-200dp,|-140dp" skin="skin_big_title" size="400dp,100dp" />
-          <imgbtn pos="|-100dp,|0dp" name="btn_open_main" skin="skin_btn_open_huge" size="200dp,60dp" animate="1" />
-
+        <img pos="|-200dp,|-150dp" skin="skin_big_title" size="400dp,130dp" />
+        <imgbtn pos="|-100dp,|0dp" name="btn_open_main" skin="skin_btn_open_huge" size="200dp,60dp" animate="1" />
         <imgbtn name="btn_album_big" skin="skin_btn_tools_big"  pos="|-38dp,%70" size="76dp,90dp" animate="1" />
       </window>
-      <window id="2" pos="|-225dp,-48dp,@450dp,@48dp" show="0">
+      <window id="2" pos="|-230dp,-52dp,@460dp,@52dp" show="0">
 
-        <imgbtnhover name="btn_pano_mode" skin="skin_btn_pano_orginal" pos="0,0" size="38dp,48dp" animate="0" myTip="更改全景模式" />
-        <imgbtnhover name="btn_scale_org" skin="skin_btn_scale_org"  pos="38dp,0" size="38dp,48dp" animate="0" myTip="全屏 (F11)" />
-        <imgbtnhover name="btn_scale_100" skin="skin_btn_scale_100"  pos="76dp,0" size="38dp,48dp" animate="0" myTip="合适大小 (0)" />
-        <imgbtnhover name="btn_zoom_out" skin="skin_btn_zoom_out"  pos="114dp,0" size="38dp,48dp" animate="0" myTip="缩小 (-)" />
-        <imgbtnhover name="btn_zoom_in" skin="skin_btn_zoom_in"  pos="152dp,0" size="38dp,48dp" animate="0" myTip="放大 (+)" />
-        <imgbtnhover name="btn_left_img" skin="skin_btn_left" pos="190dp,0"  size="38dp,48dp" animate="0" myTip="上一张 (Alt+←)" />
-        <imgbtnhover name="btn_right_img" skin="skin_btn_right" pos="228dp,0"  size="38dp,48dp" animate="0" myTip="下一张 (Alt+→)" />
-        <imgbtnhover name="btn_info" skin="skin_btn_info" pos="266dp,0"  size="38dp,48dp" animate="0" myTip="图像信息" />
-        <imgbtnhover name="btn_open_with" skin="skin_btn_open"  pos="304dp,0" size="38dp,48dp" animate="0" myTip="使用其他软件打开" />
-        <imgbtnhover name="btn_delete" skin="skin_btn_delete" pos="342dp,0"  size="38dp,48dp" animate="0" myTip="删除图像 (Del)" />
-        <imgbtnhover name="btn_album" skin="skin_btn_btn_tools"  pos="380dp,0" size="38dp,48dp" animate="0" myTip="打开图库 (F8)" />
+        <imgbtnhover name="btn_full_screen" skin="skin_btn_scale_org"  pos="38dp,4dp" size="38dp,48dp" animate="0" myTip="全屏 (F11)" />
+        <imgbtnhover name="btn_scale_100" skin="skin_btn_scale_100"  pos="76dp,4dp" size="38dp,48dp" animate="0" myTip="合适大小 (0)" />
+        <imgbtnhover name="btn_zoom_out" skin="skin_btn_zoom_out"  pos="114dp,4dp" size="38dp,48dp" animate="0" myTip="缩小 (-)" />
+        <imgbtnhover name="btn_zoom_in" skin="skin_btn_zoom_in"  pos="152dp,4dp" size="38dp,48dp" animate="0" myTip="放大 (+)" />
+        <imgbtnhover name="btn_left_img" skin="skin_btn_left" pos="190dp,4dp"  size="38dp,48dp" animate="0" myTip="上一张 (Alt+←)" />
+        <imgbtnhover name="btn_right_img" skin="skin_btn_right" pos="228dp,4dp"  size="38dp,48dp" animate="0" myTip="下一张 (Alt+→)" />
+        <imgbtnhover name="btn_info" skin="skin_btn_info" pos="266dp,4dp"  size="38dp,48dp" animate="0" myTip="图像信息" />
+        <imgbtnhover name="btn_open_with" skin="skin_btn_open"  pos="304dp,4dp" size="38dp,48dp" animate="0" myTip="使用其他软件打开" />
+        <imgbtnhover name="btn_delete" skin="skin_btn_delete" pos="342dp,4dp"  size="38dp,48dp" animate="0" myTip="删除图像 (Del)" />
+        <imgbtnhover name="btn_pano_mode" skin="skin_btn_pano_orginal" pos="382dp,4dp" size="38dp,48dp" animate="0" myTip="更改全景模式" />
+        <imgbtnhover name="btn_album" skin="skin_btn_btn_tools"  pos="420dp,4dp" size="38dp,48dp" animate="0" myTip="打开图库 (F8)" />
 
       </window>
       <window id="3" pos="0,36" size="full,full" show="0">
-        <img pos="|-56dp,|-140dp" skin="skin_file_error" size="100dp,100dp" />
-        <text pos="|-200dp,|0dp" size="400dp,100dp" align="center" font="size:15" colorText="#777777">抱歉，我们无法打开此图像</text>
-        <text name="text_file_error" pos="|-200dp,|20dp" size="400dp,100dp" align="center" colorText="#999999" font="size:14">未知错误</text>
+        <img pos="|-56dp,|-220dp" skin="skin_file_error" size="100dp,100dp" />
+        <text pos="|-200dp,|-80dp" size="400dp,40dp" align="center" font="size:15" colorText="#777777"  multiLines="1">抱歉，我们无法打开此图像\n图像可能已经损坏，或是格式不支持</text>
+        <text name="text_file_error" pos="|-200dp,|-60dp" size="400dp,100dp" align="center" colorText="#999999" font="size:14">未知错误</text>
 
+        <imgbtn name="btn_open_with" skin="skin_btn_open_with_others" pos="|-60dp,|50dp" size="120dp,26dp" colorText="#ffffff"></imgbtn>
         <imgbtn name="btn_album_big" skin="skin_btn_tools_big"  pos="|-38dp,%70" size="76dp,90dp" animate="1" />
       </window>
     </window>

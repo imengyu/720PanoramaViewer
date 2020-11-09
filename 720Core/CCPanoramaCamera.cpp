@@ -101,25 +101,28 @@ void CCPanoramaCamera::ProcessMouseScroll(float yoffset)
 	switch (Mode)
 	{
 	case CCPanoramaCameraMode::CenterRoate: {
+		ZoomReachedLimit = false;
 		if (FiledOfView >= FovMin && FiledOfView <= FovMax)
 			FiledOfView -= yoffset * ZoomSpeed;
-		if (FiledOfView <= FovMin) FiledOfView = FovMin;
-		if (FiledOfView >= FovMax) FiledOfView = FovMax;
+		if (FiledOfView <= FovMin){ FiledOfView = FovMin; ZoomReachedLimit = true; }
+		if (FiledOfView >= FovMax) {FiledOfView = FovMax; ZoomReachedLimit = true; }
 		if (fovChangedCallback)
 			fovChangedCallback(fovChangedCallbackData, FiledOfView);
 		break;
 	}
 	case CCPanoramaCameraMode::OutRoataround: {
+		ZoomReachedLimit = false;
 		Position.z -= yoffset * ZoomSpeed * 0.1f;
 		if (Position.z < RoateNearMax) Position.z = RoateNearMax;
 		if (Position.z > RoateFarMax) Position.z = RoateFarMax;
 		break;
 	}
 	case CCPanoramaCameraMode::OrthoZoom:
+		ZoomReachedLimit = false;
 		if (OrthographicSize >= OrthoSizeMin && OrthographicSize <= OrthoSizeMax)
 			OrthographicSize -= yoffset * OrthoSizeZoomSpeed;
-		if (OrthographicSize <= OrthoSizeMin) OrthographicSize = OrthoSizeMin;
-		if (OrthographicSize >= OrthoSizeMax) OrthographicSize = OrthoSizeMax;
+		if (OrthographicSize <= OrthoSizeMin) { OrthographicSize = OrthoSizeMin; ZoomReachedLimit = true; }
+		if (OrthographicSize >= OrthoSizeMax) {OrthographicSize = OrthoSizeMax; ZoomReachedLimit = true; }
 		if (orthoSizeChangedCallback)
 			orthoSizeChangedCallback(orthoSizeChangedCallbackData, OrthographicSize);
 		break;

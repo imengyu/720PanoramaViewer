@@ -26,6 +26,9 @@ bool CCThreadMessageCenterInternal::RigisterThreadMessageHandler(int id, CCThrea
 bool CCThreadMessageCenterInternal::UnRigisterThreadMessageHandler(int id)
 {
 	if (handlers.find(id) != handlers.end()) {
+		CCThreadMessageHandler* handler = handlers[id];
+		if (handler->isUiThread && handler->id == uiThreadHandlerId)
+			uiThreadHandlerId = 0;
 		delete handlers[id];
 		handlers.erase(id);
 	}
@@ -56,12 +59,25 @@ bool CCThreadMessageCenterInternal::RunOnUIThread(void* data, CCThreadMessageRun
 	return RunOnThread(uiThreadHandlerId, data, run);
 }
 
+CCThreadMessageHandlerInternal::~CCThreadMessageHandlerInternal()
+{
+	if (!pendingRun.empty()) {
+		for (auto it = pendingRun.begin(); it != pendingRun.end(); ++it)
+			delete (*it);
+		pendingRun.clear();
+	}
+}
+
 bool CCThreadMessageHandlerInternal::RunNext() {
 	if (!pendingRun.empty()) {
 		CCThreadMessageRunData* data = pendingRun.back();
 		pendingRun.pop_back();
-		data->run(data->data);
+		//
+		CCThreadMessageRun run = data->run;
+		void* paramdata = data->data;
 		FreeRun(data);
+		//call
+		run(paramdata);
 	}
 	return false;
 }

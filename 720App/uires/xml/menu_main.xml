@@ -1,16 +1,7 @@
-﻿<menuRoot iconSkin="skin_menu_icons"
-      itemHeight="25" 
-      maxWidth="290" 
-      minWidth="220"
-      iconPos="7"
-      textOffset="8"
-      font="size:12"
-      itemSkin="skin_menu_skin" sepSkin="skin_menu_sep" checkSkin="skin_menu_check" 
-      arrowSkin="skin_menu_arrow"  ncSkin="skin_menu_border"
-      margin="8,8,8,8" colorBkgnd="#ffffff" >
-  <menuItem id="1" icon="3">打开全景图</menuItem>
+﻿<menuRoot class="my_menu" iconSkin="skin_menu_icons" maxWidth="290"  minWidth="220">
+  <menuItem id="1" icon="0">打开全景图</menuItem>
+  <menuItem id="3" icon="12">导入全景图</menuItem>
   <menuItem id="2">关闭当前全景图</menuItem>
-  <menuItem id="3">导入全景图</menuItem>
   <sep/>
   <menuItem id="4">使用其他软件打开当前图像
   </menuItem>

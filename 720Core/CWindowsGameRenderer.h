@@ -27,7 +27,14 @@ enum PanoramaMode : int16_t {
 #define GAME_FILE_OK 2
 #define GAME_FILE_OPEN_FAILED 3
 
+#define GAME_EVENT_GO_FULLSCREEN 1
+#define GAME_EVENT_QUIT_FULLSCREEN 2
+#define GAME_EVENT_SHOW_RIGHT_MENU 3
+#define GAME_EVENT_FILE_DELETE_BACK 4
+#define GAME_EVENT_LOADING_STATUS 5
+
 typedef void(*CGameFileStatusChangedCallback)(void* data, bool isOpen, int status);
+typedef void(*CGameSampleEventCallback)(void* data, int eventCode, void* param);
 
 class CWindowsGameRenderer : public COpenGLRenderer
 {
@@ -39,21 +46,23 @@ public:
 	virtual void DoOpenFile() {}
 	virtual void MarkShouldOpenFile() { }
 	virtual void MarkCloseFile(bool delete_after_close) { }
-	virtual void NotifyAboutDialogClosed() { }
-	virtual void NotifyHelpDialogClosed() { }
+	virtual void SetRenderQuitFullScreenButton(bool show) { }
 	virtual void AddTextureToQueue(CCTexture* tex, int x, int y, int id) { }
 	virtual CCGUInfo* GetGUInfo() { return nullptr; }
 	virtual PanoramaMode GetMode() { return PanoramaMode::PanoramaModeMax; }
 	virtual void SetMode(PanoramaMode mode) { }
 	virtual const wchar_t* GetFileLastError() { return nullptr; }
+	virtual const wchar_t* GetCurrentFilePath() { return nullptr; }
+	virtual const wchar_t* GetCurrentFileInfoTitle() { return nullptr; }
 
-	virtual void ZoomIn() { }
-	virtual void ZoomOut() { }
+	virtual bool ZoomIn() { return false; }
+	virtual bool ZoomOut() { return false; }
 	virtual void ZoomReset() { }
 	virtual void ZoomBest() { }
 	virtual void OpenFileAs() { }
 
 	virtual void SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void*data) {}
+	virtual void SetSampleEventCallback(CGameSampleEventCallback callback, void* data) {}
 };
 
 #ifdef VR720_EXPORTS
@@ -63,6 +72,12 @@ struct FileStatusChangedCallbackData {
 	int status;
 	void* data;
 	CGameFileStatusChangedCallback callback;
+};
+struct SampleEventCallbackData {
+	void* data;
+	int eventCode;
+	void* param;
+	CGameSampleEventCallback callback;
 };
 
 class CImageLoader;
@@ -75,26 +90,24 @@ public:
 	void SetOpenFilePath(const wchar_t* path);
 	void DoOpenFile();
 	void MarkShouldOpenFile() { should_open_file = true; }
-	void MarkCloseFile(bool delete_after_close) {
-		should_close_file = true; 
-		this->delete_after_close = delete_after_close;
-	}
-	void NotifyAboutDialogClosed() { about_dialog_showed = false; }
-	void NotifyHelpDialogClosed() { help_dialog_showed = false; }
+	void MarkCloseFile(bool delete_after_close) { should_close_file = true;  this->delete_after_close = delete_after_close; }
+	void SetRenderQuitFullScreenButton(bool show) { renderQuitFullScreenButton = show; }
 	void AddTextureToQueue(CCTexture* tex, int x, int y, int id);
 	CCGUInfo* GetGUInfo() { return uiInfo; }
 	PanoramaMode GetMode() { return mode; }
 	void SetMode(PanoramaMode mode) { SwitchMode(mode); }
 	const wchar_t* GetFileLastError() { return fileManager->GetLastError(); }
+	const wchar_t* GetCurrentFilePath() { return currentOpenFilePath.c_str(); }
+	const wchar_t* GetCurrentFileInfoTitle();
 
-	void ZoomIn();
-	void ZoomOut();
+	bool ZoomIn();
+	bool ZoomOut();
 	void ZoomReset();
 	void ZoomBest();
 	void OpenFileAs();
 
 	void SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void* data);
-
+	void SetSampleEventCallback(CGameSampleEventCallback callback, void* data);
 
 private:
 
@@ -134,23 +147,19 @@ private:
 	bool main_menu_active = true;
 	float ui_update_tick = 0.0f;
 
-
-	bool about_dialog_showed = false;
-	bool help_dialog_showed = false;
-	bool about_dialog_active = false;
 	bool glinfo_dialog_active = false;
 	bool render_dialog_active = false;
-	bool loading_dialog_active = false;
-	bool welecome_dialog_active = true;
-	bool image_err_dialog_active = false;
-	bool reg_dialog_showed = false;
 	bool file_opened = false;
+
+	bool renderQuitFullScreenButton = false;
 
 	float current_fps = 0;
 	float current_draw_time = 0;
 
 	int zoom_slider_value = 50;
-	float best_zoom = 0;
+
+	float bestZoom = 0;
+	float bestOrthoSize = 0;
 
 	bool render_init_finish = false;
 	bool should_open_file = false;
@@ -159,6 +168,7 @@ private:
 	bool destroying = false;
 	bool needTestImageAndSplit = false;
 	bool firstMouse = true;
+	bool lastMoved = false;
 	float lastX = 0, lastY = 0, xoffset = 0, yoffset = 0;
 	float loopCount = 0;
 
@@ -174,7 +184,7 @@ private:
 	static void BeforeQuitCallback(COpenGLView* view);
 
 	void UpdateConsoleState();
-	void LoadAndChechkRegister();
+	void UpdateLoadingState(bool loading);
 
 	void SwitchMode(PanoramaMode mode);
 
@@ -193,7 +203,10 @@ private:
 	void LoadSettings();
 	void SaveSettings();
 
+	SampleEventCallbackData sampleEventCallbackData;
 	FileStatusChangedCallbackData fileStatusChangedCallbackData;
+
+	void CallSampleEventCallback(int code, void* param);
 	void CallFileStatusChangedCallback(bool isOpen, int status);
 };
 

@@ -7,5 +7,7 @@
     <menu value="菜单"/>
     <restore value="还原"/>
     <fullscreen value="全屏"/>
+    <about_title value="关于软件"/>
+    <help_title value="使用帮助"/>
     <ver value="1.0"/>
   </string>

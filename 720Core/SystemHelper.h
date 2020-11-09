@@ -10,5 +10,8 @@ public:
    static bool FileExists(LPCSTR file);
    static bool OpenAs(LPCWSTR file);
    static bool ShellDeleteFile(HWND hWnd, LPCWSTR file);
+   static bool ShellCopyFile(HWND hWnd, LPCWSTR file);
+   static bool ShowInExplorer(LPCWSTR file);
+   static bool CopyToClipBoard(LPCWSTR string);;
 };
 

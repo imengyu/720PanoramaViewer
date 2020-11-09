@@ -4,7 +4,7 @@
 #include "CStringHlp.h"
 #include <shlwapi.h>
 
-class VR720_EXP Path
+class Path
 {
 public:
 	static std::wstring GetFileNameWithoutExtension(std::wstring path);

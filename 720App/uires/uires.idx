@@ -6,7 +6,10 @@
     <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
     <file name="XML_SHADOWWND" path="xml\dlg_shadow.xml"/>
     <file name="XML_TIPWND" path="xml\dlg_tip.xml"/>
+    <file name="XML_NOTIFYWND" path="xml\dlg_notify.xml"/>
     <file name="XML_PANO_MODEWND" path="xml\dlg_pano_mode.xml"/>
+    <file name="XML_HELPWND" path="xml\dlg_help.xml"/>
+    <file name="XML_ABOUTWND" path="xml\dlg_about.xml"/>
   </LAYOUT>
   
   <values>
@@ -14,7 +17,18 @@
   	<file name="color" path="values\color.xml"/>
   	<file name="skin" path="values\skin.xml"/>
   </values>
-
+  
+  <rtf>
+    <file name="rtf_elua" path="rtf\elua.rtf" />
+  </rtf>
+  
+  <anim>
+    <file name="alpha_in" path="anim\alpha_in.xml"/>
+    <file name="alpha_out" path="anim\alpha_out.xml"/>
+    <file name="zoom_in" path="anim\zoom_in.xml"/>
+    <file name="zoom_out" path="anim\zoom_out.xml"/>
+  </anim>
+  
   <IMGX>
     <file name="btn_close" path="image\btn_close.png"/>
     <file name="btn_delete" path="image\btn_delete.png"/>
@@ -33,6 +47,10 @@
     <file name="btn_zoom_out" path="image\btn_zoom_out.png"/>
     <file name="btn_open" path="image\btn_open.png"/>
     <file name="btn_info" path="image\btn_info.png"/>
+
+    <file name="png_vscroll" path="image\vscrollbar.png" />
+    <file name="png_hscroll" path="image\hscrollbar.png" />
+    <file name="scroll_bar" path="image\scroll_bar.png" />
     
     <file name="btn_close@200" path="image\btn_close@200.png"/>
     <file name="btn_delete@200" path="image\btn_delete@200.png"/>
@@ -52,21 +70,26 @@
     <file name="btn_info@200" path="image\btn_info@200.png"/>
     <file name="btn_open_huge" path="image\btn_open_huge.png"/>
     
-
     <file name="menu_icons" path="image\menu_icons.png"/>
     <file name="menu_check" path="image\menu_check.png"/>
     <file name="menu_arrow" path="image\menu_arrow.png"/>
     <file name="menu_sep" path="image\menu_sep.png"/>
     <file name="menu_border" path="image\menu_border.png"/>
     <file name="menu_skin" path="image\menu_skin.png"/>
-    
+
+    <file name="notify_bkgnd" path="image\notify_bkgnd.png"/>
     <file name="window_bkgnd" path="image\window_bkgnd.png"/>
     <file name="window_shadow" path="image\window_shadow.png"/>
+    <file name="window_shadow_bkgnd" path="image\window_shadow_bkgnd.png"/>
 
     <file name="big_title" path="image\big_title.png"/>
     <file name="btn_huge" path="image\btn_huge.png"/>
     <file name="btn_small" path="image\btn_small.png"/>
+    <file name="btn_small_round" path="image\btn_small_round.png"/>
+    <file name="btn_big" path="image\btn_big.png"/>
     
+    <file name="btn_open_with_others" path="image\btn_open_with_others.png"/>
+
     <file name="btn_pano_360@200" path="image\btn_pano_360.png"/>
     <file name="btn_pano_asteroid@200" path="image\btn_pano_asteroid@200.png"/>
     <file name="btn_pano_cylinder@200" path="image\btn_pano_cylinder@200.png"/>
@@ -82,12 +105,15 @@
     <file name="icon_pano_all" path="image\icon_pano_all.png"/>
 
     <file name="file_error" path="image\file_error.png"/>
+    <file name="help" path="image\help.png"/>
+    <file name="about" path="image\about.png"/>
 
     <file name="float_bg_big" path="image\float_bg_big.png"/>
     <file name="float_bg_small" path="image\float_bg_small.png"/>
   </IMGX>
   <SMENUEX>
     <file name="menu_main" path="xml\menu_main.xml" />
+    <file name="menu_right" path="xml\menu_right.xml" />
   </SMENUEX>
   <ICON>
     <file name="ICON_LOGO"  path="image\logo.ico"/>

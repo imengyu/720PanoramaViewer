@@ -1,0 +1,42 @@
+﻿<SOUI name="aboutWindow" title="@string/about_title" bigIcon="ICON_LOGO:32" 
+      smallIcon="ICON_LOGO:16" margin="28,28,28,28"  resizable="0" wndType="normal"
+      appWnd="1" translucent="1" width="480" height="520"
+>
+  <user autoScale="true"/>
+  <root skin="skin_window_bkgnd_shadow" cache="1" padding="28,28,28,28">
+    <caption pos="0,0,-0,36" show="1">
+      <icon pos="10,11" src="ICON_LOGO:16"/>
+      <imgbtn name="btn_close" skin="skin_btn_close"  pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1"/>
+    </caption>
+    <window pos="2,[2,-2,-2" padding="15,15,15,15">
+      <img pos="0,0" skin="skin_about" size="400,142" />
+      <window id="2" pos="0,142" size="400,330" layout="vbox" font="size:13" show="1">
+        
+        <text>720全景查看器 Version: 2.0 Build 1 (2020/09/29)</text>
+        <text textColor="#77777">Copyright © 2020 By imengyu. All rights reserved.</text>
+        <link href="https://www.imengyu.top" class="cls_btn_weblink">https://www.imengyu.top</link>
+        <text>本软件使用的第三方开源组件：</text>
+        <window pos="0,100" size="400,130" layout="vbox">
+          <text>SOUI (github.com/soui3/soui)</text>
+          <text>The OpenGL Extension Wrangler Library (GLEW)</text>
+          <text>OpenGL Mathematics (GLM)</text>
+          <text>Dear ImGui  (github.com/ocornut/imgui)</text>
+          <text>stb (github.com/nothings/stb)</text>
+        </window>
+        
+      </window>
+      <window id="3"  pos="0,142,-0,-50" show="0" colorBkgnd="#efefef" padding="5,5,5,5">
+        <richedit name="rtf_elua" pos="0,0,-0,-0" bkgndBlend="1" readOnly="1"
+                  class="cls_edit" sbFadeFrames="30"
+                  multiLines="1" vscrollBar="1"
+                  sbSkin="skin_scrollbar"
+                  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" maxBuf="6400000" rtf="rtf:rtf_elua" />
+      </window>
+      
+      <window  pos="0,-40" size="400,33">
+        <imgbtn name="btn_check_agreement" skin="skin_btn_big" pos="0,0"  size="150,33">查看用户使用协议</imgbtn>
+        <imgbtn name="btn_close" skin="skin_btn_big" pos="-130,0" size="120,33">我知道了</imgbtn>
+      </window>
+    </window>
+  </root>
+</SOUI>

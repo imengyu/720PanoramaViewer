@@ -25,20 +25,21 @@ void CWindowsGameRendererInternal::SetOpenFilePath(const wchar_t* path)
 }
 void CWindowsGameRendererInternal::DoOpenFile()
 {
-    loading_dialog_active = true;
+    UpdateLoadingState(true);
     if (fileManager->DoOpenFile(currentOpenFilePath.c_str())) {
 
+        /*
         if (fileManager->ImageRatioNotStandard && mode <= PanoramaMode::PanoramaOuterBall) {
             if (uiWapper->ShowConfirmBox(L"看起来这张图片的长宽比不是 2:1，不是标准的720度全景图像，如果要显示此图像，可能会导致图像变形，是否继续？", 
                 L"提示", L"", L"", CAppUIMessageBoxIcon::IconWarning) == CAppUIMessageBoxResult::ResultCancel)
             {
-                welecome_dialog_active = true;
                 file_opened = false;
                 renderer->renderOn = false;
                 loading_dialog_active = false;
                 return;
             }
         }
+        */
 
         LoadImageInfo();
 
@@ -49,7 +50,6 @@ void CWindowsGameRendererInternal::DoOpenFile()
 
         //检查是否需要分片并加载
         needTestImageAndSplit = true;
-        welecome_dialog_active = false;
         file_opened = true;
         renderer->renderOn = true;
     }
@@ -59,11 +59,9 @@ void CWindowsGameRendererInternal::DoOpenFile()
     }
 }
 void CWindowsGameRendererInternal::ShowErrorDialog() {
-    welecome_dialog_active = false;
-    image_err_dialog_active = true;
     file_opened = false;
     renderer->renderOn = false;
-    loading_dialog_active = false;
+    UpdateLoadingState(false);
     uiWapper->MessageBeep(CAppUIMessageBoxIcon::IconWarning);
 }
 void CWindowsGameRendererInternal::LoadImageInfo() {
@@ -211,6 +209,7 @@ void CWindowsGameRendererInternal::MouseCallback(COpenGLView* view, float xpos, 
     auto* renderer = (CWindowsGameRendererInternal*)view->GetRenderer();
 
     if (type == ViewMouseEventType::ViewMouseMouseDown) {
+        renderer->lastMoved = false;
         if ((button & MK_LBUTTON) == MK_LBUTTON) {
             renderer->lastX = xpos;
             renderer->lastY = ypos;
@@ -223,8 +222,13 @@ void CWindowsGameRendererInternal::MouseCallback(COpenGLView* view, float xpos, 
             view->ReleaseCapture();
             CCursor::SetViewCursur(view, CCursor::Default);
         }
+        if ((button & MK_RBUTTON) == MK_RBUTTON) {
+            if (!renderer->lastMoved)
+                renderer->CallSampleEventCallback(GAME_EVENT_SHOW_RIGHT_MENU, 0);
+        }
     }
     else  if (type == ViewMouseEventType::ViewMouseMouseMove) {
+        renderer->lastMoved = true;
 
         //Skip when mouse hover on window
         if (ImGui::IsAnyWindowHovered()) {
@@ -369,29 +373,32 @@ void CWindowsGameRendererInternal::Render(float FrameTime)
 
     texLoadQueue->ResolveRender();
 
-    if (should_open_file && render_init_finish) {
-        should_open_file = false;
-        DoOpenFile();
-    }
-
     if (needTestImageAndSplit) {
         needTestImageAndSplit = false;
         TestSplitImageAndLoadTexture();
     }
 
-    //loop count
+    //文件操作
     //===========================
 
-    LoadAndChechkRegister();
+    if (should_open_file && render_init_finish) {
+        should_open_file = false;
+        DoOpenFile();
+    }
+
     if (should_close_file) {
+
         should_close_file = false;
         std::wstring path = fileManager->CurrentFileLoader->GetPath();
         fileManager->CloseFile();
-        if (delete_after_close)
-            DeleteFile(path.c_str());
+
+        if (delete_after_close) {
+            bool ok = DeleteFile(path.c_str());
+            CallSampleEventCallback(GAME_EVENT_FILE_DELETE_BACK, (void*)ok);
+        }
     }
 }
-void CWindowsGameRendererInternal::RenderUI()
+void CWindowsGameRendererInternal::RenderUI() 
 {
     const  ImGuiWindowFlags overlay_window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
     const ImGuiIO& io = ImGui::GetIO();
@@ -399,277 +406,27 @@ void CWindowsGameRendererInternal::RenderUI()
     ui_update_tick += View->GetDeltaTime();
     if (ui_update_tick > 0.5f) ui_update_tick = 0.0f;
 
-    /*
-
-    //顶栏
-    if (main_menu_active || !View->IsFullScreen) {
+    if (main_menu_active && renderQuitFullScreenButton) {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 150.0f, 2.0f));
+        ImGui::SetNextWindowSize(ImVec2(150.0f, 23.0f));
+        ImGui::SetNextWindowBgAlpha(0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        //主菜单
-        if (ImGui::BeginMainMenuBar())
+        bool open = ImGui::Begin("quit_full_bar", nullptr, 
+            ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
+            ImGuiWindowFlags_NoNav);
+        ImGui::PopStyleVar(4);
+        if (open)
         {
-            if (ImGui::BeginMenu(u8"文件"))
-            {
-                if (ImGui::MenuItem(u8"打开全景图文件")) fileManager->OpenFile();
-
-                ImGui::Separator();
-
-                if (ImGui::MenuItem(u8"关闭当前文件", nullptr, nullptr, file_opened)) fileManager->CloseFile();
-                if (ImGui::MenuItem(u8"删除", nullptr, nullptr, file_opened)) fileManager->DeleteCurrentFile();
-                if (ImGui::MenuItem(u8"使用其他程序打开", nullptr, nullptr, file_opened)) fileManager->OpenCurrentFileAs();
-
-                ImGui::Separator();
-                if (ImGui::MenuItem(u8"退出程序", "Alt+F4")) { View->CloseView(); }
-                ImGui::EndMenu();
+            if (ImGui::Button(u8"退出全屏 (F11)")) {
+                CallSampleEventCallback(GAME_EVENT_QUIT_FULLSCREEN, 0);
             }
-            if (ImGui::BeginMenu(u8"视图"))
-            {
-                if (ImGui::MenuItem((u8"全屏"), "F11", &View->IsFullScreen))
-                    View->UpdateFullScreenState();
-
-                if (file_opened) {
-                    if (ImGui::BeginMenu(u8"模式"))
-                    {
-                        for (int i = 0; i < PanoramaModeMax; i++) {
-                            if ((PanoramaMode)i != PanoramaMode::PanoramaMercator 
-                                && ImGui::RadioButton(GetPanoramaModeStr((PanoramaMode)i), mode == (PanoramaMode)i)) {
-                                SwitchMode((PanoramaMode)i);
-                                ImGui::CloseCurrentPopup();
-                            }
-                        }
-                        ImGui::EndMenu();
-                    }
-                    if (ImGui::MenuItem(u8"重置视图", "F10")) renderer->ResetModel();
-                }
-
-                ImGui::Separator();
-
-                ImGui::MenuItem(u8"显示FPS", "", &show_fps);
-                ImGui::MenuItem(u8"状态栏", "", &show_status_bar);
-
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu(u8"工具"))
-            {
-                ImGui::MenuItem(u8"渲染配置", "", &render_dialog_active);
-
-                ImGui::Separator();
-
-                if (ImGui::BeginMenu(u8"调试"))
-                {
-                    ImGui::MenuItem("Debug tool", "", &debug_tool_active);
-                    ImGui::MenuItem("Info Overlay", "", &((CWindowsOpenGLView*)View)->ShowInfoOverlay);
-
-                    if (ImGui::BeginMenu(u8"Debug render"))
-                    {
-                        ImGui::MenuItem("DebugWireframe", "", &renderer->renderDebugWireframe);
-                        ImGui::MenuItem("DebugVector", "", &renderer->renderDebugVector);
-                        ImGui::EndMenu();
-                    }
-                    ImGui::EndMenu();
-                }
-                if (ImGui::MenuItem(u8"显示控制台", "", &show_console)) UpdateConsoleState();
-
-                ImGui::EndMenu();
-            }  
-            if (ImGui::BeginMenu(u8"帮助"))
-            {
-                if (ImGui::MenuItem(u8"使用帮助")) {
-                    if (!help_dialog_showed) {
-                        help_dialog_showed = true;
-                        View->SendWindowsMessage(WM_CUSTOM_SHOW_HELPBOX, 0, 0);
-                    }
-                }
-                if (ImGui::MenuItem(u8"关于")) {
-                    if (!about_dialog_showed) {
-                        about_dialog_showed = true;
-                        View->SendWindowsMessage(WM_CUSTOM_SHOW_ABOUTBOX, 0, 0);
-                    }
-                }
-                   
-                ImGui::EndMenu();
-            }
-
-            //FPS显示
-            if (show_fps) {
-                ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 150.0f, 2.0f));
-                ImGui::SetNextWindowSize(ImVec2(150.0f, 23.0f));
-                ImGui::SetNextWindowBgAlpha(0.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-                bool open = ImGui::BeginChild("fps_bar", ImVec2(0, 0), false,
-                    ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing |
-                    ImGuiWindowFlags_NoNav);
-                ImGui::PopStyleVar(4);
-                if (open)
-                {
-                    if (ui_update_tick == 0) {
-                        current_fps = View->GetCurrentFps();
-                        current_draw_time = View->GetDrawTime();
-                    }
-                    ImGui::Text("FPS: %0.2f (%d ms)", current_fps, current_draw_time);
-                    ImGui::EndChild();
-                }
-            }
-
-
-            ImGui::EndMainMenuBar();
+            ImGui::End();
         }
-        ImGui::PopStyleVar(1);
+
     }
-
-    //底栏
-    if (main_menu_active || !View->IsFullScreen) {
-
-        if (show_status_bar && file_opened) {
-            //底栏左
-            ImGui::SetNextWindowPos(ImVec2(0.0f, io.DisplaySize.y - 23.0f));
-            ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x - 330.0f, 23.0f));
-            ImGui::SetNextWindowBgAlpha(0.6f);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-            bool open = ImGui::Begin("bottom_bar", 0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
-            ImGui::PopStyleVar(4);
-            if (open)
-            {
-                if (uiInfo->currentImageOpened) {
-
-                    switch (uiInfo->currentImageType) {
-                    case ImageType::BMP:
-                        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(1.0f, 0.8f, 0.8f));
-                        ImGui::Button("BMP"); ImGui::SameLine();
-                        ImGui::PopStyleColor(1);
-                        break;
-                    case ImageType::JPG:
-                        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.2f, 0.8f, 0.8f));
-                        ImGui::Button("JPG"); ImGui::SameLine();
-                        ImGui::PopStyleColor(1);
-                        break;
-                    case ImageType::PNG:
-                        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.6f, 0.0f, 0.8f));
-                        ImGui::Button("PNG"); ImGui::SameLine();
-                        ImGui::PopStyleColor(1);
-                        break;
-                    }
-                    ImGui::Text(uiInfo->currentImageImgSize.c_str()); ImGui::SameLine();
-                    ImGui::Text(uiInfo->currentImageSize.c_str()); ImGui::SameLine();
-               
-                    if (uiInfo->currentImageLoading) {
-                        ImGui::Text("|"); ImGui::SameLine();
-                        float precent = fileManager->CurrentFileLoader->GetLoadingPrecent();
-                        ImGui::Text(u8"加载中: %d%%", (int)(precent * 100)); ImGui::SameLine();
-                    }
-
-                    ImGui::Text("|"); ImGui::SameLine();
-
-                    if (uiInfo->currentImageAllChunks > 0) {
-                        ImGui::Text("%d-%d/%d", uiInfo->currentImageLoadChunks, uiInfo->currentImageLoadedChunks, uiInfo->currentImageAllChunks); ImGui::SameLine();
-                        ImGui::Text("|"); ImGui::SameLine();
-                    }
-
-                    ImGui::Text(u8"%s 修改日期: %s", uiInfo->currentImageName.c_str(), uiInfo->currentImageChangeDate.c_str()); ImGui::SameLine();
-                }
-
-                ImGui::End();
-            }
-
-            //底栏右
-            ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 330.0f, io.DisplaySize.y - 23.0f));
-            ImGui::SetNextWindowSize(ImVec2(330.0f, 23.0f));
-            ImGui::SetNextWindowBgAlpha(0.6f);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-            open = ImGui::Begin("bottom_bar_right", 0, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
-            ImGui::PopStyleVar(4);
-
-            if (open)
-            {
-                //更改模式
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-                ImGui::Button(u8"模式:"); ImGui::SameLine();
-                ImGui::PopStyleColor(1);
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.9f, 1.0f, 1.0f));
-                if (ImGui::Button(GetPanoramaModeStr(mode)))
-                    ImGui::OpenPopup("mode_popup");
-                else if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
-                    ImGui::SetTooltip(u8"更改全景模式");
-                if (ImGui::BeginPopup("mode_popup"))
-                {
-                    for (int i = 0; i < PanoramaModeMax; i++) {
-                        if ((PanoramaMode)i != PanoramaMode::PanoramaMercator 
-                            &&  ImGui::RadioButton(GetPanoramaModeStr((PanoramaMode)i), mode == (PanoramaMode)i)) {
-                            SwitchMode((PanoramaMode)i);
-                            ImGui::CloseCurrentPopup();
-                        }
-                    }
-                    ImGui::EndMenu();
-                }
-
-                ImGui::PopStyleColor(1);
-                ImGui::SameLine();
-
-                //全屏
-                if (ImGui::Button(View->IsFullScreen ? u8"退出全屏" : u8"全屏")) {
-                    View->IsFullScreen = !View->IsFullScreen;
-                    View->UpdateFullScreenState();
-                }
-                else if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
-                    ImGui::SetTooltip(View->IsFullScreen ? u8"退出全屏" : u8"全屏");
-                ImGui::SameLine();
-
-                //缩放工具
-                if (mode <= PanoramaMode::PanoramaOuterBall) {
-                    if (ImGui::Button(u8"─"))
-                        camera->ProcessMouseScroll(-120);
-                    else  if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
-                        ImGui::SetTooltip(u8"缩小");
-
-                    ImGui::SameLine();
-
-                    ImGui::SetNextItemWidth(100.0f);
-                    if (ImGui::SliderInt("", &zoom_slider_value, 0, 100, u8"缩放: %d%%"))
-                        camera->SetFOV((1.0f - (zoom_slider_value / 100.0f)) * (camera->FovMax - camera->FovMin) + camera->FovMin);
-                    ImGui::SameLine();
-
-                    if (ImGui::Button(u8"＋"))
-                        camera->ProcessMouseScroll(120);
-                    else if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
-                        ImGui::SetTooltip(u8"放大");
-
-                    ImGui::SameLine();
-                }
-                else if(mode == PanoramaMode::PanoramaFull360 || mode == PanoramaMode::PanoramaFullOrginal) {
-                    if (ImGui::Button(u8"─"))
-                        camera->ProcessMouseScroll(-120);
-                    else  if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
-                        ImGui::SetTooltip(u8"缩小");
-
-                    ImGui::SameLine();
-
-                    ImGui::SetNextItemWidth(100.0f);
-                    if (ImGui::SliderInt("", &zoom_slider_value, 0, 100, u8"缩放: %d%%"))
-                        camera->SetOrthoSize((1.0f - (zoom_slider_value / 100.0f)) * (camera->OrthoSizeMax - camera->OrthoSizeMin) + camera->OrthoSizeMin);
-                    ImGui::SameLine();
-
-                    if (ImGui::Button(u8"＋"))
-                        camera->ProcessMouseScroll(120);
-                    else if (!ImGui::IsItemActivated() && ImGui::IsItemHovered())
-                        ImGui::SetTooltip(u8"放大");
-
-                    ImGui::SameLine();
-                }
-
-                ImGui::End();
-            }
-        }
-    }
-
-    */
 
     //调试工具
     if (debug_tool_active) {
@@ -763,8 +520,6 @@ void CWindowsGameRendererInternal::RenderUI()
 
             ImGui::Separator();
             ImGui::Checkbox("RenderTest modul", &renderer->renderPanoramaATest);
-            ImGui::Separator();
-            ImGui::Checkbox("welecome_dialog_active", &welecome_dialog_active);
         }
         ImGui::End();
     }
@@ -809,77 +564,6 @@ void CWindowsGameRendererInternal::RenderUI()
             ImGui::End();
         }
     }
-
-    //对话框  
-    if (loading_dialog_active) {
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(io.DisplaySize);
-        ImGui::SetNextWindowBgAlpha(0.8f);
-        if (ImGui::Begin("loading_bg", 0, overlay_window_flags))
-            ImGui::End();
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_None, ImVec2(0.5f, 0.5f));
-        if (ImGui::Begin("loading_box", 0, overlay_window_flags))
-        {
-            float precent = fileManager->CurrentFileLoader ? fileManager->CurrentFileLoader->GetLoadingPrecent()  : 0 ;
-            ImGui::Text(u8"图像载入中 %d%% ，请稍后...", (int)(precent * 100));
-            ImGui::End();
-        }
-    }
-
-    /*
-    //欢迎对话框  
-    if (welecome_dialog_active) {
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
-        ImGui::SetNextWindowBgAlpha(0.0f);
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_None, ImVec2(0.5f, 0.5f));
-        if (ImGui::Begin("welecome_box", 0, overlay_window_flags))
-        {
-            ImGui::Image((ImTextureID)renderer->uiTitleTex->texture, ImVec2(378, 56));
-            ImGui::Spacing();
-            ImGui::Spacing();
-            ImGui::Spacing();
-            ImGui::Spacing();
-            ImGui::Spacing();
-            ImGui::SameLine(97);
-            if (ImGui::ImageButton((ImTextureID)renderer->uiOpenButtonTex->texture, ImVec2(184, 56)))
-                fileManager->OpenFile();
-            ImGui::End();
-        }
-        ImGui::PopStyleVar(4);
-    }
-
-    //错误对话框
-    if(image_err_dialog_active) {
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
-        ImGui::SetNextWindowBgAlpha(0.0f);
-        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_None, ImVec2(0.5f, 0.5f));
-        if (ImGui::Begin("image_err_box", 0, overlay_window_flags))
-        {
-            ImGui::Image((ImTextureID)renderer->uiFailedTex->texture, ImVec2(60, 60));
-            ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();ImGui::Spacing();
-            ImGui::Spacing();
-            ImGui::Text(u8"我们无法打开此图像，%s", last_image_error.c_str());
-            ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-            ImGui::Spacing();
-            //ImGui::SameLine(97);
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 6));
-            if (ImGui::Button(u8"返回")) {
-                image_err_dialog_active = false;
-                welecome_dialog_active = true;
-            }
-            ImGui::PopStyleVar(1);
-            ImGui::End();
-        }
-        ImGui::PopStyleVar(4);
-    }
-    
-    */
 }
 void CWindowsGameRendererInternal::Update()
 {
@@ -907,14 +591,12 @@ void CWindowsGameRendererInternal::Update()
     if (View->GetKeyPress(VK_RIGHT)) KeyMoveCallback(CCameraMovement::ROATE_RIGHT);
     if (View->GetKeyPress(VK_DOWN)) KeyMoveCallback(CCameraMovement::ROATE_DOWN);
 
-    if (View->GetKeyDown(VK_ESCAPE)) {//ESC
-        if (View->GetIsFullScreen()) View->SetFullScreen(false);
-    }
-    if (View->GetKeyDown(VK_F11)) { //F11
-        View->SetFullScreen(!View->GetIsFullScreen());
-    }
+    if (View->GetKeyDown(VK_ESCAPE)) //ESC
+        CallSampleEventCallback(GAME_EVENT_QUIT_FULLSCREEN, 0);
+    if (View->GetKeyDown(VK_F11)) //F11
+        CallSampleEventCallback(GAME_EVENT_GO_FULLSCREEN, 0);
     if (View->GetKeyDown(VK_F10)) //F10
-        renderer->ResetModel();
+        SwitchMode(GetMode());
 }
 
 //逻辑控制
@@ -973,13 +655,14 @@ TextureLoadQueueDataResult* CWindowsGameRendererInternal::LoadTexCallback(Textur
         result->height = (int)size.y;
         result->success = true;
 
-        ptr->best_zoom = ptr->camera->FovMin + (result->height > 2048 ? 1 : result->height / 2048.0f) * 
+        ptr->bestZoom = ptr->camera->FovMin + (result->height > 2048 ? 1 : result->height / 2048.0f) *
             ((ptr->camera->FovMax - ptr->camera->FovMin) / 2);
+        ptr->bestOrthoSize = ptr->camera->FovMin + (result->height > 2048 ? 1 : result->height / 2048.0f) *
+            ((ptr->camera->OrthoSizeMax - ptr->camera->OrthoSizeMin) / 2);
 
         ptr->logger->Log(L"Load tex buffer: w: %d h: %d (%d)  Buffer Size: %d", (int)size.x, (int)size.y, result->compoents, result->size);
-        ptr->loading_dialog_active = false;
+        ptr->UpdateLoadingState(false);
         ptr->uiInfo->currentImageLoading = false;
-
         ptr->CallFileStatusChangedCallback(true, GAME_FILE_OK);
 
         return result;
@@ -1000,7 +683,6 @@ void CWindowsGameRendererInternal::FileCloseCallback(void* data) {
     ptr->renderer->UpdateMainModelTex();
     ptr->uiInfo->currentImageOpened = false;
     ptr->renderer->renderOn = false;
-    ptr->welecome_dialog_active = true;
     ptr->file_opened = false;
     ptr->CallFileStatusChangedCallback(false, GAME_FILE_OK);
 }
@@ -1123,41 +805,36 @@ void CWindowsGameRendererInternal::SwitchMode(PanoramaMode mode)
         break;
     }
 }
-void CWindowsGameRendererInternal::ZoomIn() { camera->ProcessMouseScroll(-120); }
-void CWindowsGameRendererInternal::ZoomOut() { camera->ProcessMouseScroll(120); }
-void CWindowsGameRendererInternal::ZoomReset() { camera->FiledOfView = camera->FovMin; }
-void CWindowsGameRendererInternal::ZoomBest() { camera->FiledOfView = best_zoom; }
+bool CWindowsGameRendererInternal::ZoomIn() { 
+    camera->ProcessMouseScroll(120); 
+    return camera->ZoomReachedLimit;
+}
+bool CWindowsGameRendererInternal::ZoomOut() { 
+    camera->ProcessMouseScroll(-120); 
+    return camera->ZoomReachedLimit;
+}
+void CWindowsGameRendererInternal::ZoomReset() {
+    if (camera->Mode == CCPanoramaCameraMode::CenterRoate)
+        camera->FiledOfView = camera->FovMin;
+    else if (camera->Mode == CCPanoramaCameraMode::OrthoZoom)
+        camera->OrthographicSize = camera->OrthoSizeMin;
+}
+void CWindowsGameRendererInternal::ZoomBest() { 
+    if (camera->Mode == CCPanoramaCameraMode::CenterRoate)
+        camera->FiledOfView = bestZoom;
+    else if (camera->Mode == CCPanoramaCameraMode::OrthoZoom)
+        camera->OrthographicSize = bestOrthoSize;
+}
 void CWindowsGameRendererInternal::OpenFileAs() {  fileManager->OpenCurrentFileAs();  }
+const wchar_t* CWindowsGameRendererInternal::GetCurrentFileInfoTitle() { return fileManager->GetCurrentFileInfoTitle(); }
 
 void CWindowsGameRendererInternal::UpdateConsoleState() {
     ShowWindow(GetConsoleWindow(), show_console ? SW_SHOW : SW_HIDE);
     if (show_console) View->Active();
 }
-void CWindowsGameRendererInternal::LoadAndChechkRegister() {
-    if (!reg_dialog_showed) {
-        loopCount += View->GetDeltaTime();
-        if (loopCount >= 10.0f) {
-            loopCount = 0;
-            reg_dialog_showed = true;
-            time_t timep;
-            struct tm* p;
-            time(&timep);
-            p = gmtime(&timep);
-            int lastDayShowRegCount = settings->GetSettingInt(L"regShowLast", p->tm_mday);
-            int todayShowRegCount = 0;
-            if (lastDayShowRegCount == p->tm_mday) {
-                todayShowRegCount = settings->GetSettingInt(L"regShowCount", 0);
-            }
-            else 
-                settings->SetSettingInt(L"regShowCount", 0);
-
-            if (!settings->GetSettingBool(L"registered", false) && todayShowRegCount < 2) {
-                settings->SetSettingInt(L"regShowCount", todayShowRegCount++);
-                settings->SetSettingInt(L"regShowLast", p->tm_mday);
-                View->SendWindowsMessage(WM_CUSTOM_SHOW_REG, 0, 0);
-            }
-        }
-    }
+void CWindowsGameRendererInternal::UpdateLoadingState(bool loading)
+{
+    CallSampleEventCallback(GAME_EVENT_LOADING_STATUS, (void*)loading);
 }
 
 //回调设置
@@ -1168,13 +845,31 @@ void CWindowsGameRendererInternal::SetFileStatusChangedCallback(CGameFileStatusC
     fileStatusChangedCallbackData.callback = callback;
     fileStatusChangedCallbackData.data = data;
 }
+void CWindowsGameRendererInternal::SetSampleEventCallback(CGameSampleEventCallback callback, void* data)
+{
+    sampleEventCallbackData.callback = callback;
+    sampleEventCallbackData.data = data;
+}
 
 //回调处理
 //****************************************************************
 
+void ThreadSampleEventCallback(void* ptr) {
+    auto* a = (SampleEventCallbackData*)ptr;
+    a->callback(a->data, a->eventCode, a->param);
+}
 void ThreadFileStatusChangedCallback(void* ptr) {
     auto* a = (FileStatusChangedCallbackData*)ptr;
     a->callback(a->data, a->isOpen, a->status);
+}
+
+void CWindowsGameRendererInternal::CallSampleEventCallback(int code, void* param)
+{
+    if (sampleEventCallbackData.callback) {
+        sampleEventCallbackData.eventCode = code;
+        sampleEventCallbackData.param = param;
+        AppGetAppInstance()->GetMessageCenter()->RunOnUIThread(&sampleEventCallbackData, ThreadSampleEventCallback);
+    }
 }
 void CWindowsGameRendererInternal::CallFileStatusChangedCallback(bool isOpen, int status)
 {

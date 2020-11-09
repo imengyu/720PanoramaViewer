@@ -19,6 +19,8 @@
   <imglist name="skin_btn_open"  src="IMGX:btn_open" states="4" />
   <imglist name="skin_btn_info"  src="IMGX:btn_info" states="4" />
 
+  <scrollbar name="skin_scrollbar" src="IMGX:scroll_bar" margin="3" hasgripper="0"/>
+  
   <imglist name="skin_btn_close"  src="IMGX:btn_close@200" states="3" scale="200" />
   <imglist name="skin_btn_max"  src="IMGX:btn_max@200" states="3" scale="200"  />
   <imglist name="skin_btn_restore"  src="IMGX:btn_restore@200" states="3" scale="200"  />
@@ -38,21 +40,27 @@
   
   <imglist name="skin_btn_open_huge"  src="IMGX:btn_open_huge" states="3" />
   
-  <imglist name="skin_menu_icons" src="imgx:menu_icons" states="9" />
+  <imglist name="skin_menu_icons" src="imgx:menu_icons" states="12" />
   <imglist name="skin_menu_check" src="IMGX:menu_check" states="3" />
   <imglist name="skin_menu_arrow" src="IMGX:menu_arrow" states="2" />
   <imgframe name="skin_menu_sep" src="IMGX:menu_sep" left="26"/>
   <imgframe name="skin_menu_border" src="IMGX:menu_border" margin-x="8" margin-y="8"/>
   <imgframe name="skin_menu_skin" src="IMGX:menu_skin" states="2" margin="26,2,5,2"/>
 
-  <imgframe name="skin_window_shadow"  src="IMGX:window_shadow" left="28" right="28" top="28" bottom="28"/>
+  <imgframe name="skin_window_shadow"  src="IMGX:window_shadow" margin-x="28" margin-y="28" />
   <imgframe name="skin_window_bkgnd"  src="IMGX:window_bkgnd" left="5" right="5" top="40" bottom="40"/>
+  <imgframe name="skin_window_bkgnd_shadow"  src="IMGX:window_shadow_bkgnd"  margin-x="28" margin-y="28" />
+
   <imgframe name="skin_big_title"  src="IMGX:big_title" />
   <imgframe name="skin_file_error"  src="IMGX:file_error" />
+  <imgframe name="skin_notify_bkgnd"  src="IMGX:notify_bkgnd" margin-x="30" margin-y="30" />
 
-  <imglist name="skin_btn_huge" src="imgx:btn_huge" states="3" left="35" right="35" top="35" bottom="35" />
-  <imglist name="skin_btn_small" src="imgx:btn_small" states="3" left="2" right="2" top="2" bottom="2" />
+  <imglist name="skin_btn_huge" src="imgx:btn_huge" states="3" />
+  <imglist name="skin_btn_small" src="imgx:btn_small" states="3" />
+  <imglist name="skin_btn_small_round" src="imgx:btn_small_round" states="3"  margin-x="13" margin-y="13"/>
   <imglist name="skin_icon_pano_all"  src="IMGX:icon_pano_all" states="6"  />
+  <imglist name="skin_btn_open_with_others" src="imgx:btn_open_with_others" states="3" />
+  <imglist name="skin_btn_big" src="imgx:btn_big" states="3"  margin-x="2" margin-y="2"/>
 
   <imglist name="skin_btn_pano_360"  src="IMGX:btn_pano_360@200" states="4"  scale="200" />
   <imglist name="skin_btn_pano_asteroid"  src="IMGX:btn_pano_asteroid@200" states="4"  scale="200" />
@@ -70,5 +78,8 @@
 
   <imgframe name="skin_float_bg_small"  src="IMGX:float_bg_small" left="8" right="8" top="8" bottom="14"/>
   <imgframe name="skin_float_bg_big"  src="IMGX:float_bg_big" left="8" right="8" top="8" bottom="14"/>
-  
+
+  <imgframe name="skin_help"  src="IMGX:help"/>
+  <imgframe name="skin_about"  src="IMGX:about"/>
+
 </skin>
