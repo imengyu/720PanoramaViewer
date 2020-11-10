@@ -15,7 +15,6 @@ public:
 
 	bool DoOpenFile(const wchar_t* path);
 	void DeleteCurrentFile();
-	void OpenCurrentFileAs();
 	void OpenFile();
 
 	void CloseFile();
@@ -29,15 +28,17 @@ public:
 		onCloseCallbackData = data;
 	}
 
+	void UpdateLastError();
+
 	bool ImageRatioNotStandard = false;
 
-	const wchar_t* GetCurrentFileInfoTitle();
+	const wchar_t* GetCurrentFileLoadingPrecent();
 	const wchar_t* GetLastError();
 private:
 
 	Logger* logger = nullptr;
 	std::wstring lastErr;
-	std::wstring imageInfoTitle;
+	std::wstring imageLoadingPrecent;
 	COpenGLRenderer* Render = nullptr;
 
 	CCFileManagerOnCloseCallback onCloseCallback = nullptr;

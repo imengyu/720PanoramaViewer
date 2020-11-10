@@ -9,9 +9,11 @@ public:
    static bool FileExists(LPCWSTR file);
    static bool FileExists(LPCSTR file);
    static bool OpenAs(LPCWSTR file);
+   static bool Open(LPCWSTR file);
    static bool ShellDeleteFile(HWND hWnd, LPCWSTR file);
    static bool ShellCopyFile(HWND hWnd, LPCWSTR file);
-   static bool ShowInExplorer(LPCWSTR file);
+   static bool ShowInExplorer(HWND hWndMain, LPCWSTR file);
+   static bool ShowFileProperties(HWND hWndMain, LPCWSTR file);
    static bool CopyToClipBoard(LPCWSTR string);;
 };
 

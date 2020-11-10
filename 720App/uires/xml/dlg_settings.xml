@@ -1,4 +1,4 @@
-﻿<SOUI name="helpWindow" title="@string/help_title" bigIcon="ICON_LOGO:32" 
+﻿<SOUI name="helpWindow" title="软件设置" bigIcon="ICON_LOGO:32" 
       smallIcon="ICON_LOGO:16" margin="28,28,28,28" resizable="0" wndType="normal"
       appWnd="1" translucent="1" width="460" height="610"
 >
@@ -9,7 +9,7 @@
       <imgbtn name="btn_close" skin="skin_btn_close"  pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1"/>
     </caption>
     <window pos="2,[2,-2,-2">
-      <img pos="0,0" skin="skin_help" size="400,441" />
+
       <imgbtn name="btn_close" skin="skin_btn_big" pos="|-60,-55" size="120,33">我知道了</imgbtn>
     </window>
  

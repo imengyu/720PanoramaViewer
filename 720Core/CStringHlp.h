@@ -17,7 +17,7 @@ public:
 	 * @param byteSize ด๓ะก
 	 * @return
 	 */
-	static std::string GetFileSizeStringAuto(long long byteSize);
+	static std::wstring GetFileSizeStringAuto(long long byteSize);
 
 	static std::string & FormatString(std::string & _str, const char * format, ...);
 	static std::wstring & FormatString(std::wstring & _str, const wchar_t * format, ...);

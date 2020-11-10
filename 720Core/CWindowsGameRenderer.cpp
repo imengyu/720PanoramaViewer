@@ -7,6 +7,7 @@
 #include "CApp.h"
 #include "CStringHlp.h"
 #include "SettingHlp.h"
+#include "PathHelper.h"
 #include "imgui/imgui.h"
 #include <Shlwapi.h>
 #include <time.h>
@@ -23,6 +24,10 @@ void CWindowsGameRendererInternal::SetOpenFilePath(const wchar_t* path)
 {
 	currentOpenFilePath = path;
 }
+const wchar_t* CWindowsGameRendererInternal::GetOpenFilePath()
+{
+    return currentOpenFilePath.c_str();
+}
 void CWindowsGameRendererInternal::DoOpenFile()
 {
     UpdateLoadingState(true);
@@ -33,7 +38,7 @@ void CWindowsGameRendererInternal::DoOpenFile()
             if (uiWapper->ShowConfirmBox(L"看起来这张图片的长宽比不是 2:1，不是标准的720度全景图像，如果要显示此图像，可能会导致图像变形，是否继续？", 
                 L"提示", L"", L"", CAppUIMessageBoxIcon::IconWarning) == CAppUIMessageBoxResult::ResultCancel)
             {
-                file_opened = false;
+                currentImageOpened = false;
                 renderer->renderOn = false;
                 loading_dialog_active = false;
                 return;
@@ -50,7 +55,7 @@ void CWindowsGameRendererInternal::DoOpenFile()
 
         //检查是否需要分片并加载
         needTestImageAndSplit = true;
-        file_opened = true;
+        currentImageOpened = true;
         renderer->renderOn = true;
     }
     else {
@@ -59,7 +64,7 @@ void CWindowsGameRendererInternal::DoOpenFile()
     }
 }
 void CWindowsGameRendererInternal::ShowErrorDialog() {
-    file_opened = false;
+    currentImageOpened = false;
     renderer->renderOn = false;
     UpdateLoadingState(false);
     uiWapper->MessageBeep(CAppUIMessageBoxIcon::IconWarning);
@@ -70,13 +75,27 @@ void CWindowsGameRendererInternal::LoadImageInfo() {
     auto imgSize = loader->GetImageSize();
     auto imgFileInfo = loader->GetImageFileInfo();
 
-    uiInfo->currentImageType = fileManager->CurrenImageType;
-    uiInfo->currentImageName = CStringHlp::UnicodeToUtf8(fileManager->GetCurrentFileName());
-    uiInfo->currentImageImgSize = CStringHlp::FormatString("%dx%dx%db", (int)imgSize.x, (int)imgSize.y, loader->GetImageDepth());
-    uiInfo->currentImageSize = CStringHlp::GetFileSizeStringAuto(imgFileInfo->fileSize);
-    uiInfo->currentImageChangeDate = imgFileInfo->Write;
+    currentImageLoading = true;
+    currentImageType = fileManager->CurrenImageType;
+    currentImageChangeDate = imgFileInfo->Write;
+    currentImageFileSize = CStringHlp::GetFileSizeStringAuto(imgFileInfo->fileSize);
+    currentImageResolutionSize = CStringHlp::FormatString(L"%dx%dx%db", (int)imgSize.x, (int)imgSize.y, loader->GetImageDepth());
+    currentImageInfoTitle = CStringHlp::FormatString(L"%s (%s, %s)",
+        Path::GetFileName(currentOpenFilePath).c_str(),
+        currentImageResolutionSize.c_str(), currentImageFileSize.c_str());
 
-    uiInfo->currentImageOpened = true;
+    CallSampleEventCallback(GAME_EVENT_IMAGE_INFO_LOADED, 0);
+
+    //jpg文件还可以加载EXIF信息
+    if (currentImageType == ImageType::JPG) {
+        currentImageHasExifData = true;
+        currentImageExifDataLoading = true;
+        currentImageExifInfo.clear();
+        CreateThread(NULL, NULL, LoadImageInfoThread, this, NULL, NULL);
+    }
+    else {
+        currentImageHasExifData = false;
+    }
 }
 void CWindowsGameRendererInternal::TestSplitImageAndLoadTexture() {
     glm::vec2 size = fileManager->CurrentFileLoader->GetImageSize();
@@ -94,18 +113,55 @@ void CWindowsGameRendererInternal::TestSplitImageAndLoadTexture() {
 
         int chunkWi = (int)ceil(chunkW), chunkHi = (int)ceil(chunkH);
 
-        uiInfo->currentImageAllChunks = chunkWi * chunkHi;
-        uiInfo->currentImageLoadChunks = 0;
+        currentImageAllChunks = chunkWi * chunkHi;
+        currentImageLoadChunks = 0;
         logger->Log(L"Image use split mode , size: %d, %d", chunkWi, chunkHi);
         renderer->sphereFullSegmentX = renderer->sphereSegmentX + (renderer->sphereSegmentX % chunkWi);
         renderer->sphereFullSegmentY = renderer->sphereSegmentY + (renderer->sphereSegmentY % chunkHi);
         renderer->GenerateFullModel(chunkWi, chunkHi);
     }
     else {
-        uiInfo->currentImageAllChunks = 0;
+        currentImageAllChunks = 0;
     }
 
     SwitchMode(mode);
+}
+void CWindowsGameRendererInternal::LoadImageExifInfo() {
+
+    FILE* fp = nullptr;
+    _wfopen_s(&fp, currentOpenFilePath.c_str(), L"rb");
+    if (!fp) {
+        logger->LogError2(L"Can't open JPEG file : %s.", currentOpenFilePath.c_str());
+        currentImageExifDataLoading = false;
+        return;
+    }
+    fseek(fp, 0, SEEK_END);
+    unsigned long fsize = ftell(fp);
+    rewind(fp);
+    unsigned char* buf = new unsigned char[fsize];
+    if (fread(buf, 1, fsize, fp) != fsize) {
+        logger->LogError2(L"Can't read JPEG file : size : %d", fsize);
+        currentImageExifDataLoading = false;
+        delete[] buf;
+        return;
+    }
+    fclose(fp);
+
+    int code = currentImageExifInfo.parseFrom(buf, fsize);
+    delete[] buf;
+    if (!code) {
+        logger->LogError2(L"Can't read JPEG EXIF Data : %d", code);
+        currentImageExifDataLoading = true;
+        return;
+    }
+    
+    CallSampleEventCallback(GAME_EVENT_IMAGE_INFO_LOADED2, 0);
+}
+DWORD WINAPI CWindowsGameRendererInternal::LoadImageInfoThread(LPVOID lpParam)
+{
+    auto* view = (CWindowsGameRendererInternal*)lpParam;
+    view->LoadImageExifInfo();
+    return 0;
 }
 
 bool CWindowsGameRendererInternal::Init()
@@ -117,7 +173,6 @@ bool CWindowsGameRendererInternal::Init()
     fileManager = new CCFileManager(this);
     uiWapper = new CAppUIWapper(this->View);
     texLoadQueue = new CCTextureLoadQueue();
-    uiInfo = new CCGUInfo();
 
     renderer->Init();
     texLoadQueue->SetLoadHandle(LoadTexCallback, this);
@@ -147,10 +202,6 @@ bool CWindowsGameRendererInternal::Init()
 void CWindowsGameRendererInternal::Destroy()
 {
     destroying = true;
-    if (uiInfo != nullptr) {
-        delete uiInfo;
-        uiInfo = nullptr;
-    }
     if (fileManager != nullptr) {
         delete fileManager;
         fileManager = nullptr;
@@ -317,8 +368,6 @@ void CWindowsGameRendererInternal::LoadSettings()
 
     ((CWindowsOpenGLView*)View)->ShowInfoOverlay = settings->GetSettingBool(L"ShowInfoOverlay", false);
     show_console = settings->GetSettingBool(L"ShowConsole", false);
-    show_fps = settings->GetSettingBool(L"ShowFps", show_fps);
-    show_status_bar = settings->GetSettingBool(L"ShowStatusBar", show_status_bar);
     debug_tool_active = settings->GetSettingBool(L"DebugTool", false);
     renderer->renderDebugWireframe = settings->GetSettingBool(L"renderDebugWireframe", false);
     renderer->renderDebugVector = settings->GetSettingBool(L"renderDebugVector", false);
@@ -348,8 +397,6 @@ void CWindowsGameRendererInternal::SaveSettings()
     settings->SetSettingInt(L"sphereSegmentX", renderer->sphereSegmentX);
     settings->SetSettingInt(L"sphereSegmentY", renderer->sphereSegmentY);
     settings->SetSettingInt(L"LastMode", mode);
-    settings->SetSettingBool(L"ShowFps", show_fps);
-    settings->SetSettingBool(L"ShowStatusBar", show_status_bar);
 }
 
 
@@ -603,7 +650,7 @@ void CWindowsGameRendererInternal::Update()
 
 TextureLoadQueueDataResult* CWindowsGameRendererInternal::LoadChunkTexCallback(TextureLoadQueueInfo* info, CCTexture* texture) {
 
-    if (!file_opened)
+    if (!currentImageOpened)
         return nullptr;
 
     auto imgSize = fileManager->CurrentFileLoader->GetImageSize();
@@ -612,8 +659,8 @@ TextureLoadQueueDataResult* CWindowsGameRendererInternal::LoadChunkTexCallback(T
     int chunkX = info->x * chunkW;
     int chunkY = info->y * chunkH;
 
-    uiInfo->currentImageLoading = true;
-    uiInfo->currentImageLoadChunks = info->id;
+    currentImageLoading = true;
+    currentImageLoadChunks = info->id;
     
     //Load full main tex
     TextureLoadQueueDataResult* result = new TextureLoadQueueDataResult();
@@ -624,8 +671,8 @@ TextureLoadQueueDataResult* CWindowsGameRendererInternal::LoadChunkTexCallback(T
     result->height = chunkH;
     result->success = true;
 
-    uiInfo->currentImageLoadedChunks++;
-    uiInfo->currentImageLoading = false;
+    currentImageLoadedChunks++;
+    currentImageLoading = false;
 
     return result;
 }
@@ -635,16 +682,17 @@ TextureLoadQueueDataResult* CWindowsGameRendererInternal::LoadTexCallback(Textur
         return nullptr;
     if (info->id == -1) {
         ptr->logger->Log(L"Load main tex: id: -1");
-        ptr->uiInfo->currentImageLoading = true;
+        ptr->currentImageLoading = true;
 
         //Load full main tex
         TextureLoadQueueDataResult* result = new TextureLoadQueueDataResult();
         result->buffer = ptr->fileManager->CurrentFileLoader->GetAllImageData();
         if (!result->buffer) {
+            ptr->fileManager->UpdateLastError();
             ptr->ShowErrorDialog();
             ptr->logger->LogError2(L"Load tex main buffer failed : %s", ptr->fileManager->CurrentFileLoader->GetLastError());
             delete result;
-             ptr->CallFileStatusChangedCallback(false, GAME_FILE_OPEN_FAILED);
+            ptr->CallFileStatusChangedCallback(false, GAME_FILE_OPEN_FAILED);
             return nullptr;
         }
 
@@ -662,7 +710,7 @@ TextureLoadQueueDataResult* CWindowsGameRendererInternal::LoadTexCallback(Textur
 
         ptr->logger->Log(L"Load tex buffer: w: %d h: %d (%d)  Buffer Size: %d", (int)size.x, (int)size.y, result->compoents, result->size);
         ptr->UpdateLoadingState(false);
-        ptr->uiInfo->currentImageLoading = false;
+        ptr->currentImageLoading = false;
         ptr->CallFileStatusChangedCallback(true, GAME_FILE_OK);
 
         return result;
@@ -681,14 +729,12 @@ void CWindowsGameRendererInternal::FileCloseCallback(void* data) {
     ptr->renderer->ReleaseFullModel();
     ptr->renderer->ReleaseTexPool();
     ptr->renderer->UpdateMainModelTex();
-    ptr->uiInfo->currentImageOpened = false;
     ptr->renderer->renderOn = false;
-    ptr->file_opened = false;
+    ptr->currentImageOpened = false;
     ptr->CallFileStatusChangedCallback(false, GAME_FILE_OK);
 }
 void CWindowsGameRendererInternal::CameraFOVChanged(void* data, float fov) {
     auto* ptr = (CWindowsGameRendererInternal*)data;
-    ptr->zoom_slider_value = (int)((1.0f - (fov - ptr->camera->FovMin) / (ptr->camera->FovMax - ptr->camera->FovMin)) * 100);
     if (ptr->mode == PanoramaSphere || ptr->mode == PanoramaCylinder) {
         ptr->renderer->renderPanoramaFull = ptr->SplitFullImage && fov < 40;
         if(ptr->renderer->renderPanoramaFull) ptr->renderer->UpdateFullChunksVisible();
@@ -696,7 +742,6 @@ void CWindowsGameRendererInternal::CameraFOVChanged(void* data, float fov) {
 }
 void CWindowsGameRendererInternal::CameraOrthoSizeChanged(void* data, float fov) {
     auto* ptr = (CWindowsGameRendererInternal*)data;
-    ptr->zoom_slider_value = (int)((1.0f - (fov - ptr->camera->OrthoSizeMin) / (ptr->camera->OrthoSizeMax - ptr->camera->OrthoSizeMin)) * 100);
     ptr->renderer->UpdateFlatModelMinMax(fov);
 }
 
@@ -825,8 +870,58 @@ void CWindowsGameRendererInternal::ZoomBest() {
     else if (camera->Mode == CCPanoramaCameraMode::OrthoZoom)
         camera->OrthographicSize = bestOrthoSize;
 }
-void CWindowsGameRendererInternal::OpenFileAs() {  fileManager->OpenCurrentFileAs();  }
-const wchar_t* CWindowsGameRendererInternal::GetCurrentFileInfoTitle() { return fileManager->GetCurrentFileInfoTitle(); }
+
+const wchar_t* CWindowsGameRendererInternal::GetCurrentFileInfo(int c) {
+    switch (c)
+    {
+    case GAME_IMAGE_INFO_TYPE: {
+        switch (currentImageType)
+        {
+        case BMP: return L"BMP";
+        case JPG: return L"JPG";
+        case PNG: return L"PNG";
+        case Unknow:
+        default: return L"未知";
+        }
+        break;
+    }
+    case GAME_IMAGE_INFO_DATE:
+        return currentImageChangeDate.c_str();
+    case GAME_IMAGE_INFO_SHOOTING_DATE:
+        currentImageInfoDateTime = CStringHlp::AnsiToUnicode(currentImageExifInfo.DateTime);
+        return currentImageInfoDateTime.c_str();
+    case GAME_IMAGE_INFO_SHUTTER_TIME:
+        currentImageInfoShutterSpeedValue = currentImageExifInfo.ShutterSpeedValue > 0 ?
+            CStringHlp::FormatString(L"%.2f", (float)(1 / currentImageExifInfo.ShutterSpeedValue)) : L"0";
+        return currentImageInfoShutterSpeedValue.c_str();
+    case GAME_IMAGE_INFO_EXPOSURE_BIAS_VALUE:
+        currentImageInfoExposureBiasValue = CStringHlp::FormatString(L"%.2f", currentImageExifInfo.ExposureBiasValue);
+        return currentImageInfoExposureBiasValue.c_str();
+    case GAME_IMAGE_INFO_ISO_SENSITIVITY:
+        currentImageInfoISOSpeedRatings = CStringHlp::FormatString(L"%d", currentImageExifInfo.ISOSpeedRatings);
+        return currentImageInfoISOSpeedRatings.c_str();
+    case GAME_IMAGE_INFO_FILE_SIZE:
+        return currentImageFileSize.c_str();
+    case GAME_IMAGE_INFO_RESOLUTION: {
+        currentImageInfoResolution = currentImageResolutionSize;
+        currentImageInfoResolution += L"  (";
+        currentImageInfoResolution += GetCurrentFileInfo(GAME_IMAGE_INFO_TYPE);
+        currentImageInfoResolution += L")";
+        return currentImageInfoResolution.c_str();
+    }
+    case GAME_IMAGE_INFO_CAMERA:
+        currentImageInfoCamera = CStringHlp::FormatString(L"%hs (%hs)", currentImageExifInfo.Model.c_str(), currentImageExifInfo.Make.c_str());
+        return currentImageInfoCamera.c_str();
+    case GAME_IMAGE_INFO_FOCAL_LENGTH:
+        currentImageInfoFocalLength = CStringHlp::FormatString(L"%d  (35mm : %d)", currentImageExifInfo.FocalLength, currentImageExifInfo.FocalLengthIn35mm);
+        return currentImageInfoFocalLength.c_str();
+    }
+    return nullptr;
+}
+const wchar_t* CWindowsGameRendererInternal::GetCurrentFileInfoTitle() { 
+    return currentImageInfoTitle.c_str();
+}
+const wchar_t* CWindowsGameRendererInternal::GetCurrentFileLoadingPrecent() { return fileManager->GetCurrentFileLoadingPrecent(); }
 
 void CWindowsGameRendererInternal::UpdateConsoleState() {
     ShowWindow(GetConsoleWindow(), show_console ? SW_SHOW : SW_HIDE);
@@ -857,6 +952,7 @@ void CWindowsGameRendererInternal::SetSampleEventCallback(CGameSampleEventCallba
 void ThreadSampleEventCallback(void* ptr) {
     auto* a = (SampleEventCallbackData*)ptr;
     a->callback(a->data, a->eventCode, a->param);
+    delete a;
 }
 void ThreadFileStatusChangedCallback(void* ptr) {
     auto* a = (FileStatusChangedCallbackData*)ptr;
@@ -866,9 +962,12 @@ void ThreadFileStatusChangedCallback(void* ptr) {
 void CWindowsGameRendererInternal::CallSampleEventCallback(int code, void* param)
 {
     if (sampleEventCallbackData.callback) {
-        sampleEventCallbackData.eventCode = code;
-        sampleEventCallbackData.param = param;
-        AppGetAppInstance()->GetMessageCenter()->RunOnUIThread(&sampleEventCallbackData, ThreadSampleEventCallback);
+        SampleEventCallbackData* dat = new SampleEventCallbackData();
+        dat->eventCode  = code;
+        dat->param = param;
+        dat->callback = sampleEventCallbackData.callback;
+        dat->data = sampleEventCallbackData.data;
+        AppGetAppInstance()->GetMessageCenter()->RunOnUIThread(dat, ThreadSampleEventCallback);
     }
 }
 void CWindowsGameRendererInternal::CallFileStatusChangedCallback(bool isOpen, int status)

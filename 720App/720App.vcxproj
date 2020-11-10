@@ -22,6 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{5206FB8D-E27A-4138-A614-16E1BC41E279}</ProjectGuid>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -72,6 +73,7 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(SolutionDir)$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)720Core\glm;$(SolutionDir)720Core\glew\include;$(IncludePath)</IncludePath>
+    <TargetName>panoramav</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IntDir>$(Configuration)\</IntDir>
@@ -79,6 +81,7 @@
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(SolutionDir)$(Configuration)\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)720Core\glm;$(SolutionDir)720Core\glew\include;$(IncludePath)</IncludePath>
+    <TargetName>panoramav</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>$(Configuration)64\</IntDir>
@@ -107,7 +110,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SOUI3PATH)\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>720Core.lib;utilitiesd.lib;soui3d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>core.lib;utilitiesd.lib;soui3d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <ResourceCompile>
@@ -130,7 +133,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SOUI3PATH)\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>720Core.lib;utilities.lib;soui3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>core.lib;utilities.lib;soui3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <ResourceCompile>
@@ -191,9 +194,11 @@
   <ItemGroup>
     <ClCompile Include="720App.cpp" />
     <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="FeedbackDlg.cpp" />
     <ClCompile Include="HelpDlg.cpp" />
     <ClCompile Include="NotifyWnd.cpp" />
     <ClCompile Include="PanoModeWnd.cpp" />
+    <ClCompile Include="SettingsDlg.cpp" />
     <ClCompile Include="SImageButtonHover.cpp" />
     <ClCompile Include="TipWnd.cpp" />
     <ClCompile Include="MainDlg.cpp" />
@@ -210,9 +215,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="FeedbackDlg.h" />
     <ClInclude Include="HelpDlg.h" />
     <ClInclude Include="NotifyWnd.h" />
     <ClInclude Include="PanoModeWnd.h" />
+    <ClInclude Include="SettingsDlg.h" />
     <ClInclude Include="SImageButtonHover.h" />
     <ClInclude Include="TipWnd.h" />
     <ClInclude Include="MainDlg.h" />
@@ -246,14 +253,19 @@
     <Xml Include="uires\values\skin.xml" />
     <Xml Include="uires\values\string.xml" />
     <Xml Include="uires\xml\dlg_about.xml" />
+    <Xml Include="uires\xml\dlg_feedback.xml" />
     <Xml Include="uires\xml\dlg_help.xml" />
     <Xml Include="uires\xml\dlg_main.xml" />
     <Xml Include="uires\xml\dlg_notify.xml" />
     <Xml Include="uires\xml\dlg_pano_mode.xml" />
+    <Xml Include="uires\xml\dlg_settings.xml" />
     <Xml Include="uires\xml\dlg_shadow.xml" />
     <Xml Include="uires\xml\dlg_tip.xml" />
     <Xml Include="uires\xml\menu_main.xml" />
     <Xml Include="uires\xml\menu_right.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="logo.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

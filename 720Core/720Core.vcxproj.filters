@@ -31,12 +31,6 @@
     <Filter Include="源文件\ImageLoader">
       <UniqueIdentifier>{a840a425-2bfa-48eb-ac12-b2d6d0337150}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Dialogs">
-      <UniqueIdentifier>{ebceb831-5735-43d4-afa8-5a17912c9fe4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\Dialogs">
-      <UniqueIdentifier>{5ae91501-1cf3-4d49-9556-9f2dcd974a59}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Lib">
       <UniqueIdentifier>{4f615027-921a-45c2-b682-dfe62f217728}</UniqueIdentifier>
     </Filter>
@@ -113,12 +107,6 @@
     </ClCompile>
     <ClCompile Include="CBMPLoader.cpp">
       <Filter>源文件\ImageLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="CAboutDialog.cpp">
-      <Filter>源文件\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="CHelpDialog.cpp">
-      <Filter>源文件\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="CJpgLoader.cpp">
       <Filter>源文件\ImageLoader</Filter>
@@ -447,9 +435,6 @@
     <ClCompile Include="CCGUInfo.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="CRegDialog.cpp">
-      <Filter>源文件\Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="CCAssetsManager.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
@@ -475,6 +460,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CCThreadMessageCenter.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="easyexif.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -526,12 +514,6 @@
     </ClInclude>
     <ClInclude Include="SettingHlp.h">
       <Filter>头文件\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="CAboutDialog.h">
-      <Filter>头文件\Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="CHelpDialog.h">
-      <Filter>头文件\Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="SystemHelper.h">
       <Filter>头文件\Utils</Filter>
@@ -743,9 +725,6 @@
     <ClInclude Include="CCGUInfo.h">
       <Filter>头文件\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="CRegDialog.h">
-      <Filter>头文件\Dialogs</Filter>
-    </ClInclude>
     <ClInclude Include="CCAssetsManager.h">
       <Filter>头文件\Utils</Filter>
     </ClInclude>
@@ -770,6 +749,9 @@
     <ClInclude Include="CCThreadMessageCenter.h">
       <Filter>头文件\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="easyexif.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="720Core.rc">
@@ -792,9 +774,6 @@
     <None Include="cur\bin2.bin">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="res\soui_res.rc2">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="logo.ico">
@@ -813,9 +792,6 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="about.bmp">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="uires\image\soui.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

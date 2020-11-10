@@ -71,12 +71,26 @@ bool SystemHelper::FileExists(LPCSTR file) {
 }
 bool SystemHelper::OpenAs(LPCWSTR file) {
 	if(Path::Exists(L"C:\\Windows\\System32\\OpenWith.exe"))
-		return ShellExecute(NULL, L"open", L"OpenWith.exe", file, NULL, NULL);
+		return (int)ShellExecute(NULL, L"open", L"OpenWith.exe", file, NULL, NULL) >= 32;
 	else
-		return ShellExecute(NULL, L"open", L"rundll32", CStringHlp::FormatString(L"shell32, OpenAs_RunDLL %s", file).c_str(), NULL, NULL);
+		return (int)ShellExecute(NULL, L"open", L"rundll32", CStringHlp::FormatString(L"shell32, OpenAs_RunDLL %s", file).c_str(), NULL, NULL) >= 32;
 }
-bool SystemHelper::ShowInExplorer(LPCWSTR file) {
-	return ShellExecute(NULL, L"open", L"explorer.exe", CStringHlp::FormatString(L"/select, %s", file).c_str(), NULL, NULL);
+bool SystemHelper::Open(LPCWSTR file) {
+	return (int)ShellExecute(NULL, L"open", file, NULL, NULL, NULL) >= 32;
+}
+bool SystemHelper::ShowInExplorer(HWND hWndMain, LPCWSTR szFile) {
+	std::wstring path2 = CStringHlp::FormatString(L"/select, %s", szFile);
+	return (ULONG_PTR)ShellExecute(hWndMain, L"open", L"explorer.exe", path2.c_str(), NULL, 5) >= 32;
+}
+bool SystemHelper::ShowFileProperties(HWND hWndMain, LPCWSTR file) {
+	SHELLEXECUTEINFO info = { 0 };
+	info.cbSize = sizeof(SHELLEXECUTEINFO);
+	info.hwnd = hWndMain;	
+	info.lpVerb = L"properties";
+	info.lpFile = file;
+	info.nShow = SW_SHOW;
+	info.fMask = SEE_MASK_INVOKEIDLIST;
+	return ShellExecuteEx(&info) >= 32;
 }
 bool SystemHelper::ShellDeleteFile(HWND hWnd, LPCWSTR file) {
 	SHFILEOPSTRUCT lpfileop;

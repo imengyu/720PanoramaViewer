@@ -3,7 +3,7 @@
 
 struct ImageFileInfo {
 	long long fileSize;
-	std::string Create, Access, Write;
+	std::wstring Create, Access, Write;
 };
 enum ImageType {
 	Unknow,

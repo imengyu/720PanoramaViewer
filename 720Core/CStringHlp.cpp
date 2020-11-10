@@ -63,8 +63,7 @@ std::wstring CStringHlp::FormatString(const wchar_t * format, va_list marker)
 #else
 	vswprintf((wchar_t *)tmp.data(), tmp.capacity(), format, marker);
 #endif
-	std::wstring  _str = tmp.c_str();
-	return _str;
+	return tmp;
 }
 std::string CStringHlp::FormatString(const char * format, va_list marker)
 {
@@ -83,8 +82,7 @@ std::string CStringHlp::FormatString(const char * format, va_list marker)
 #else
 	vsprintf(nullptr, format, marker);
 #endif
-	std::string _str = tmp.c_str();
-	return _str;
+	return tmp;
 }
 std::wstring CStringHlp::FormatString(const wchar_t * format, ...)
 {
@@ -106,8 +104,7 @@ std::wstring CStringHlp::FormatString(const wchar_t * format, ...)
 	vswprintf((wchar_t *)tmp.data(), tmp.capacity(), format, marker);
 #endif
 	va_end(marker);
-	std::wstring  _str = tmp.c_str();
-	return _str;
+	return tmp;
 }
 std::string CStringHlp::FormatString(const char * format, ...)
 {
@@ -137,20 +134,20 @@ std::string CStringHlp::FormatString(const char * format, ...)
 	return _str;
 }
 
-std::string CStringHlp::GetFileSizeStringAuto(long long byteSize) {
-	std::string sizeStr;
+std::wstring CStringHlp::GetFileSizeStringAuto(long long byteSize) {
+	std::wstring sizeStr;
 	double size;
 	if (byteSize >= 1073741824) {
-		size = round(byteSize / 1073741824 * 100.0f) / 100.0f;
-		sizeStr = FormatString("%.2fG", size);
+		size = round(byteSize / 1073741824.0 * 100.0) / 100.0;
+		sizeStr = FormatString(L"%d GB", (long)size);
 	}
 	else if (byteSize >= 1048576) {
-		size = round(byteSize / 1048576 * 100.0f) / 100.0f;
-		sizeStr = FormatString("%.2fM", size);
+		size = round(byteSize / 1048576.0 * 100.0) / 100.0;
+		sizeStr = FormatString(L"%d MB", (long)size);
 	}
 	else {
-		size = round(byteSize / 1024 * 100.0f) / 100.0f;
-		sizeStr = FormatString("%.2fK", size);
+		size = round(byteSize / 1024.0 * 100.0) / 100.0;
+		sizeStr = FormatString(L"%d KB", (long)size);
 	}
 	return sizeStr;
 }

@@ -9,6 +9,8 @@
 
 bool CAppInternal::Init()
 {	
+	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
 	//ÃüÁîÐÐ
 	appArgList = CommandLineToArgvW(GetCommandLine(), &appArgCount);
 	if (appArgList == NULL)
@@ -144,13 +146,15 @@ void CAppInternal::InitConsole()
 }
 bool CAppInternal::Destroy()
 {
+	logger->Log(L"Quiting..");
+
 	FreeConsole();
 
 	fclose(fileIn);
 	fclose(file);
 	fclose(fileErr);
 
-	logger->Log(L"Quiting..");
+	CoUninitialize();
 
 	LoggerInternal::DestroyConst();
 	CCursor::Destroy();

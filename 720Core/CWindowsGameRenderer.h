@@ -32,6 +32,8 @@ enum PanoramaMode : int16_t {
 #define GAME_EVENT_SHOW_RIGHT_MENU 3
 #define GAME_EVENT_FILE_DELETE_BACK 4
 #define GAME_EVENT_LOADING_STATUS 5
+#define GAME_EVENT_IMAGE_INFO_LOADED 6
+#define GAME_EVENT_IMAGE_INFO_LOADED2 7
 
 typedef void(*CGameFileStatusChangedCallback)(void* data, bool isOpen, int status);
 typedef void(*CGameSampleEventCallback)(void* data, int eventCode, void* param);
@@ -43,6 +45,7 @@ public:
 	virtual ~CWindowsGameRenderer() {}
 
 	virtual void SetOpenFilePath(const wchar_t* path) {}
+	virtual const wchar_t* GetOpenFilePath() { return nullptr; }
 	virtual void DoOpenFile() {}
 	virtual void MarkShouldOpenFile() { }
 	virtual void MarkCloseFile(bool delete_after_close) { }
@@ -53,19 +56,33 @@ public:
 	virtual void SetMode(PanoramaMode mode) { }
 	virtual const wchar_t* GetFileLastError() { return nullptr; }
 	virtual const wchar_t* GetCurrentFilePath() { return nullptr; }
+	virtual const wchar_t* GetCurrentFileInfo(int c) { return nullptr; }
 	virtual const wchar_t* GetCurrentFileInfoTitle() { return nullptr; }
+	virtual const wchar_t* GetCurrentFileLoadingPrecent() { return nullptr; }
 
 	virtual bool ZoomIn() { return false; }
 	virtual bool ZoomOut() { return false; }
 	virtual void ZoomReset() { }
 	virtual void ZoomBest() { }
-	virtual void OpenFileAs() { }
 
 	virtual void SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void*data) {}
 	virtual void SetSampleEventCallback(CGameSampleEventCallback callback, void* data) {}
 };
 
+#define GAME_IMAGE_INFO_TYPE 2
+#define GAME_IMAGE_INFO_DATE 3
+#define GAME_IMAGE_INFO_SHOOTING_DATE 4
+#define GAME_IMAGE_INFO_SHUTTER_TIME 5
+#define GAME_IMAGE_INFO_EXPOSURE_BIAS_VALUE 6
+#define GAME_IMAGE_INFO_ISO_SENSITIVITY 7
+#define GAME_IMAGE_INFO_FILE_SIZE 8
+#define GAME_IMAGE_INFO_RESOLUTION 9
+#define GAME_IMAGE_INFO_CAMERA 10
+#define GAME_IMAGE_INFO_FOCAL_LENGTH 11
+ 
 #ifdef VR720_EXPORTS
+
+#include "easyexif.h"
 
 struct FileStatusChangedCallbackData {
 	bool isOpen;
@@ -88,23 +105,24 @@ public:
 	~CWindowsGameRendererInternal();
 
 	void SetOpenFilePath(const wchar_t* path);
+	const wchar_t* GetOpenFilePath();
 	void DoOpenFile();
 	void MarkShouldOpenFile() { should_open_file = true; }
 	void MarkCloseFile(bool delete_after_close) { should_close_file = true;  this->delete_after_close = delete_after_close; }
 	void SetRenderQuitFullScreenButton(bool show) { renderQuitFullScreenButton = show; }
 	void AddTextureToQueue(CCTexture* tex, int x, int y, int id);
-	CCGUInfo* GetGUInfo() { return uiInfo; }
 	PanoramaMode GetMode() { return mode; }
 	void SetMode(PanoramaMode mode) { SwitchMode(mode); }
 	const wchar_t* GetFileLastError() { return fileManager->GetLastError(); }
 	const wchar_t* GetCurrentFilePath() { return currentOpenFilePath.c_str(); }
+	const wchar_t* GetCurrentFileInfo(int c);
 	const wchar_t* GetCurrentFileInfoTitle();
+	const wchar_t* GetCurrentFileLoadingPrecent();
 
 	bool ZoomIn();
 	bool ZoomOut();
 	void ZoomReset();
 	void ZoomBest();
-	void OpenFileAs();
 
 	void SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void* data);
 	void SetSampleEventCallback(CGameSampleEventCallback callback, void* data);
@@ -112,9 +130,7 @@ public:
 private:
 
 	Logger* logger;
-
 	std::wstring currentOpenFilePath;
-	bool fileOpened = false;
 
 	bool Init() override;
 	void Render(float FrameTime) override;
@@ -137,26 +153,41 @@ private:
 
 	//UI¿ØÖÆ
 
-	CCGUInfo* uiInfo = nullptr;
-
+	bool glinfo_dialog_active = false;
+	bool render_dialog_active = false;
 	bool debug_tool_active = false;
 	bool show_console = false;
-	bool show_status_bar = true;
-	bool show_fps = true;
 	int debug_tool_active_tab = 1;
 	bool main_menu_active = true;
 	float ui_update_tick = 0.0f;
 
-	bool glinfo_dialog_active = false;
-	bool render_dialog_active = false;
-	bool file_opened = false;
-
-	bool renderQuitFullScreenButton = false;
-
 	float current_fps = 0;
 	float current_draw_time = 0;
 
-	int zoom_slider_value = 50;
+	bool renderQuitFullScreenButton = false;
+
+	bool currentImageOpened = false;
+	std::wstring currentImageInfoTitle;
+	std::wstring currentImageChangeDate;
+	std::wstring currentImageFileSize;
+	std::wstring currentImageResolutionSize;
+	ImageType currentImageType = ImageType::Unknow;
+	int currentImageAllChunks = 0;
+	int currentImageLoadedChunks = 0;
+	int currentImageLoadChunks = 0;
+	bool currentImageLoading = false;
+	bool currentImageHasExifData = false;
+	bool currentImageExifDataLoading = false;
+
+	std::wstring currentImageInfoResolution;
+	std::wstring currentImageInfoCamera;
+	std::wstring currentImageInfoFocalLength;
+	std::wstring currentImageInfoISOSpeedRatings;
+	std::wstring currentImageInfoExposureBiasValue;
+	std::wstring currentImageInfoShutterSpeedValue;
+	std::wstring currentImageInfoDateTime;
+
+	easyexif::EXIFInfo currentImageExifInfo;
 
 	float bestZoom = 0;
 	float bestOrthoSize = 0;
@@ -174,6 +205,8 @@ private:
 
 	void LoadImageInfo();
 	void TestSplitImageAndLoadTexture();
+	void LoadImageExifInfo();
+	static DWORD WINAPI LoadImageInfoThread(LPVOID lpParam);
 
 	TextureLoadQueueDataResult* LoadChunkTexCallback(TextureLoadQueueInfo* info, CCTexture* texture);
 	static TextureLoadQueueDataResult* LoadTexCallback(TextureLoadQueueInfo* info, CCTexture* texture, void* data);
@@ -191,7 +224,6 @@ private:
 	float MouseSensitivity = 0.1f;
 	float RoateSpeed = 20.0f;
 	float MoveSpeed = 0.3f;
-
 	bool SplitFullImage = true;
 
 	static void MouseCallback(COpenGLView* view, float x, float y, int button, int type);

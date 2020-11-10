@@ -70,8 +70,8 @@ CCThreadMessageHandlerInternal::~CCThreadMessageHandlerInternal()
 
 bool CCThreadMessageHandlerInternal::RunNext() {
 	if (!pendingRun.empty()) {
-		CCThreadMessageRunData* data = pendingRun.back();
-		pendingRun.pop_back();
+		CCThreadMessageRunData* data = pendingRun.front();
+		pendingRun.pop_front();
 		//
 		CCThreadMessageRun run = data->run;
 		void* paramdata = data->data;

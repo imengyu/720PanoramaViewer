@@ -2,21 +2,12 @@
 // Microsoft Visual C++ 生成的包含文件。
 // 供 720Core.rc 使用
 //
-#define IDD_ABOUT                       101
 #define IDC_CUR_ARROW                   103
 #define IDC_CUR_CROSS                   104
 #define IDC_CUR_MOVE                    105
 #define IDC_CUR_HAND                    106
 #define IDI_APP                         107
-#define IDD_HELP                        108
-#define IDB_HELP                        110
-#define IDB_LOGO                        111
-#define IDD_REG                         114
 #define IDI_HELP                        116
-#define IDB_ABOUT_TOP                   117
-#define IDC_REGIST                      1001
-#define IDC_EDIT_INPUT                  1002
-#define IDC_REG_TO                      1003
 
 // Next default values for new objects
 // 

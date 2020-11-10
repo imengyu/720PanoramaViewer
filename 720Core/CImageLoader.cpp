@@ -121,11 +121,11 @@ const wchar_t* CImageLoader::GetLastError()
 			 SystemTimeToTzSpecificLocalTime(NULL, &stUTC2, &stLocal2);
 			 SystemTimeToTzSpecificLocalTime(NULL, &stUTC3, &stLocal3);
 
-			 currentImageInfo->Create = CStringHlp::FormatString("%d/%02d/%02d",
+			 currentImageInfo->Create = CStringHlp::FormatString(L"%d/%02d/%02d",
 				 stLocal1.wYear, stLocal1.wMonth, stLocal1.wDay);
-			 currentImageInfo->Access = CStringHlp::FormatString("%d/%02d/%02d",
+			 currentImageInfo->Access = CStringHlp::FormatString(L"%d/%02d/%02d",
 				 stLocal2.wYear, stLocal2.wMonth, stLocal2.wDay);
-			 currentImageInfo->Write = CStringHlp::FormatString("%d/%02d/%02d",
+			 currentImageInfo->Write = CStringHlp::FormatString(L"%d/%02d/%02d",
 				 stLocal3.wYear, stLocal3.wMonth, stLocal3.wDay);
 		 }
 	 }

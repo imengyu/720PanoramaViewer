@@ -75,11 +75,13 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)zlib;$(ProjectDir)glew\include;$(ProjectDir)bass24\c;$(ProjectDir)glm;$(ProjectDir);$(ProjectDir)imgui;$(ProjectDir)libpng;$(ProjectDir)jpeg-turbo;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)bass24\c;$(ProjectDir)glew\lib\Debug\Win32;$(LibraryPath)</LibraryPath>
+    <TargetName>core</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(ProjectDir)bass24\c;$(ProjectDir)glew\lib\Release\Win32;$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)libpng;$(ProjectDir)glew\include;$(ProjectDir)bass24\c;$(ProjectDir)glm;$(ProjectDir)zlib;$(ProjectDir)imgui;$(ProjectDir);$(ProjectDir)jpeg-turbo;$(SOUI3PATH)\soui\include;$(SOUI3PATH)\utilities\include;$(SOUI3PATH)\components;$(SOUI3PATH)\config;$(IncludePath)</IncludePath>
+    <TargetName>core</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -151,7 +153,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="720Core.cpp" />
-    <ClCompile Include="CAboutDialog.cpp" />
     <ClCompile Include="CApp.cpp" />
     <ClCompile Include="CAppUIWapper.cpp" />
     <ClCompile Include="CBMPLoader.cpp" />
@@ -172,7 +173,6 @@
     <ClCompile Include="CCursor.cpp" />
     <ClCompile Include="CCFileManager.cpp" />
     <ClCompile Include="CWindowsGameRenderer.cpp" />
-    <ClCompile Include="CHelpDialog.cpp" />
     <ClCompile Include="CImageLoader.cpp" />
     <ClCompile Include="CJpgLoader.cpp" />
     <ClCompile Include="CCMesh.cpp" />
@@ -183,8 +183,8 @@
     <ClCompile Include="CCPanoramaCamera.cpp" />
     <ClCompile Include="CPngLoader.cpp" />
     <ClCompile Include="CCTexture.cpp" />
-    <ClCompile Include="CRegDialog.cpp" />
     <ClCompile Include="CStringHlp.cpp" />
+    <ClCompile Include="easyexif.cpp" />
     <ClCompile Include="GlUtils.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -285,7 +285,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="720Core.h" />
-    <ClInclude Include="CAboutDialog.h" />
     <ClInclude Include="CApp.h" />
     <ClInclude Include="CAppUIWapper.h" />
     <ClInclude Include="CBMPLoader.h" />
@@ -306,7 +305,6 @@
     <ClInclude Include="CCursor.h" />
     <ClInclude Include="CCFileManager.h" />
     <ClInclude Include="CWindowsGameRenderer.h" />
-    <ClInclude Include="CHelpDialog.h" />
     <ClInclude Include="CImageLoader.h" />
     <ClInclude Include="CJpgLoader.h" />
     <ClInclude Include="CCMesh.h" />
@@ -317,8 +315,8 @@
     <ClInclude Include="CCPanoramaCamera.h" />
     <ClInclude Include="CPngLoader.h" />
     <ClInclude Include="CCTexture.h" />
-    <ClInclude Include="CRegDialog.h" />
     <ClInclude Include="CStringHlp.h" />
+    <ClInclude Include="easyexif.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl3.h" />
@@ -399,12 +397,6 @@
     <Image Include="logo-small.bmp" />
     <Image Include="logo.bmp" />
     <Image Include="logo.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\soui_res.rc2" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="uires\image\soui.ico" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="not use code.txt" />
