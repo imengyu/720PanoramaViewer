@@ -134,6 +134,19 @@ std::string CStringHlp::FormatString(const char * format, ...)
 	return _str;
 }
 
+char* CStringHlp::AllocString(std::string& str)
+{
+	char* s = new char[str.size()];
+	strcpy_s(s, str.size(), str.data());
+	return s;
+}
+wchar_t* CStringHlp::AllocString(std::wstring &str)
+{
+	wchar_t* s = new wchar_t[str.size()];
+	wcscpy_s(s, str.size(), str.data());
+	return nullptr;
+}
+
 std::wstring CStringHlp::GetFileSizeStringAuto(long long byteSize) {
 	std::wstring sizeStr;
 	double size;

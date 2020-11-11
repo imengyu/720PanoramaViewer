@@ -3,13 +3,21 @@
 #include "CCMeshLoader.h"
 #include "CWindowsOpenGLView.h"
 #include "CWindowsGameRenderer.h"
+#include "CGdiPlusUtils.h"
 #include "StringSplit.h"
 #include "PathHelper.h"
 #include <shellapi.h>
 
+ULONG_PTR m_gdiplusToken;
+
 bool CAppInternal::Init()
 {	
+	//co
 	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+
+	//Gdiplus
+	Gdiplus::GdiplusStartupInput StartupInput;
+	GdiplusStartup(&m_gdiplusToken, &StartupInput, NULL);
 
 	//命令行
 	appArgList = CommandLineToArgvW(GetCommandLine(), &appArgCount);
@@ -29,6 +37,7 @@ bool CAppInternal::Init()
 	//将程序的运行路径修改到当前程序所在的目录
 	SetCurrentDirectory(Path::GetDirectoryName(std::wstring(currentPath)).c_str());
 
+	InitDirs();
 	InitConsole();
 
 	CCPtrPool::InitPool();
@@ -46,6 +55,7 @@ bool CAppInternal::Init()
 
 	CCursor::Init(hInst);
 	CCMeshLoader::Init();
+	CGdiPlusUtils::Init();
 
 	//命令行读取
 	return true;
@@ -144,6 +154,25 @@ void CAppInternal::InitConsole()
 	freopen_s(&fileErr, "CONOUT$", "w", stderr);
 	freopen_s(&file, "CONOUT$", "w", stdout);
 }
+void CAppInternal::InitDirs() {
+
+	const wchar_t *dynDirs[] = {
+		L"\\data",
+		L"\\config",
+		L"\\data\\thumbnaiCache",
+		L"\\data\\imageCache",
+	};
+
+	std::wstring path;
+	for (int i = 0; i < CONST_ARR_LEN(dynDirs); i++) {
+		path = currentDir;
+		path += dynDirs[i];
+		if (!PathFileExists(path.c_str())) {
+			if (!CreateDirectory(path.c_str(), NULL))
+				logger->LogError2(L"Create directory %s failed! %d", path.c_str(), GetLastError());
+		}
+	}
+}
 bool CAppInternal::Destroy()
 {
 	logger->Log(L"Quiting..");
@@ -154,6 +183,8 @@ bool CAppInternal::Destroy()
 	fclose(file);
 	fclose(fileErr);
 
+	Gdiplus::GdiplusShutdown(m_gdiplusToken);
+	
 	CoUninitialize();
 
 	LoggerInternal::DestroyConst();

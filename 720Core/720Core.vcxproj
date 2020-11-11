@@ -93,7 +93,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>VR720_EXPORTS;_CRT_SECURE_NO_WARNINGS;IMGUI_IMPL_WIN32_DISABLE_GAMEPAD;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VR720_EXPORTS;_CRT_SECURE_NO_WARNINGS;IMGUI_IMPL_WIN32_DISABLE_GAMEPAD;WIN32;_DEBUG;_CONSOLE;ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>
@@ -102,7 +102,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32sd.lib;Dbghelp.lib;Shlwapi.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GdiPlus.lib;glew32sd.lib;Dbghelp.lib;Shlwapi.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -111,7 +111,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>VR720_EXPORTS;_CRT_SECURE_NO_WARNINGS;IMGUI_IMPL_WIN32_DISABLE_GAMEPAD;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VR720_EXPORTS;_CRT_SECURE_NO_WARNINGS;IMGUI_IMPL_WIN32_DISABLE_GAMEPAD;WIN32;NDEBUG;_CONSOLE;ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -120,7 +120,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32s.lib;Dbghelp.lib;Shlwapi.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GdiPlus.lib;glew32s.lib;Dbghelp.lib;Shlwapi.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -170,8 +170,10 @@
     <ClCompile Include="CCSmartPtr.cpp" />
     <ClCompile Include="CCTextureLoadQueue.cpp" />
     <ClCompile Include="CCThreadMessageCenter.cpp" />
+    <ClCompile Include="CCThumbnailGenerator.cpp" />
     <ClCompile Include="CCursor.cpp" />
     <ClCompile Include="CCFileManager.cpp" />
+    <ClCompile Include="CGdiPlusUtils.cpp" />
     <ClCompile Include="CWindowsGameRenderer.cpp" />
     <ClCompile Include="CImageLoader.cpp" />
     <ClCompile Include="CJpgLoader.cpp" />
@@ -263,6 +265,7 @@
     <ClCompile Include="libpng\pngwtran.c" />
     <ClCompile Include="libpng\pngwutil.c" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="md5.cpp" />
     <ClCompile Include="PathHelper.cpp" />
     <ClCompile Include="SettingHlp.cpp" />
     <ClCompile Include="StringSplit.cpp" />
@@ -302,8 +305,10 @@
     <ClInclude Include="CCSmartPtr.hpp" />
     <ClInclude Include="CCTextureLoadQueue.h" />
     <ClInclude Include="CCThreadMessageCenter.h" />
+    <ClInclude Include="CCThumbnailGenerator.h" />
     <ClInclude Include="CCursor.h" />
     <ClInclude Include="CCFileManager.h" />
+    <ClInclude Include="CGdiPlusUtils.h" />
     <ClInclude Include="CWindowsGameRenderer.h" />
     <ClInclude Include="CImageLoader.h" />
     <ClInclude Include="CJpgLoader.h" />
@@ -360,6 +365,7 @@
     <ClInclude Include="libpng\pngpriv.h" />
     <ClInclude Include="libpng\pngstruct.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="md5.h" />
     <ClInclude Include="messages.h" />
     <ClInclude Include="PathHelper.h" />
     <ClInclude Include="resource.h" />
@@ -367,6 +373,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringSplit.h" />
     <ClInclude Include="SystemHelper.h" />
+    <ClInclude Include="utils.h" />
     <ClInclude Include="zlib\crc32.h" />
     <ClInclude Include="zlib\deflate.h" />
     <ClInclude Include="zlib\gzguts.h" />

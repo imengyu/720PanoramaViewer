@@ -131,3 +131,83 @@ bool SystemHelper::CopyToClipBoard(LPCWSTR string) {
 	}
 	return false;
 }
+bool SystemHelper::IsVistaOrLater() {
+	static int isVista = -1;
+	if (isVista == -1)
+		isVista = IsWinVersionGreaterThan(6, 0);
+	return isVista != FALSE;
+}
+BOOL SystemHelper::IsWinVersionEqualTo(DWORD dwMajorVersion, DWORD dwMinorVersion)
+{
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+
+	//Initialize the OSVERSIONINFOEX structure.
+	ZeroMemory(&osvi, sizeof(osvi));
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+	osvi.dwMajorVersion = dwMajorVersion;
+	osvi.dwMinorVersion = dwMinorVersion;
+
+	//Initialize the condition mask.
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_EQUAL);
+	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_EQUAL);
+
+	return VerifyVersionInfo(
+		&osvi,
+		VER_MAJORVERSION | VER_MINORVERSION,
+		dwlConditionMask
+	);
+}
+BOOL SystemHelper::IsWinVersionGreaterThan(DWORD dwMajorVersion, DWORD dwMinorVersion)
+{
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+
+	//Initialize the OSVERSIONINFOEX structure.
+	ZeroMemory(&osvi, sizeof(osvi));
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+	osvi.dwMajorVersion = dwMajorVersion;
+	osvi.dwMinorVersion = dwMinorVersion;
+
+	//system major version > dwMajorVersion
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_GREATER);
+	if (VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask))
+		return TRUE;
+
+	//sytem major version = dwMajorVersion && minor version > dwMinorVersion
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_EQUAL);
+	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_GREATER);
+
+	return VerifyVersionInfo(
+		&osvi,
+		VER_MAJORVERSION | VER_MINORVERSION,
+		dwlConditionMask
+	);
+}
+BOOL SystemHelper::IsWinVersionLessThan(DWORD dwMajorVersion, DWORD dwMinorVersion)
+{
+	OSVERSIONINFOEX osvi;
+	DWORDLONG dwlConditionMask = 0;
+
+	//Initialize the OSVERSIONINFOEX structure.
+	ZeroMemory(&osvi, sizeof(osvi));
+	osvi.dwOSVersionInfoSize = sizeof(osvi);
+	osvi.dwMajorVersion = dwMajorVersion;
+	osvi.dwMinorVersion = dwMinorVersion;
+
+	//system major version < dwMajorVersion
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_LESS);
+	if (VerifyVersionInfo(&osvi, VER_MAJORVERSION, dwlConditionMask))
+		return TRUE;
+
+	//sytem major version = dwMajorVersion && minor version < dwMinorVersion
+	dwlConditionMask = 0;
+	VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_EQUAL);
+	VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_LESS);
+
+	return VerifyVersionInfo(
+		&osvi,
+		VER_MAJORVERSION | VER_MINORVERSION,
+		dwlConditionMask
+	);
+}

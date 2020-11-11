@@ -1,102 +1,120 @@
-﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" 
-      smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
-      appWnd="1" translucent="0" maxInset="0,0,0,0" minsize="600,480"
->
-  <user autoScale="true"/>
-  <root skin="skin_window_bkgnd" cache="1"  width="800" height="600" colorBkgnd="#ffffff">
-    <caption pos="0,0,-0,36" show="1">
-      <icon pos="10,11" src="ICON_LOGO:16"/>
+<?xml version="1.0"?>
+<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5" resizable="1" wndType="appMain" appWnd="1" translucent="0" maxInset="0,0,0,0" minsize="600,480">
+	<user autoScale="true" />
+	<root skin="skin_window_bkgnd" cache="1" width="800" height="600" colorBkgnd="#ffffff">
+		<window pos="2,[2,-2,-2">
+			<window id="1" pos="0,0" size="full,full" show="1">
+				<img pos="|-200dp,|-150dp" skin="skin_big_title" size="400dp,130dp" />
+				<imgbtn pos="|-100dp,|0dp" name="btn_open_main" skin="skin_btn_open_huge" size="200dp,60dp" animate="1" />
+				<imgbtn name="btn_album_big" skin="skin_btn_tools_big" pos="|-38dp,%70" size="76dp,90dp" animate="1" />
+			</window>
+			<window id="2" pos="|-230dp,-52dp,@460dp,@52dp" show="0">
+				<imgbtnhover name="btn_scale_100" skin="skin_btn_scale_100" pos="38dp,4dp" size="38dp,48dp" animate="0" myTip="合适大小 (0)" />
+				<imgbtnhover name="btn_zoom_out" skin="skin_btn_zoom_out" pos="76dp,4dp" size="38dp,48dp" animate="0" myTip="缩小 (-)" />
+				<imgbtnhover name="btn_zoom_in" skin="skin_btn_zoom_in" pos="114dp,4dp" size="38dp,48dp" animate="0" myTip="放大 (+)" />
+				<imgbtnhover name="btn_full_screen" skin="skin_btn_scale_org" pos="152dp,4dp" size="38dp,48dp" animate="0" myTip="全屏 (F11)" />
+				<imgbtnhover name="btn_left_img" skin="skin_btn_left" pos="190dp,4dp" size="38dp,48dp" animate="0" myTip="上一张 (Alt+←)" />
+				<imgbtnhover name="btn_right_img" skin="skin_btn_right" pos="228dp,4dp" size="38dp,48dp" animate="0" myTip="下一张 (Alt+→)" />
+				<imgbtnhover name="btn_info" skin="skin_btn_info" pos="266dp,4dp" size="38dp,48dp" animate="0" myTip="图像信息" />
+				<imgbtnhover name="btn_open_with" skin="skin_btn_open" pos="304dp,4dp" size="38dp,48dp" animate="0" myTip="使用其他软件打开" />
+				<imgbtnhover name="btn_delete" skin="skin_btn_delete" pos="342dp,4dp" size="38dp,48dp" animate="0" myTip="删除图像 (Del)" />
+				<imgbtnhover name="btn_pano_mode" skin="skin_btn_pano_orginal" pos="382dp,4dp" size="38dp,48dp" animate="0" myTip="更改全景模式" />
+				<imgbtnhover name="btn_album" skin="skin_btn_btn_tools" pos="420dp,4dp" size="38dp,48dp" animate="0" myTip="打开图库 (F8)" />
+			</window>
+			<window id="3" pos="0,0,0,-52dp" show="0">
+				<img pos="|-56dp,|-220dp" skin="skin_file_error" size="100dp,100dp" />
+				<text pos="|-200dp,|-80dp" size="400dp,40dp" align="center" font="size:15" colorText="#777777" multiLines="1">抱歉，我们无法打开此图像\n图像可能已经损坏，或是格式不支持</text>
+				<text name="text_file_error" pos="|-200dp,|-60dp" size="400dp,100dp" align="center" colorText="#999999" font="size:14">未知错误</text>
+				<imgbtn name="btn_open_with" skin="skin_btn_open_with_others" pos="|-60dp,|50dp" size="120dp,26dp" colorText="#ffffff" />
+			</window>
+			<scrollview id="4" pos="0,0,@290dp,-52dp" show="0" font="size:13" viewSize="-2,-1" colorBkgnd="#F2F2F2" sbSkin="skin_scrollbar">
+				<window size="290,-1" layout="vbox" gravity="left" padding="15,15,15,15">
+					<window size="260,40">
+						<text pos="0,8" font="bold:1,size:17">图像信息</text>
+						<imgbtn name="btn_info_close" skin="skin_btn_close" pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1" />
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">文件大小：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_file_size">未知</text>
+					</window>
+					<window size="260,100">
+						<text pos="0,4" size="full,25" colorText="#989898">完整路径：</text>
+						<link pos="0,30" name="link_show_file_dir" class="cls_btn_weblink">打开所在文件夹</link>
+						<text pos="0,50" size="full,25" font="size:15" name="text_image_info_full_path" multiLines="1">未知</text>
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">修改日期：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_modify_date">未知</text>
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">分辨率：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_resolution">未知</text>
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">拍摄日期：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_shooting_date">未知</text>
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">照相机：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_camera">未知</text>
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">快门时间：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_shutter_time">未知</text>
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">ISO 速度：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_iso_sensitivity">未知</text>
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">曝光补偿：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_exposure_bias_value">未知</text>
+					</window>
+					<window size="260,55">
+						<text pos="0,4" size="full,25" colorText="#989898">焦距：</text>
+						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_focal_length">未知</text>
+					</window>
+					<window size="260,65">
+						<link name="link_show_file_info" class="cls_btn_weblink">显示图像文件信息</link>
+					</window>
+				</window>
+			</scrollview>
+    </window>
+    <window naem="wnd_album" pos="-310dp,0,@310dp,-0" show="0" colorBkgnd="#FFFFFF">
+      <window name="wnd_album_title" pos="5dp,40dp" size="280dp,40dp">
+        <text name="text_album_title" pos="0,8" font="bold:1,size:17">图库</text>
+        <imgbtn name="btn_import" skin="skin_btn_close" pos="-70dp,0" size="35dp,35dp" tip="导入图片" animate="1" />
+        <imgbtn name="btn_album_check_mode" skin="skin_btn_close" pos="-35dp,0" size="35dp,35dp" tip="多选图片" animate="1" />
+      </window>
+      <window name="wnd_album_title_select" pos="5dp,40dp" size="280dp,40dp">
+        <text name="text_album_select_title" pos="0,8" font="bold:1,size:17">请选择图片</text>
+        <imgbtn name="btn_album_check_all" skin="skin_btn_close" pos="-70dp,0" size="35dp,35dp" tip="全选" animate="1" />
+        <imgbtn name="btn_album_check_cancel" skin="skin_btn_close" pos="-35dp,0" size="35dp,35dp" tip="取消选择" animate="1" />
+      </window>
+      <listview pos="5dp,80dp,-0,-0" name="lv_main" dividerSize="1" sbFadeFrames="30" sbSkin="skin_scrollbar">
+        <template>
+          <itemTitle colorHover="#ffffff" colorSelected="#ffffff">
+            <text pos="0,0,0,0" align="center" maxWidth="500" colorText="#888888" name="text_title">未知时间</text>
+            <check pos="-20,0" name="chk_check" tip="全选" /> 
+          </itemTitle>
+          <itemImage colorHover="#dfdfdf" colorSelected="#aaaaaa">
+            <check pos="-20,-20" name="chk_check" tip="选择" />
+            <img pos="0,0" size="300dp,150dp" name="img_thumbnail" skin="skin_img_thumbnail_def"></img>
+            <text pos="0,-30dp,0,@30dp" colorText="#000000" name="text_title">text</text>
+          </itemImage>
+        </template>
+      </listview>
+      <imgbtn name="btn_close_album" skin="skin_btn_collapse_off" pos="0,|-17dp" size="18dp,34dp" animate="1" />
+    </window>
+    <caption pos="0,0,-0,36" show="1" >
+      <icon pos="10,11" src="ICON_LOGO:16" />
       <text pos="32,9" font="size:13" name="text_title">@string/title</text>
-      <imgbtn name="btn_close" skin="skin_btn_close"  pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1"/>
-      <imgbtn name="btn_max" skin="skin_btn_max"  pos="-70dp,0" size="35dp,36dp" tip="@string/maximize" animate="1" />
-      <imgbtn name="btn_restore" skin="skin_btn_restore"  pos="-70dp,0" size="35dp,36dp" tip="@string/restore" show="0" animate="1" />
+      <imgbtn name="btn_close" skin="skin_btn_close" pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1" />
+      <imgbtn name="btn_max" skin="skin_btn_max" pos="-70dp,0" size="35dp,36dp" tip="@string/maximize" animate="1" />
+      <imgbtn name="btn_restore" skin="skin_btn_restore" pos="-70dp,0" size="35dp,36dp" tip="@string/restore" show="0" animate="1" />
       <imgbtn name="btn_min" skin="skin_btn_min" pos="-105dp,0" size="35dp,36dp" tip="@string/minimize" animate="1" />
       <imgbtn name="btn_menu" skin="skin_btn_menu" pos="-140dp,0" size="35dp,36dp" animate="0" />
       <imgbtn name="btn_fullscreen_menu" skin="skin_btn_fullscreen" pos="-175dp,0" size="35dp,36dp" tip="@string/fullscreen" show="0" animate="0" />
     </caption>
-    <window pos="2,[2,-2,-2">
-
-      <window id="1" pos="0,0" size="full,full" show="1">
-        <img pos="|-200dp,|-150dp" skin="skin_big_title" size="400dp,130dp" />
-        <imgbtn pos="|-100dp,|0dp" name="btn_open_main" skin="skin_btn_open_huge" size="200dp,60dp" animate="1" />
-        <imgbtn name="btn_album_big" skin="skin_btn_tools_big"  pos="|-38dp,%70" size="76dp,90dp" animate="1" />
-      </window>
-      <window id="2" pos="|-230dp,-52dp,@460dp,@52dp" show="0">
-        
-        <imgbtnhover name="btn_scale_100" skin="skin_btn_scale_100"  pos="38dp,4dp" size="38dp,48dp" animate="0" myTip="合适大小 (0)" />
-        <imgbtnhover name="btn_zoom_out" skin="skin_btn_zoom_out"  pos="76dp,4dp" size="38dp,48dp" animate="0" myTip="缩小 (-)" />
-        <imgbtnhover name="btn_zoom_in" skin="skin_btn_zoom_in"  pos="114dp,4dp" size="38dp,48dp" animate="0" myTip="放大 (+)" />
-        <imgbtnhover name="btn_full_screen" skin="skin_btn_scale_org"  pos="152dp,4dp" size="38dp,48dp" animate="0" myTip="全屏 (F11)" />
-        <imgbtnhover name="btn_left_img" skin="skin_btn_left" pos="190dp,4dp"  size="38dp,48dp" animate="0" myTip="上一张 (Alt+←)" />
-        <imgbtnhover name="btn_right_img" skin="skin_btn_right" pos="228dp,4dp"  size="38dp,48dp" animate="0" myTip="下一张 (Alt+→)" />
-        <imgbtnhover name="btn_info" skin="skin_btn_info" pos="266dp,4dp"  size="38dp,48dp" animate="0" myTip="图像信息" />
-        <imgbtnhover name="btn_open_with" skin="skin_btn_open"  pos="304dp,4dp" size="38dp,48dp" animate="0" myTip="使用其他软件打开" />
-        <imgbtnhover name="btn_delete" skin="skin_btn_delete" pos="342dp,4dp"  size="38dp,48dp" animate="0" myTip="删除图像 (Del)" />
-        <imgbtnhover name="btn_pano_mode" skin="skin_btn_pano_orginal" pos="382dp,4dp" size="38dp,48dp" animate="0" myTip="更改全景模式" />
-        <imgbtnhover name="btn_album" skin="skin_btn_btn_tools"  pos="420dp,4dp" size="38dp,48dp" animate="0" myTip="打开图库 (F8)" />
-
-      </window>
-      <window id="3" pos="0,0,0,-52dp" show="0">
-        <img pos="|-56dp,|-220dp" skin="skin_file_error" size="100dp,100dp" />
-        <text pos="|-200dp,|-80dp" size="400dp,40dp" align="center" font="size:15" colorText="#777777"  multiLines="1">抱歉，我们无法打开此图像\n图像可能已经损坏，或是格式不支持</text>
-        <text name="text_file_error" pos="|-200dp,|-60dp" size="400dp,100dp" align="center" colorText="#999999" font="size:14">未知错误</text>
-
-        <imgbtn name="btn_open_with" skin="skin_btn_open_with_others" pos="|-60dp,|50dp" size="120dp,26dp" colorText="#ffffff"></imgbtn>
-      </window>
-      <scrollview id="4" pos="0,0,@290,-52" show="0" font="size:13" viewSize="-2,-1" colorBkgnd="#F2F2F2"  sbSkin="skin_scrollbar">
-        <window size="290,-1"  layout="vbox" gravity="left" padding="15,15,15,15" >
-            <window size="260,40">
-              <text pos="0,8" font="bold:1,size:17">图像信息</text>
-              <imgbtn name="btn_info_close" skin="skin_btn_close"  pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1"/>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">文件大小：</text>
-              <text pos="0,28" size="full,25" font="size:15" name="text_image_info_file_size">未知</text>
-            </window>
-            <window size="260,100">
-              <text pos="0,4" size="full,25" colorText="#989898">完整路径：</text>
-              <link pos="0,30" name="link_show_file_dir" class="cls_btn_weblink">打开所在文件夹</link>
-              <text pos="0,50" size="full,25" font="size:15" name="text_image_info_full_path"  multiLines="1">未知</text>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">修改日期：</text>
-              <text pos="0,28" size="full,25" font="size:15" name="text_image_info_modify_date">未知</text>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">分辨率：</text>
-              <text pos="0,28" size="full,25" font="size:15"  name="text_image_info_resolution">未知</text>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">拍摄日期：</text>
-              <text pos="0,28" size="full,25" font="size:15" name="text_image_info_shooting_date">未知</text>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">照相机：</text>
-              <text pos="0,28" size="full,25" font="size:15" name="text_image_info_camera">未知</text>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">快门时间：</text>
-              <text pos="0,28" size="full,25" font="size:15" name="text_image_info_shutter_time">未知</text>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">ISO 速度：</text>
-              <text pos="0,28" size="full,25" font="size:15" name="text_image_info_iso_sensitivity">未知</text>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">曝光补偿：</text>
-              <text pos="0,28" size="full,25" font="size:15"  name="text_image_info_exposure_bias_value">未知</text>
-            </window>
-            <window size="260,55">
-              <text pos="0,4" size="full,25" colorText="#989898">焦距：</text>
-              <text pos="0,28" size="full,25" font="size:15"  name="text_image_info_focal_length">未知</text>
-            </window>
-            <window  size="260,65">
-              <link name="link_show_file_info" class="cls_btn_weblink">显示图像文件信息</link>
-            </window>
-        </window>
-      </scrollview>
-
-    </window>
- 
-  </root>
+	</root>
 </SOUI>

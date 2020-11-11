@@ -189,11 +189,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="license.txt" />
-    <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="720App.cpp" />
     <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="CMainAlbumAdapter.cpp" />
     <ClCompile Include="FeedbackDlg.cpp" />
     <ClCompile Include="HelpDlg.cpp" />
     <ClCompile Include="NotifyWnd.cpp" />
@@ -215,6 +215,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="CMainAlbumAdapter.h" />
     <ClInclude Include="FeedbackDlg.h" />
     <ClInclude Include="HelpDlg.h" />
     <ClInclude Include="NotifyWnd.h" />

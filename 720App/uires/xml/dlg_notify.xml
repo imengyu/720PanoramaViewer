@@ -1,7 +1,8 @@
-﻿<SOUI name="notifyWindow" wndType="normal" translucent="1"  toolWindow="1">
-  <root size="800,600" cache="1" show="1">
-    <window pos="|0,|0" offset="-0.5,-0.5" size="-1,-1"  skin="skin_notify_bkgnd"  layout="vbox" padding="30,20,30,20">
-      <text name="txt_tip" font="size:15,bold:1" colorText="#ffffff" maxWidth="300" multiLines="1"/>
-    </window>
-  </root>
+<?xml version="1.0"?>
+<SOUI name="notifyWindow" wndType="normal" translucent="1" toolWindow="1">
+	<root size="800,600" cache="1" show="1">
+		<window pos="|0,|0" offset="-0.5,-0.5" size="-1,-1" skin="skin_notify_bkgnd" layout="vbox" padding="30,20,30,20">
+			<text name="txt_tip" font="size:15,bold:1" colorText="#ffffff" maxWidth="300" multiLines="1">提示</text>
+		</window>
+	</root>
 </SOUI>

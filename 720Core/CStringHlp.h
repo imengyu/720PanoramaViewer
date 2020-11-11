@@ -26,6 +26,9 @@ public:
 	static std::string FormatString(const char * format, va_list marker);
 	static std::string FormatString(const char * format, ...);
 
+	static char* AllocString(std::string& str);
+	static wchar_t* AllocString(std::wstring &str);
+
 	/**
 	 * ¿í×Ö·û Unicode ×ª Char
 	 * @param szStr Ô´×Ö·û´®

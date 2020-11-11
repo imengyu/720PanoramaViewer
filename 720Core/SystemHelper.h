@@ -14,6 +14,11 @@ public:
    static bool ShellCopyFile(HWND hWnd, LPCWSTR file);
    static bool ShowInExplorer(HWND hWndMain, LPCWSTR file);
    static bool ShowFileProperties(HWND hWndMain, LPCWSTR file);
-   static bool CopyToClipBoard(LPCWSTR string);;
+   static bool CopyToClipBoard(LPCWSTR string);
+   static bool IsVistaOrLater();
+   static BOOL IsWinVersionEqualTo(DWORD dwMajorVersion, DWORD dwMinorVersion);
+   static BOOL IsWinVersionGreaterThan(DWORD dwMajorVersion, DWORD dwMinorVersion);
+   static BOOL IsWinVersionLessThan(DWORD dwMajorVersion, DWORD dwMinorVersion);
+   ;
 };
 

@@ -18,7 +18,8 @@
   <imglist name="skin_btn_zoom_out"  src="IMGX:btn_zoom_out" states="4" />
   <imglist name="skin_btn_open"  src="IMGX:btn_open" states="4" />
   <imglist name="skin_btn_info"  src="IMGX:btn_info" states="4" />
-
+  <imglist name="skin_btn_collapse_off"  src="IMGX:btn_collapse_off" states="4" />
+  
   <scrollbar name="skin_scrollbar" src="IMGX:scroll_bar" margin="3" hasgripper="0"/>
   
   <imglist name="skin_btn_close"  src="IMGX:btn_close-200" states="3" scale="200" />
@@ -78,7 +79,8 @@
 
   <imgframe name="skin_float_bg_small"  src="IMGX:float_bg_small" left="8" right="8" top="8" bottom="14"/>
   <imgframe name="skin_float_bg_big"  src="IMGX:float_bg_big" left="8" right="8" top="8" bottom="14"/>
-
+  
+  <imgframe name="skin_img_thumbnail_def"  src="IMGX:ing_thumbnail_def"/>
   <imgframe name="skin_help"  src="IMGX:help"/>
   <imgframe name="skin_about"  src="IMGX:about"/>
 

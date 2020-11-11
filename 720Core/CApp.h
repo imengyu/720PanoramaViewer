@@ -78,6 +78,7 @@ private:
 
 	bool CheckMutex();
 	void InitConsole();
+	void InitDirs();
 
 	int GetCommandIsProvideFile(std::wstring* path);
 };

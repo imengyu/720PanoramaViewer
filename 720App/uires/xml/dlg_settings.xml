@@ -1,17 +1,13 @@
-﻿<SOUI name="helpWindow" title="软件设置" bigIcon="ICON_LOGO:32" 
-      smallIcon="ICON_LOGO:16" margin="28,28,28,28" resizable="0" wndType="normal"
-      appWnd="1" translucent="1" width="460" height="610"
->
-  <user autoScale="true"/>
-  <root skin="skin_window_bkgnd_shadow" cache="1" padding="28,28,28,28">
-    <caption pos="0,0,-0,36" show="1">
-      <icon pos="10,11" src="ICON_LOGO:16"/>
-      <imgbtn name="btn_close" skin="skin_btn_close"  pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1"/>
-    </caption>
-    <window pos="2,[2,-2,-2">
-
-      <imgbtn name="btn_close" skin="skin_btn_big" pos="|-60,-55" size="120,33">我知道了</imgbtn>
-    </window>
- 
-  </root>
+<?xml version="1.0"?>
+<SOUI name="helpWindow" title="软件设置" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="28,28,28,28" resizable="0" wndType="normal" appWnd="1" translucent="1" width="460" height="610">
+	<user autoScale="true" />
+	<root skin="skin_window_bkgnd_shadow" cache="1" padding="28,28,28,28">
+		<caption pos="0,0,-0,36" show="1">
+			<icon pos="10,11" src="ICON_LOGO:16" />
+			<imgbtn name="btn_close" skin="skin_btn_close" pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1" />
+		</caption>
+		<window pos="2,[2,-2,-2">
+			<imgbtn name="btn_close" skin="skin_btn_big" pos="|-60,-55" size="120,33">我知道了</imgbtn>
+		</window>
+	</root>
 </SOUI>

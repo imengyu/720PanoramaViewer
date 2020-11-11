@@ -465,6 +465,15 @@
     <ClCompile Include="easyexif.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="CCThumbnailGenerator.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="md5.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="CGdiPlusUtils.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -750,6 +759,18 @@
       <Filter>头文件\Utils</Filter>
     </ClInclude>
     <ClInclude Include="easyexif.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CCThumbnailGenerator.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="md5.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CGdiPlusUtils.h">
       <Filter>头文件\Utils</Filter>
     </ClInclude>
   </ItemGroup>

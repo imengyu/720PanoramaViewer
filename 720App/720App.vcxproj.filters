@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="license.txt" />
-    <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="720App.cpp">
@@ -57,6 +56,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FeedbackDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainAlbumAdapter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -100,6 +102,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FeedbackDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CMainAlbumAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

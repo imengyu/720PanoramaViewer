@@ -1,4 +1,4 @@
-﻿<SOUI name="shadowWindow" title="@string/title" translucent="1"  toolWindow="1">
-  <root skin="skin_window_shadow" width="800" height="600">
-  </root>
+<?xml version="1.0"?>
+<SOUI name="shadowWindow" title="@string/title" translucent="1" toolWindow="1">
+	<root skin="skin_window_shadow" width="800" height="600" />
 </SOUI>
