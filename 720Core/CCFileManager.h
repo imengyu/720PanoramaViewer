@@ -29,11 +29,12 @@ public:
 	}
 
 	void UpdateLastError();
-
-	bool ImageRatioNotStandard = false;
+	bool IsThisCloseWillOpenNext();
 
 	const wchar_t* GetCurrentFileLoadingPrecent();
 	const wchar_t* GetLastError();
+
+	bool ImageRatioNotStandard = false;
 private:
 
 	Logger* logger = nullptr;
@@ -43,5 +44,8 @@ private:
 
 	CCFileManagerOnCloseCallback onCloseCallback = nullptr;
 	void*onCloseCallbackData = nullptr;
+
+
+	bool isThisCloseWillOpenNext = false;
 };
 

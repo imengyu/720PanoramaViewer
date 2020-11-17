@@ -96,8 +96,18 @@
 		<file name="btn_pano_sphere" path="image\btn_pano_sphere.png" />
     <file name="btn_collapse_off" path="image\btn_collapse_off.png" />
     <file name="btn_collapse_on" path="image\btn_collapse_on.png" />
-		<file name="icon_pano_all" path="image\icon_pano_all.png" />
-    <file name="ing_thumbnail_def" path="image\ing_thumbnail_def.png" />
+
+    <file name="btn_cancel" path="image\btn_cancel.png" />
+    <file name="btn_check" path="image\btn_check.png" />
+    <file name="btn_check_none" path="image\btn_check_none.png" />
+    <file name="btn_import" path="image\btn_import.png" />
+
+    <file name="icon_pano_all" path="image\icon_pano_all.png" />
+    <file name="img_thumbnail_def" path="image\img_thumbnail_def.png" />
+    <file name="img_thumbnail_hover_overlay" path="image\img_thumbnail_hover_overlay.png" />
+    <file name="img_thumbnail_border_overlay" path="image\img_thumbnail_border_overlay.png" />
+    <file name="img_thumbnail_select_overlay" path="image\img_thumbnail_select_overlay.png" />
+    
     <file name="file_error" path="image\file_error.png" />
 		<file name="help" path="image\help.png" />
 		<file name="about" path="image\about.png" />

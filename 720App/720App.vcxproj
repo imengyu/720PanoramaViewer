@@ -195,6 +195,7 @@
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="CMainAlbumAdapter.cpp" />
     <ClCompile Include="FeedbackDlg.cpp" />
+    <ClCompile Include="FormatString.cpp" />
     <ClCompile Include="HelpDlg.cpp" />
     <ClCompile Include="NotifyWnd.cpp" />
     <ClCompile Include="PanoModeWnd.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="CMainAlbumAdapter.h" />
     <ClInclude Include="FeedbackDlg.h" />
+    <ClInclude Include="FormatString.h" />
     <ClInclude Include="HelpDlg.h" />
     <ClInclude Include="NotifyWnd.h" />
     <ClInclude Include="PanoModeWnd.h" />

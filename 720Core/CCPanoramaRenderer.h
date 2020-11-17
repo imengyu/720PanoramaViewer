@@ -114,6 +114,7 @@ public:
     void UpdateFullChunksVisible();
     void UpdateFlatModelMinMax(float orthoSize);
 
+
 private:
 
 

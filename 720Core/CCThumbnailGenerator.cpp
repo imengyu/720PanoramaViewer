@@ -14,7 +14,7 @@ wchar_t* CCThumbnailGenerator::GetImageThumbnailAuto(const wchar_t* filePath)
 {
     std::wstring filename(filePath);
     std::wstring filePathMD5 = md5(filename);
-    std::wstring fileCachePath = CStringHlp::FormatString(L"%s\\thumbnaiCache\\%s", AppGetAppInstance()->GetCurrentDir(), filePathMD5.c_str());
+    std::wstring fileCachePath = CStringHlp::FormatString(L"%s\\data\\thumbnaiCache\\%s", AppGetAppInstance()->GetCurrentDir(), filePathMD5.c_str());
 
     //Tes Thumbnail cache
     if (Path::Exists(fileCachePath))
@@ -29,7 +29,10 @@ wchar_t* CCThumbnailGenerator::GetImageThumbnailAuto(const wchar_t* filePath)
 
     Gdiplus::Status stat = bitmap->Save(fileCachePath.c_str(), CGdiPlusUtils::GetJpegClsid(), nullptr);
     if (stat != Gdiplus::Status::Ok) {
-        LOGEF(L"[CCThumbnailGenerator] GetImageThumbnail failed when save bitmap ! %s, Status: %d", filePath, stat);
+        if(stat == Gdiplus::Status::Win32Error)
+            LOGEF(L"[CCThumbnailGenerator] GetImageThumbnail failed when save bitmap ! %s, Status: Win32Error, LastError: %d", filePath, GetLastError());
+        else
+            LOGEF(L"[CCThumbnailGenerator] GetImageThumbnail failed when save bitmap ! %s, Status: %d", filePath, stat);
         delete bitmap;
         return nullptr;
     }

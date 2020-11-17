@@ -731,7 +731,8 @@ void CWindowsGameRendererInternal::FileCloseCallback(void* data) {
     ptr->renderer->UpdateMainModelTex();
     ptr->renderer->renderOn = false;
     ptr->currentImageOpened = false;
-    ptr->CallFileStatusChangedCallback(false, GAME_FILE_OK);
+    ptr->CallFileStatusChangedCallback(false, 
+        ptr->fileManager->IsThisCloseWillOpenNext() ? GAME_FILE_CLOSE_BUT_WILL_OPEN_NEXT :  GAME_FILE_OK);
 }
 void CWindowsGameRendererInternal::CameraFOVChanged(void* data, float fov) {
     auto* ptr = (CWindowsGameRendererInternal*)data;

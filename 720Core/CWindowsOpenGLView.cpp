@@ -100,7 +100,6 @@ bool CWindowsOpenGLViewInternal::CreateViewWindow(HINSTANCE hInstance) {
 		return false;
 	}
 
-	SetWindowLong(hWnd, GWL_EXSTYLE, GetWindowLong(hWnd, GWL_EXSTYLE) | (WS_EX_ACCEPTFILES));
 	SetWindowLongW(hWnd, GWL_USERDATA, (LONG)this);
 
 	hDC = GetDC(hWnd);

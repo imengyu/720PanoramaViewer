@@ -136,15 +136,15 @@ std::string CStringHlp::FormatString(const char * format, ...)
 
 char* CStringHlp::AllocString(std::string& str)
 {
-	char* s = new char[str.size()];
-	strcpy_s(s, str.size(), str.data());
+	char* s = new char[str.size() + 1];
+	strcpy_s(s, str.size() + 1, str.data());
 	return s;
 }
 wchar_t* CStringHlp::AllocString(std::wstring &str)
 {
-	wchar_t* s = new wchar_t[str.size()];
-	wcscpy_s(s, str.size(), str.data());
-	return nullptr;
+	wchar_t* s = new wchar_t[str.size() + 1];
+	wcscpy_s(s, str.size() + 1, str.data());
+	return s;
 }
 
 std::wstring CStringHlp::GetFileSizeStringAuto(long long byteSize) {

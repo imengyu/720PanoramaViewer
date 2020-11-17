@@ -161,6 +161,7 @@ void CAppInternal::InitDirs() {
 		L"\\config",
 		L"\\data\\thumbnaiCache",
 		L"\\data\\imageCache",
+		L"\\data\\captureCache",
 	};
 
 	std::wstring path;

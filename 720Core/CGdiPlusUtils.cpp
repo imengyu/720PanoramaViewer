@@ -202,8 +202,10 @@ Bitmap* CGdiPlusUtils::GetThumbnail(Image* bm, int width, int height, Gdiplus::S
 Bitmap* CGdiPlusUtils::GetThumbnail(std::wstring& filename, int width, int height, Gdiplus::Size* realSize) {
     using namespace Gdiplus;
     Image* bm = Image::FromFile(filename.c_str());
-    if (bm->GetLastStatus() != Ok)
+    if (bm->GetLastStatus() != Ok) {
+        LOGEF(L"[CGdiPlusUtils::GetThumbnail] Load image failed! %s, Status: %d", filename.c_str(), bm->GetLastStatus());
         return 0;
+    }
     Bitmap* bs = GetThumbnail(bm, width, height, realSize);
     delete bm;
     return bs;

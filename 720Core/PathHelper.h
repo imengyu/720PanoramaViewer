@@ -46,3 +46,5 @@ public:
 	static bool Exists(LPCSTR path1);
 	static bool Exists(std::string path1);
 };
+
+EXTERN_C VR720_EXP wchar_t* Path_GetFileName(const wchar_t *path);

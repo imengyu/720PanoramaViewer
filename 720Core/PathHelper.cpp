@@ -369,4 +369,8 @@ std::string Path::GetDirectoryName(LPCSTR path)
 	return GetDirectoryName(std::string(path));
 }
 
-
+EXTERN_C VR720_EXP wchar_t* Path_GetFileName(const wchar_t* path)
+{
+	auto n = Path::GetFileName(path);
+	return CStringHlp::AllocString(n);
+}

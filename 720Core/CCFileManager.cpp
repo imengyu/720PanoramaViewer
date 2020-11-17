@@ -26,6 +26,7 @@ void CCFileManager::DeleteCurrentFile() {
 }
 bool CCFileManager::DoOpenFile(const wchar_t* path) {
 
+    isThisCloseWillOpenNext = true;
     CloseFile();
 
     if (!SystemHelper::FileExists(path)) {
@@ -71,10 +72,14 @@ void CCFileManager::UpdateLastError()
     if (CurrentFileLoader)
         lastErr = CurrentFileLoader->GetLastError();
 }
+bool CCFileManager::IsThisCloseWillOpenNext()
+{
+    return isThisCloseWillOpenNext;
+}
 
 const wchar_t* CCFileManager::GetCurrentFileLoadingPrecent() {
     if (CurrentFileLoader)
-        imageLoadingPrecent = CStringHlp::FormatString(L"%d%%", CurrentFileLoader->GetLoadingPrecent());
+        imageLoadingPrecent = CStringHlp::FormatString(L"%d%%", (int)CurrentFileLoader->GetLoadingPrecent());
     return imageLoadingPrecent.c_str();
 }
 std::wstring CCFileManager::GetCurrentFileName() {

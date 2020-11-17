@@ -63,6 +63,65 @@ bool SystemHelper::ChooseOneFileA(HWND hWnd, LPCSTR startDir, LPCSTR title, LPCS
 	}
 	return 0;
 }
+MultiFileSelectResult* SystemHelper::ChooseMultiFile(HWND hWnd, LPCWSTR startDir, LPCWSTR title, LPCWSTR fileFilter, LPCWSTR fileName, LPCWSTR defExt)
+{
+	OPENFILENAME ofn;
+	TCHAR szFile[2048];
+	if (fileName != 0 && wcslen(fileName) != 0)
+		wcscpy_s(szFile, fileName);
+	ZeroMemory(&ofn, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = hWnd;
+	ofn.lpstrFile = szFile;
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = sizeof(szFile);
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFilter = fileFilter;
+	ofn.lpstrDefExt = defExt;
+	ofn.lpstrFileTitle = (LPWSTR)title;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = startDir;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_ALLOWMULTISELECT | OFN_EXPLORER;
+	if (GetOpenFileName(&ofn))
+	{
+		MultiFileSelectResult* result = new MultiFileSelectResult();
+
+		wchar_t* ptr = ofn.lpstrFile;
+		ptr[ofn.nFileOffset - 1] = 0;
+
+		result->dir = (LPWSTR)malloc((lstrlenW(ptr) + 1) * sizeof(wchar_t));
+		lstrcpyW(result->dir, ptr);
+
+		std::vector<LPWSTR> strs;
+
+		ptr += ofn.nFileOffset;
+		while (*ptr)
+		{
+			strs.push_back(ptr);
+			ptr += (lstrlenW(ptr) + 1);
+		}
+
+		result->fileCount = strs.size();
+		result->files = (LPWSTR*)malloc(result->fileCount * sizeof(LPWSTR));
+
+		for (size_t i = 0; i < result->fileCount; i++) {
+			LPWSTR str = strs[i];
+			result->files[i] = (LPWSTR)malloc((lstrlenW(str) + 1) * sizeof(wchar_t));
+			lstrcpyW(result->files[i], str);
+		}
+
+		return result;
+	}
+	return nullptr;
+}
+void SystemHelper::DeleteMultiFilResult(MultiFileSelectResult* v)
+{
+	for (size_t i = 0; i < v->fileCount; i++)
+		delete v->files[i];
+	delete v->dir;
+	delete v;
+}
+
 bool SystemHelper::FileExists(LPCWSTR file) {
 	return PathFileExists(file);
 }

@@ -24,7 +24,8 @@ enum PanoramaMode : int16_t {
 	PanoramaModeMax,
 };
 
-#define GAME_FILE_OK 2
+#define GAME_FILE_OK 1
+#define GAME_FILE_CLOSE_BUT_WILL_OPEN_NEXT 2
 #define GAME_FILE_OPEN_FAILED 3
 
 #define GAME_EVENT_GO_FULLSCREEN 1

@@ -277,8 +277,6 @@ glm::vec3 CCPanoramaRenderer::CreateFullModelSphereMesh(ChunkModel* info, int se
     int skip = 0;
 
     for (int j = segYStart; j <= segYEnd; j++) {
-        v += vstep;
-        cv += cvstep;
         if (j <= 2 || j >= sphereFullSegmentY - 4) {
             skip++;
             continue;
@@ -286,11 +284,13 @@ glm::vec3 CCPanoramaRenderer::CreateFullModelSphereMesh(ChunkModel* info, int se
         u = u_start;
         cu = 1.0f;
         for (int i = segXStart; i <= segXEnd; i++) {
-            u += ustep;
-            cu -= custep;
             mesh->positions.push_back(GetSpherePoint(u, v, r));
             mesh->texCoords.push_back(glm::vec2(cu, cv));
+            u += ustep;
+            cu -= custep;
         }
+        v += vstep;
+        cv += cvstep;
     }
 
     int vertices_line_count = segXEnd - segXStart + 1;
@@ -565,6 +565,7 @@ void CCPanoramaRenderer::UpdateFlatModelMinMax(float orthoSize) {
     FlatModelMoveRato = orthoSize / 1.0f;
     MoveModelForce(0, 0);
 }
+
 
 bool CCPanoramaRenderer::IsInView(glm::vec3 worldPos)
 {
