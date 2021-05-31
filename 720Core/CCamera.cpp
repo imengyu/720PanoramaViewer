@@ -1,6 +1,7 @@
 #include "CCamera.h"
 #include "GlUtils.h"
 #include "COpenGLView.h"
+#include "720Core.h"
 
 CCamera::CCamera(glm::vec3 position, glm::vec3 up, glm::vec3 rotate)
 {

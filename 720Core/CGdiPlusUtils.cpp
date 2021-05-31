@@ -3,7 +3,6 @@
 #include <string>
 #include <math.h>
 #include <Shlwapi.h>
-#include "utils.h"
 
 PropertyItem* CGdiPlusUtils::GetPropertyItemFromImage(Image* bm, PROPID propId) {
     UINT itemSize = bm->GetPropertyItemSize(propId);
@@ -210,7 +209,7 @@ Bitmap* CGdiPlusUtils::GetThumbnail(std::wstring& filename, int width, int heigh
     delete bm;
     return bs;
 }
-Gdiplus::Size CGdiPlusUtils::AdaptProportionalSize(const Gdiplus::Size& szMax, const Gdiplus::Size& szReal)
+Size CGdiPlusUtils::AdaptProportionalSize(const Gdiplus::Size& szMax, const Gdiplus::Size& szReal)
 {
     int nWidth;
     int nHeight;

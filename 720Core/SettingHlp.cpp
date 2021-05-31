@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SettingHlp.h"
 #include "CStringHlp.h"
+#include "720Core.h"
 
 SettingHlpInternal::SettingHlpInternal(LPCWSTR setttingFilePath)
 {

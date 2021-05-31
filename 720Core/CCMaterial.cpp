@@ -1,5 +1,6 @@
 #include "CCMaterial.h"
 #include "CCRenderGlobal.h"
+#include "720Core.h"
 
 CCMaterial::CCMaterial() = default;
 CCMaterial::CCMaterial(CCSmartPtr<CCTexture> &diffuse) {

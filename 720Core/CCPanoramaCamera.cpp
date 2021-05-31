@@ -1,4 +1,5 @@
 #include "CCPanoramaCamera.h"
+#include "720Core.h"
 
 
 // 处理从任何类似键盘的输入系统接收的输入，以摄像机定义的ENUM形式接受输入参数（从窗口系统中抽象出来）

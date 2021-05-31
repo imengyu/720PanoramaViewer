@@ -3,12 +3,14 @@
 #include "PathHelper.h"
 #include "CApp.h"
 #include "CStringHlp.h"
+#include "720Core.h"
 #include <ObjIdl.h>
 #include <shlwapi.h>
 #include <string>
 #include <math.h>
 #include "utils.h"
 #include "md5.h"
+#include "CGdiPlusUtils.h"
 
 wchar_t* CCThumbnailGenerator::GetImageThumbnailAuto(const wchar_t* filePath)
 {
@@ -38,9 +40,4 @@ wchar_t* CCThumbnailGenerator::GetImageThumbnailAuto(const wchar_t* filePath)
     }
 
     return CStringHlp::AllocString(fileCachePath);
-}
-Bitmap* CCThumbnailGenerator::GetImageThumbnail(const wchar_t* filePath, int w, int h)
-{
-    std::wstring filename(filePath);
-    return CGdiPlusUtils::GetThumbnail(filename, w, h, nullptr);
 }

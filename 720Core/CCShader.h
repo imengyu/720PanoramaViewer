@@ -6,7 +6,7 @@ class CCShader
 {
 public:
     // the program ID
-    unsigned int ID;
+    unsigned int ID = -1;
 
     // constructor reads and builds the shader
     CCShader(const wchar_t* vertexPath, const wchar_t* fragmentPath);
@@ -30,5 +30,20 @@ public:
     GLint viewLoc = -1;
     GLint projectionLoc = -1;
     GLint modelLoc = -1;
+
+    bool IsSuccess() { return ID > 0; }
+    bool IsNotSupport() { return errNotSupport; }
+    bool IsFileMissing() { return errFileMissing; }
+
+    void AddBindAttribLocation(std::string name) { bindAttribLocations.push_back(name); }
+
+    bool Init();
+private:
+
+    std::wstring vertexPath;
+    std::wstring fragmentPath;
+    bool errNotSupport = false;
+    bool errFileMissing = false;
+    std::list<std::string> bindAttribLocations;
 };
 

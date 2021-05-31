@@ -3,7 +3,7 @@
 #include "COpenGLView.h"
 #include "resource.h"
 
-class CCursor
+class VR720_EXP CCursor
 {
 public:
 	static CCursor* Default;
@@ -11,9 +11,11 @@ public:
 	static CCursor* Grab;
 	static CCursor* Hand;
 
-	static void Init(HINSTANCE hInst);
+	static void Init();
 	static void Destroy();
+
 	static void SetViewCursur(COpenGLView* view, CCursor* cursor);
+	static void SetHWNDCursur(HWND view, CCursor* cursor);
 
 	CCursor(LPCWSTR type);
 	CCursor(HINSTANCE hInst, LPCWSTR type);

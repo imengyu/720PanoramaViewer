@@ -2,6 +2,7 @@
 #include "COpenGLView.h"
 #include "CCamera.h"
 #include "CCShader.h"
+#include "720Core.h"
 
 void COpenGLView::CalcNoCameraProjection(CCamera* camera, CCShader* shader) {
 	glm::mat4 view(1.0f);

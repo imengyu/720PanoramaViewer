@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdarg.h>
-#include <list>
 #include <string>
 
 //日志级别
@@ -67,6 +66,8 @@ public:
 };
 
 #ifdef VR720_EXPORTS
+
+#include <list>
 
 class LoggerInternal : public Logger
 {

@@ -1,5 +1,6 @@
 #include "Logger.h"
 #include "CStringHlp.h"
+#include "720Core.h"
 #include <ctime>
 
 using namespace std;

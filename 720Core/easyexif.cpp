@@ -1,4 +1,5 @@
 #include "easyexif.h"
+#include "720Core.h"
 #include <algorithm>
 #include <cstdint>
 #include <stdio.h>

@@ -58,6 +58,8 @@ public:
 	static bool StrEqualW(const wchar_t* str1, const wchar_t* str2);
 	static bool StrEmeptyW(const wchar_t* str);
 	static bool StrEmeptyA(const char* strSTR);
+	static bool StrContainsA(const char* str, const char* testStr, const char** resultStr);
+	static bool StrContainsW(const wchar_t* str, const wchar_t* testStr, const wchar_t** resultStr);
 	static int StrToIntA(const char* str);
 	static int StrToIntW(const wchar_t* str);
 	static bool StrToBoolA(const char* str);

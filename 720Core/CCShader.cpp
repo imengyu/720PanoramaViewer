@@ -1,5 +1,6 @@
 #include "CCShader.h"
 #include "CStringHlp.h"
+#include "720Core.h"
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -7,6 +8,15 @@
 
 CCShader::CCShader(const wchar_t* vertexPath, const wchar_t* fragmentPath)
 {
+    this->vertexPath = vertexPath;
+    this->fragmentPath = fragmentPath;
+}
+CCShader::~CCShader()
+{
+    glDeleteProgram(ID);
+}
+
+bool CCShader::Init() {
     // 1. retrieve the vertex/fragment source code from filePath
     std::wstring vertexCode;
     std::wstring fragmentCode;
@@ -35,7 +45,10 @@ CCShader::CCShader(const wchar_t* vertexPath, const wchar_t* fragmentPath)
     catch (std::wifstream::failure e)
     {
         LOGEF(L"[CCShader] Read shader file failed! %s (%d)", e.code().message().c_str(), e.code().value());
+        errFileMissing = true;
+        return false;
     }
+
     std::string vShaderCode = CStringHlp::UnicodeToAnsi(vertexCode);
     std::string fShaderCode = CStringHlp::UnicodeToAnsi(fragmentCode);
 
@@ -57,6 +70,8 @@ CCShader::CCShader(const wchar_t* vertexPath, const wchar_t* fragmentPath)
     {
         glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
         LOGEF(L"[CCShader] Compile vertex shader file failed! \n%hs", infoLog);
+        errNotSupport = CStringHlp::StrContainsA(infoLog, "not supported", nullptr);
+        return false;
     };
 
     // similiar for Fragment Shader
@@ -69,12 +84,21 @@ CCShader::CCShader(const wchar_t* vertexPath, const wchar_t* fragmentPath)
     {
         glGetShaderInfoLog(fragment, 512, nullptr, infoLog);
         LOGEF(L"[CCShader] Compile fragment shader file failed! \n%hs", infoLog);
+        errNotSupport = CStringHlp::StrContainsA(infoLog, "not supported", nullptr);
+        return false;
     };
 
     // shader Program
     ID = glCreateProgram();
     glAttachShader(ID, vertex);
     glAttachShader(ID, fragment);
+
+    //BindAttribLocations
+    int i = 0;
+    std::list<std::string>::iterator iter = bindAttribLocations.begin();
+    for (; iter != bindAttribLocations.end(); iter++, i++)
+        glBindAttribLocation(ID, i, (*iter).c_str());
+
     glLinkProgram(ID);
     // print linking errors if any
     glGetProgramiv(ID, GL_LINK_STATUS, &success);
@@ -82,6 +106,7 @@ CCShader::CCShader(const wchar_t* vertexPath, const wchar_t* fragmentPath)
     {
         glGetProgramInfoLog(ID, 512, nullptr, infoLog);
         LOGEF(L"[CCShader] Link shader program failed! \n%hs", infoLog);
+        return false;
     }
 
     // delete the shaders as they're linked into our program now and no longer necessary
@@ -91,12 +116,9 @@ CCShader::CCShader(const wchar_t* vertexPath, const wchar_t* fragmentPath)
     viewLoc = GetUniformLocation("view");
     projectionLoc = GetUniformLocation("projection");
     modelLoc = GetUniformLocation("model");
-}
-CCShader::~CCShader()
-{
-    glDeleteProgram(ID);
-}
 
+    return true;
+}
 void CCShader::Use() const
 {
     glUseProgram(ID);

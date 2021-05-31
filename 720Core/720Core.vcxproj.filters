@@ -474,6 +474,9 @@
     <ClCompile Include="CGdiPlusUtils.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="ImageUtils.cpp">
+      <Filter>源文件\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -772,6 +775,12 @@
     </ClInclude>
     <ClInclude Include="CGdiPlusUtils.h">
       <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageUtils.h">
+      <Filter>头文件\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="720CoreExport.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

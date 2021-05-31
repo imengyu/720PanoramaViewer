@@ -1,4 +1,5 @@
 #include "CCThreadMessageCenter.h"
+#include "720Core.h"
 
 CCThreadMessageCenterInternal::CCThreadMessageCenterInternal()
 {
@@ -78,6 +79,7 @@ bool CCThreadMessageHandlerInternal::RunNext() {
 		FreeRun(data);
 		//call
 		run(paramdata);
+		return true;
 	}
 	return false;
 }

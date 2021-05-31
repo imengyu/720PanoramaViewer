@@ -1,6 +1,7 @@
 #include "CCModel.h"
 #include "CCMesh.h"
 #include "CCMaterial.h"
+#include "720Core.h"
 
 CCModel::CCModel()
 {

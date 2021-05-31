@@ -82,33 +82,22 @@
 		<file name="btn_small_round" path="image\btn_small_round.png" />
 		<file name="btn_big" path="image\btn_big.png" />
 		<file name="btn_open_with_others" path="image\btn_open_with_others.png" />
-		<file name="btn_pano_360-200" path="image\btn_pano_360.png" />
-		<file name="btn_pano_asteroid-200" path="image\btn_pano_asteroid@200.png" />
-		<file name="btn_pano_cylinder-200" path="image\btn_pano_cylinder@200.png" />
-		<file name="btn_pano_orginal-200" path="image\btn_pano_orginal@200.png" />
-		<file name="btn_pano_outball-200" path="image\btn_pano_outball@200.png" />
-		<file name="btn_pano_sphere-200" path="image\btn_pano_sphere@200.png" />
-		<file name="btn_pano_360" path="image\btn_pano_360.png" />
-		<file name="btn_pano_asteroid" path="image\btn_pano_asteroid.png" />
-		<file name="btn_pano_cylinder" path="image\btn_pano_cylinder.png" />
-		<file name="btn_pano_orginal" path="image\btn_pano_orginal.png" />
-		<file name="btn_pano_outball" path="image\btn_pano_outball.png" />
-		<file name="btn_pano_sphere" path="image\btn_pano_sphere.png" />
-    <file name="btn_collapse_off" path="image\btn_collapse_off.png" />
-    <file name="btn_collapse_on" path="image\btn_collapse_on.png" />
-
-    <file name="btn_cancel" path="image\btn_cancel.png" />
-    <file name="btn_check" path="image\btn_check.png" />
-    <file name="btn_check_none" path="image\btn_check_none.png" />
-    <file name="btn_import" path="image\btn_import.png" />
-
-    <file name="icon_pano_all" path="image\icon_pano_all.png" />
-    <file name="img_thumbnail_def" path="image\img_thumbnail_def.png" />
-    <file name="img_thumbnail_hover_overlay" path="image\img_thumbnail_hover_overlay.png" />
-    <file name="img_thumbnail_border_overlay" path="image\img_thumbnail_border_overlay.png" />
-    <file name="img_thumbnail_select_overlay" path="image\img_thumbnail_select_overlay.png" />
-    
-    <file name="file_error" path="image\file_error.png" />
+		<file name="btn_collapse_off" path="image\btn_collapse_off.png" />
+		<file name="btn_collapse_on" path="image\btn_collapse_on.png" />
+		<file name="btn_cancel" path="image\btn_cancel.png" />
+		<file name="btn_check" path="image\btn_check.png" />
+		<file name="btn_check_none" path="image\btn_check_none.png" />
+		<file name="btn_back" path="image\btn_back.png" />
+		<file name="btn_import" path="image\btn_import.png" />
+		<file name="checkbox" path="image\checkbox.png" />
+		<file name="checkbox_focus" path="image\checkbox_focus.png" />
+		<file name="btn_tool_blank" path="image\btn_tool_blank.png" />
+		<file name="btn_tool_blank-200" path="image\btn_tool_blank@200.png" />
+		<file name="img_thumbnail_def" path="image\img_thumbnail_def.png" />
+		<file name="img_thumbnail_hover_overlay" path="image\img_thumbnail_hover_overlay.png" />
+		<file name="img_thumbnail_border_overlay" path="image\img_thumbnail_border_overlay.png" />
+		<file name="img_thumbnail_select_overlay" path="image\img_thumbnail_select_overlay.png" />
+		<file name="file_error" path="image\file_error.png" />
 		<file name="help" path="image\help.png" />
 		<file name="about" path="image\about.png" />
 		<file name="float_bg_big" path="image\float_bg_big.png" />
@@ -117,6 +106,7 @@
 	<SMENUEX>
 		<file name="menu_main" path="xml\menu_main.xml" />
 		<file name="menu_right" path="xml\menu_right.xml" />
+		<file name="menu_list_right" path="xml\menu_list_right.xml" />
 	</SMENUEX>
 	<ICON>
 		<file name="ICON_LOGO" path="image\logo.ico" />

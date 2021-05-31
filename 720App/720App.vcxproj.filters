@@ -177,6 +177,9 @@
     <Xml Include="uires\xml\dlg_feedback.xml">
       <Filter>SoUI Resource</Filter>
     </Xml>
+    <Xml Include="uires\xml\menu_list_right.xml">
+      <Filter>SoUI Resource</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="uires\uires.idx">

@@ -2,6 +2,7 @@
 #include "CCMesh.h"
 #include "CCObjLoader.h"
 #include "PathHelper.h"
+#include "720Core.h"
 
 CCObjLoader* objLoader = nullptr;
 

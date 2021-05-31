@@ -1,5 +1,6 @@
 #include "CCObjLoader.h"
 #include "CCMesh.h"
+#include "720Core.h"
 #include <vector>
 
 bool CCObjLoader::Load(const wchar_t* path, CCMesh* mesh)

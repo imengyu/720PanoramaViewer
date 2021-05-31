@@ -1,4 +1,5 @@
 #include "CColor.h"
+#include "720Core.h"
 
 CColor CColor::Black = CColor(0.0f, 0.0f, 0.0f);
 CColor CColor::White = CColor(1.0f, 1.0f, 1.0f);

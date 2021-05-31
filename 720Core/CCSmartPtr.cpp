@@ -1,4 +1,5 @@
 #include "CCSmartPtr.hpp"
+#include "720Core.h"
 
 CCUPtr::CCUPtr(void* ptr) : p(ptr), count(1) { }
 CCUPtr::~CCUPtr() { 

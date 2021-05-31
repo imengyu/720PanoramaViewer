@@ -39,6 +39,7 @@ public:
 	void CheckNone();
 
 	void SetCheckMode(bool c);
+	bool IsCheckMode();
 	void SetCheckItemChangeCallback(CMainCheckItemChangeCallback callback, void*data);
 	void SetItemClickCallback(CMainItemClickCallback callback, void* data);
 

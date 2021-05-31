@@ -12,6 +12,11 @@ ULONG_PTR m_gdiplusToken;
 
 bool CAppInternal::Init()
 {	
+#if _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG));
+#endif
+
+
 	//co
 	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
@@ -53,7 +58,7 @@ bool CAppInternal::Init()
 
 	settings = new SettingHlpInternal(CStringHlp::FormatString(L"%s\\config\\config.ini", currentDir).c_str());
 
-	CCursor::Init(hInst);
+	CCursor::Init();
 	CCMeshLoader::Init();
 	CGdiPlusUtils::Init();
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GlUtils.h"
+#include "720Core.h"
 
 /**
  * @brief 一维线性映射函数，将[a,b]中的点x，映射到[a1,b1]中的点x1

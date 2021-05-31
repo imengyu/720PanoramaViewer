@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PathHelper.h"
 #include "CStringHlp.h"
+#include "720Core.h"
 #include <shlwapi.h>
 
 #define DirectorySeparatorChar L'\\'

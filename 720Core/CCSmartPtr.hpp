@@ -101,13 +101,15 @@ public:
         return 0;
     }
     void ForceRelease() {
-        CCPtrPool::GetStaticPool()->ReleasePtr(ptr);
+        if (ptr)
+            CCPtrPool::GetStaticPool()->ReleasePtr(ptr);
         ptr = nullptr;
         *rp = nullptr;
     }
 
     ~CCSmartPtr() {        //Îö¹¹º¯Êý
-        CCPtrPoolStatic->RemoveRefPtr(ptr);
+        if(ptr)
+            CCPtrPoolStatic->RemoveRefPtr(ptr);
         ptr = nullptr;
         rp = nullptr;
     }

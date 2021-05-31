@@ -2,6 +2,7 @@
 #include "CCRenderGlobal.h"
 #include "CCMaterial.h"
 #include "CCMeshLoader.h"
+#include "720Core.h"
 
 CCMesh::CCMesh() = default;
 CCMesh::~CCMesh()

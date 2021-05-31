@@ -1,13 +1,19 @@
 <?xml version="1.0"?>
-<SOUI name="helpWindow" title="软件设置" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="28,28,28,28" resizable="0" wndType="normal" appWnd="1" translucent="1" width="460" height="610">
+<SOUI name="helpWindow" title="软件设置" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="28,28,28,28" resizable="0" wndType="normal" appWnd="1" translucent="1" width="460" height="430">
 	<user autoScale="true" />
 	<root skin="skin_window_bkgnd_shadow" cache="1" padding="28,28,28,28">
 		<caption pos="0,0,-0,36" show="1">
 			<icon pos="10,11" src="ICON_LOGO:16" />
+			<text pos="40, 10" font="size:13">软件设置</text>
 			<imgbtn name="btn_close" skin="skin_btn_close" pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1" />
 		</caption>
 		<window pos="2,[2,-2,-2">
-			<imgbtn name="btn_close" skin="skin_btn_big" pos="|-60,-55" size="120,33">我知道了</imgbtn>
+			<check name="check_reverse_control" pos="30,30" size="200,32" skin="skin_checkbox" focusSkin="skin_checkbox_focus">反向旋转控制</check>
+			<check name="check_check_image_ratio" pos="30,70" size="200,32" skin="skin_checkbox" focusSkin="skin_checkbox_focus">加载时检查全景图比例</check>
+			<check name="check_check_console" pos="30,110" size="200,32" skin="skin_checkbox" focusSkin="skin_checkbox_focus">显示 Console</check>
+			<check name="check_check_debugtool" pos="30,150" size="200,32" skin="skin_checkbox" focusSkin="skin_checkbox_focus">显示调试工具</check>
+			<check name="check_check_infoov" pos="30,190" size="200,32" skin="skin_checkbox" focusSkin="skin_checkbox_focus">显示状态</check>
+			<imgbtn name="btn_close" skin="skin_btn_big" pos="|-60,-55" size="120,33">确定</imgbtn>
 		</window>
 	</root>
 </SOUI>

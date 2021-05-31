@@ -1,4 +1,5 @@
 #include "CCFileReader.h"
+#include "720Core.h"
 
 CCFileReader::CCFileReader() = default;
 CCFileReader::CCFileReader(std::wstring & path)

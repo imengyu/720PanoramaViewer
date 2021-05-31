@@ -1,5 +1,5 @@
 #include "CCRenderGlobal.h"
-
+#include "720Core.h"
 
 CCRenderGlobal* instance;
 CCRenderGlobal* CCRenderGlobal::GetInstance()

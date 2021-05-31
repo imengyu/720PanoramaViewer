@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "720Core.h"
 #include "COpenGLView.h"
 #include "CWindowsOpenGLView.h"
 #include "CCFileManager.h"
@@ -45,6 +46,7 @@ bool CWindowsOpenGLViewInternal::Init() {
 
 	Rendering = true;
 	RenderThreadRunning = true;
+	MainThreadRunning = true;
 	ViewportChanged = true;
 	hThreadRender = CreateThread(0, 0, RenderThread, this, 0, 0);
 	hThreadMain = CreateThread(0, 0, MainThread, this, 0, 0);
@@ -57,8 +59,10 @@ void CWindowsOpenGLViewInternal::Destroy()
 {
 	if (!Destroying) {
 		closeActived = true;
-		Rendering = false;
+		MainThreadRunning = false;
+		Sleep(100);
 		RenderThreadRunning = false;
+		Rendering = false;
 		Destroying = true;
 		DestroyWindow(hWnd);
 	}
@@ -181,15 +185,10 @@ void CWindowsOpenGLViewInternal::InitImgui() {
 	static ImVector<ImWchar> myRange;
 	ImFontGlyphRangesBuilder myGlyph;
 
-	myGlyph.AddText(u8"1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,./<>?;:\"'{}[]|\\+_-=()：；\
-*&^%$#@!~`，。《》￥ 关于文件修这是一个简易删除它的全景期图查看无软件染支持多种投影方式回可快速打开您浏览程序信息好欢迎使用请先提渲\
-示确定设置模入帮日助能全屏未调试退返出显示控制前载台配使用球栏面平小行星水晶球单闭当中稍后此案像该球体轴分段失败误错不灰度色或位格\
-非常大很抱歉我们改暂时加缩细放更器帧率限需要重新损坏启动才生效视暂停状态工其他具无法深颜类型已经原始＋－─");
-	//
+	myGlyph.AddText(u8"1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,./<>?;:\"'{}[]|\\+_-=()*&^%$#@!~`");
 	myGlyph.BuildRanges(&myRange);
 
-	//io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.5f, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-	io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 16.5f, NULL, myRange.Data);
+	io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/simsun.ttc", 16.5f, NULL, myRange.Data);
 
 	//设置颜色风格
 	ImGui::StyleColorsLight();
@@ -439,6 +438,7 @@ LRESULT WINAPI CWindowsOpenGLViewInternal:: WndProc(HWND hWnd, UINT uiMsg, WPARA
 			if (view->scrollCallback != nullptr && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyWindowHovered()) {
 				short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 				view->scrollCallback(view, 0, (float)zDelta, wParam, ViewMouseEventType::ViewMouseMouseWhell);
+				return TRUE;
 			}
 			break;
 		}
@@ -521,7 +521,7 @@ DWORD WINAPI CWindowsOpenGLViewInternal::MainThread(LPVOID lpParam)
 
 	view->logger->Log2(L"MainThread created!");
 
-	while (view->RenderThreadRunning) {
+	while (view->MainThreadRunning && view->RenderThreadRunning) {
 
 		if (view->UpdateTicked) {
 			if(view->OpenGLRenderer) view->OpenGLRenderer->Update();

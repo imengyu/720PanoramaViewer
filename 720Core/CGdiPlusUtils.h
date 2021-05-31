@@ -16,7 +16,7 @@ public:
 
     static Bitmap* GetThumbnail(Image* bm, int width, int height, Gdiplus::Size* realSize = 0);
     static Bitmap* GetThumbnail(std::wstring& filename, int width, int height, Gdiplus::Size* realSize);
-    static Gdiplus::Size AdaptProportionalSize(const Gdiplus::Size& szMax, const Gdiplus::Size& szReal);
+    static Size AdaptProportionalSize(const Size& szMax, const Size& szReal);
 
     static INT GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 

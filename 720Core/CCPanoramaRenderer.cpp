@@ -8,6 +8,7 @@
 #include "CCMaterial.h"
 #include "CCRenderGlobal.h"
 #include "CWindowsGameRenderer.h"
+#include "720Core.h"
 
 CCPanoramaRenderer::CCPanoramaRenderer(CWindowsGameRenderer* renderer)
 {
@@ -30,6 +31,18 @@ void CCPanoramaRenderer::Init()
     shader = new CCShader(
         CCAssetsManager::GetResourcePath(L"shader", L"Standard_vertex.glsl").c_str(),
         CCAssetsManager::GetResourcePath(L"shader", L"Standard_fragment.glsl").c_str());
+
+    shader->AddBindAttribLocation("aPos");
+    shader->AddBindAttribLocation("aNormal");
+    shader->AddBindAttribLocation("aUv");
+
+    if (!shader->Init()) {
+        if (shader->IsFileMissing())
+            Renderer->CallSampleEventCallback(GAME_EVENT_SHADER_FILE_MISSING, nullptr);
+        else if (shader->IsNotSupport())
+            Renderer->CallSampleEventCallback(GAME_EVENT_SHADER_NOT_SUPPORT, nullptr);
+        return;
+    }
 
     CreateMainModel();
 
@@ -151,7 +164,6 @@ void CCPanoramaRenderer::Render(float deltaTime)
 }
 
 void CCPanoramaRenderer::CreateMainModel() {
-
     mainModel = new CCModel();
     mainModel->Mesh = new CCMesh();
     mainModel->Material = new CCMaterial(panoramaCheckTex);
@@ -394,7 +406,7 @@ void CCPanoramaRenderer::GenerateFullModel(int chunkW, int chunkH)
 void CCPanoramaRenderer::ResetModel() const
 {
     mainModel->Reset();
-    mainFlatModel->Material->offest.x = 0.0f;
+    //mainFlatModel->Material->offest.x = 0.0f;
 }
 void CCPanoramaRenderer::RotateModel(float xoffset, float yoffset)
 {
@@ -469,6 +481,7 @@ void CCPanoramaRenderer::UpdateMercatorControl() {
     mesh->ReBufferData();
 }
 void CCPanoramaRenderer::ResetMercatorControl() const {
+
     CCMesh* mesh = mainFlatModel->Mesh.GetPtr();
     mesh->texCoords.clear();
 
@@ -537,24 +550,33 @@ void CCPanoramaRenderer::UpdateFullChunksVisible() {
     if (renderPanoramaFull || renderPanoramaFullTest) {
         float fov = Renderer->View->Camera->FiledOfView;
         for (auto m : fullModels) {
-            if (fov > 50)
-                m->model->Visible = IsInView(m->pointCenter);
-            else
-                m->model->Visible = IsInView(m->pointA) || IsInView(m->pointB) || IsInView(m->pointC) || IsInView(m->pointD);
+            m->model->Visible = 
+                IsInView(m->pointCenter) || IsInView(m->pointA) ||
+                IsInView(m->pointB) || IsInView(m->pointC) || IsInView(m->pointD);
+
             if (m->model->Visible) {
+                CCTexture* tex = nullptr;
                 if (!m->loadMarked && !renderPanoramaFullTest) {//¼ÓÔØÌùÍ¼
                     m->loadMarked = true;
 
                     logger->Log(L"Star load chunk %d, %d", m->chunkX, m->chunkY);
 
-                    auto* tex = new CCTexture();
+                    tex = new CCTexture();
                     tex->wrapS = GL_MIRRORED_REPEAT;
                     tex->wrapT = GL_MIRRORED_REPEAT;
                     m->model->Material->diffuse = tex;
                     m->model->Material->tilling = glm::vec2(1.0f, 1.0f);
                     Renderer->AddTextureToQueue(tex, m->chunkX, m->chunkY, m->chunkY * m->chunkX + m->chunkX);//MainTex
                     panoramaTexPool.push_back(tex);
+
+                    tex->loaded = false;
                 }
+                else {
+                    tex = m->model->Material->diffuse.GetPtr();
+                }
+
+                if (tex != nullptr && !tex->loaded)
+                    m->model->Visible = false;
             }
         }
     }

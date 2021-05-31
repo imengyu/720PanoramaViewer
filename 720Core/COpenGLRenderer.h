@@ -47,6 +47,23 @@ public:
 	{
 
 	}
+	virtual bool SetProperty(const char* name, const wchar_t* val)
+	{
+		return false;
+	}
+	virtual bool GetPropertyBool(const char* name)
+	{
+		return false;
+	}
+	virtual bool GetPropertyInt(const char* name)
+	{
+		return false;
+	}
+	virtual bool GetPropertyString(const char* name)
+	{
+		return false;
+	}
+
 	/**
 	 * 当视图重新调整大小时会调用此方法
 	 * @param Width 新宽度

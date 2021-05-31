@@ -1,6 +1,7 @@
 #include "CCTexture.h"
 #include "CCRenderGlobal.h"
 #include "CStringHlp.h"
+#include "720Core.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -81,12 +82,14 @@ void CCTexture::LoadBytes(BYTE * data, int width, int height, GLenum type) {
 
 	this->width = width;
 	this->height = height;
+	this->loaded = true;
 }
 
 void CCTexture::Destroy()
 {
 	if (texture >= 0)
 		glDeleteTextures(1, &texture);
+	this->loaded = false;
 }
 void CCTexture::Use() const
 {

@@ -1,4 +1,5 @@
 #include "CStringHlp.h"
+#include "720Core.h"
 
 std::string & CStringHlp::FormatString(std::string & _str, const char * format, ...) {
 	std::string tmp;
@@ -218,6 +219,26 @@ bool CStringHlp::StrEmeptyW(const wchar_t* str)
 bool CStringHlp::StrEmeptyA(const char* str)
 {
 	return !str || CStringHlp::StrEqualA(str, "");
+}
+bool CStringHlp::StrContainsA(const char* str, const char* testStr, const char** resultStr)
+{
+	bool result = false;
+	const char* rs = strstr(str, testStr);
+	if (rs) {
+		result = true;
+		if (resultStr)*resultStr = rs;
+	}
+	return result;
+}
+bool CStringHlp::StrContainsW(const wchar_t* str, const wchar_t* testStr, const wchar_t** resultStr)
+{
+	bool result = false;
+	const wchar_t* rs = wcsstr(str, testStr);
+	if (rs) {
+		result = true;
+		if (resultStr) *resultStr = (const wchar_t*)rs;
+	}
+	return result;
 }
 int CStringHlp::StrToIntA(const char* str)
 {

@@ -101,15 +101,17 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <AdditionalDependencies>GdiPlus.lib;glew32sd.lib;Dbghelp.lib;Shlwapi.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapExports>true</MapExports>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>VR720_EXPORTS;_CRT_SECURE_NO_WARNINGS;IMGUI_IMPL_WIN32_DISABLE_GAMEPAD;WIN32;NDEBUG;_CONSOLE;ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -188,6 +190,7 @@
     <ClCompile Include="CStringHlp.cpp" />
     <ClCompile Include="easyexif.cpp" />
     <ClCompile Include="GlUtils.cpp" />
+    <ClCompile Include="ImageUtils.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -288,6 +291,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="720Core.h" />
+    <ClInclude Include="720CoreExport.h" />
     <ClInclude Include="CApp.h" />
     <ClInclude Include="CAppUIWapper.h" />
     <ClInclude Include="CBMPLoader.h" />
@@ -322,6 +326,7 @@
     <ClInclude Include="CCTexture.h" />
     <ClInclude Include="CStringHlp.h" />
     <ClInclude Include="easyexif.h" />
+    <ClInclude Include="ImageUtils.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl3.h" />

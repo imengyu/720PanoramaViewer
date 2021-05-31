@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "720Core.h"
 #include "CCamera.h"
 
 //摄像机全景模式

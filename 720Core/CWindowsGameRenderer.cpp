@@ -8,7 +8,9 @@
 #include "CStringHlp.h"
 #include "SettingHlp.h"
 #include "PathHelper.h"
+#include "ImageUtils.h"
 #include "imgui/imgui.h"
+#include "720Core.h"
 #include <Shlwapi.h>
 #include <time.h>
 
@@ -20,9 +22,13 @@ CWindowsGameRendererInternal::~CWindowsGameRendererInternal()
 {
 }
 
-void CWindowsGameRendererInternal::SetOpenFilePath(const wchar_t* path)
+bool CWindowsGameRendererInternal::SetOpenFilePath(const wchar_t* path)
 {
-	currentOpenFilePath = path;
+    if (currentOpenFilePath != path) {
+        currentOpenFilePath = path;
+        return true;
+    }
+    return false;
 }
 const wchar_t* CWindowsGameRendererInternal::GetOpenFilePath()
 {
@@ -33,25 +39,26 @@ void CWindowsGameRendererInternal::DoOpenFile()
     UpdateLoadingState(true);
     if (fileManager->DoOpenFile(currentOpenFilePath.c_str())) {
 
-        /*
-        if (fileManager->ImageRatioNotStandard && mode <= PanoramaMode::PanoramaOuterBall) {
+        if (CheckImageRatio && fileManager->ImageRatioNotStandard && mode <= PanoramaMode::PanoramaOuterBall) 
+        {
             if (uiWapper->ShowConfirmBox(L"看起来这张图片的长宽比不是 2:1，不是标准的720度全景图像，如果要显示此图像，可能会导致图像变形，是否继续？", 
                 L"提示", L"", L"", CAppUIMessageBoxIcon::IconWarning) == CAppUIMessageBoxResult::ResultCancel)
             {
                 currentImageOpened = false;
-                renderer->renderOn = false;
-                loading_dialog_active = false;
+                UpdateLoadingState(false);
                 return;
             }
         }
-        */
 
         LoadImageInfo();
 
         //主图
         renderer->panoramaThumbnailTex = texLoadQueue->Push(new CCTexture(), 0, 0, -1);//MainTex
-        renderer->panoramaTexPool.push_back(renderer->panoramaThumbnailTex);
         renderer->UpdateMainModelTex();
+
+        UpdateLoadingState(false);
+        currentImageLoading = false;
+        CallFileStatusChangedCallback(true, GAME_FILE_OK);
 
         //检查是否需要分片并加载
         needTestImageAndSplit = true;
@@ -166,8 +173,6 @@ DWORD WINAPI CWindowsGameRendererInternal::LoadImageInfoThread(LPVOID lpParam)
 
 bool CWindowsGameRendererInternal::Init()
 {
-    CCursor::SetViewCursur(View, CCursor::Default);
-
     camera = new CCPanoramaCamera();
     renderer = new CCPanoramaRenderer(this);
     fileManager = new CCFileManager(this);
@@ -265,13 +270,13 @@ void CWindowsGameRendererInternal::MouseCallback(COpenGLView* view, float xpos, 
             renderer->lastX = xpos;
             renderer->lastY = ypos;
             view->MouseCapture();
-            CCursor::SetViewCursur(view, CCursor::Grab);
+            renderer->CallSampleEventCallback(GAME_CUR_CURB, NULL);
         }
     }
     else  if (type == ViewMouseEventType::ViewMouseMouseUp) {
         if ((button & MK_LBUTTON) == MK_LBUTTON) {
             view->ReleaseCapture();
-            CCursor::SetViewCursur(view, CCursor::Default);
+            renderer->CallSampleEventCallback(GAME_CUR_DEF, NULL);
         }
         if ((button & MK_RBUTTON) == MK_RBUTTON) {
             if (!renderer->lastMoved)
@@ -295,11 +300,13 @@ void CWindowsGameRendererInternal::MouseCallback(COpenGLView* view, float xpos, 
             renderer->lastX = xpos;
             renderer->lastY = ypos;
 
+            short reverse = (renderer->ReverseRotation ? -1 : 1);
+
             //旋转球体
             if (renderer->mode <= PanoramaMode::PanoramaOuterBall) {
                 float xoffset = -renderer->xoffset * renderer->MouseSensitivity;
                 float yoffset = -renderer->yoffset * renderer->MouseSensitivity;
-                renderer->renderer->RotateModel(xoffset, yoffset);
+                renderer->renderer->RotateModel(xoffset * reverse, yoffset);
             }
             //全景模式是更改U偏移和纬度偏移
             else if(renderer->mode == PanoramaMode::PanoramaMercator) {
@@ -309,7 +316,7 @@ void CWindowsGameRendererInternal::MouseCallback(COpenGLView* view, float xpos, 
                 || renderer->mode == PanoramaMode::PanoramaFullOrginal) {
                 float xoffset = -renderer->xoffset * renderer->MouseSensitivity;
                 float yoffset = -renderer->yoffset * renderer->MouseSensitivity;
-                renderer->renderer->MoveModel(xoffset, yoffset);
+                renderer->renderer->MoveModel(xoffset * reverse, yoffset);
             }
         }
 
@@ -431,6 +438,11 @@ void CWindowsGameRendererInternal::Render(float FrameTime)
     if (should_open_file && render_init_finish) {
         should_open_file = false;
         DoOpenFile();
+    }
+
+    if (should_capture) {
+        should_capture = false;
+        CaptureFromGLSurface();
     }
 
     if (should_close_file) {
@@ -644,6 +656,18 @@ void CWindowsGameRendererInternal::Update()
         CallSampleEventCallback(GAME_EVENT_GO_FULLSCREEN, 0);
     if (View->GetKeyDown(VK_F10)) //F10
         SwitchMode(GetMode());
+    if (View->GetKeyDown(VK_LEFT) && View->GetKeyPress(VK_MENU)) //Alt + left
+        CallSampleEventCallback(GAME_KEY_PREV, NULL);
+    if (View->GetKeyDown(VK_RIGHT) && View->GetKeyPress(VK_MENU)) //Alt + right
+        CallSampleEventCallback(GAME_KEY_NEXT, NULL);
+    if (View->GetKeyDown(VK_ADD) || View->GetKeyDown(VK_OEM_PLUS)) //+
+        ZoomIn();
+    if (View->GetKeyDown(VK_SUBTRACT) || View->GetKeyDown(VK_OEM_MINUS)) //-
+        ZoomOut();
+    if (View->GetKeyDown(0x30) || View->GetKeyDown(VK_NUMPAD0)) //0
+        ZoomBest();
+    if (View->GetKeyDown(VK_DELETE)) //Del
+        CallSampleEventCallback(GAME_KEY_DEL, NULL);
 }
 
 //逻辑控制
@@ -803,11 +827,12 @@ void CWindowsGameRendererInternal::SwitchMode(PanoramaMode mode)
     case PanoramaAsteroid:
         camera->Projection = CCameraProjection::Perspective;
         camera->SetMode(CCPanoramaCameraMode::CenterRoate);
-        camera->Position.z = 1.0f;
-        camera->FiledOfView = 135.0f;
-        camera->FovMin = 35.0f;
-        camera->FovMax = 135.0f;
         MouseSensitivity = 0.1f;
+        camera->Position.z = 0.95f;
+        camera->FiledOfView = 135.0f;
+        camera->FovMin = 56.0f;
+        camera->ClippingNear = 0.001f;
+        camera->FovMax = 170.0f;
         renderer->renderNoPanoramaSmall = false;
         renderer->renderPanoramaFlat = false;
         break;
@@ -872,6 +897,18 @@ void CWindowsGameRendererInternal::ZoomBest() {
         camera->OrthographicSize = bestOrthoSize;
 }
 
+void CWindowsGameRendererInternal::CaptureFromGLSurface() {
+    int w = View->Width, h = View->Height;
+    if (w % 4 != 0) w -= w % 4;
+    if (h % 4 != 0) h -= h % 4;
+
+    unsigned char* bitmapSource = new unsigned char[w * h * 3];
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, bitmapSource);
+
+    bool rs = ImageUtils::SaveJPEGToFile(glm::vec2(w, h), bitmapSource, nextCaptureSavePath);
+    CallSampleEventCallback(GAME_EVENT_CAPTURE_FINISH, &rs);
+}
+
 const wchar_t* CWindowsGameRendererInternal::GetCurrentFileInfo(int c) {
     switch (c)
     {
@@ -924,6 +961,43 @@ const wchar_t* CWindowsGameRendererInternal::GetCurrentFileInfoTitle() {
 }
 const wchar_t* CWindowsGameRendererInternal::GetCurrentFileLoadingPrecent() { return fileManager->GetCurrentFileLoadingPrecent(); }
 
+bool CWindowsGameRendererInternal::SetProperty(const char* name, const wchar_t* val)
+{
+    std::wstring value(val);
+    if (strcmp(name, "CheckImageRatio") == 0) {
+        CheckImageRatio = value == L"true";
+        return true;
+    } 
+    else if (strcmp(name, "ReverseRotation") == 0) {
+        ReverseRotation = value == L"true";
+        return true;
+    }
+    else if (strcmp(name, "ShowInfoOverlay") == 0) {
+        ((CWindowsOpenGLView*)View)->ShowInfoOverlay = value == L"true";
+        return true;
+    }
+    else if (strcmp(name, "ShowConsole") == 0) {
+        show_console = value == L"true";
+        UpdateConsoleState();
+        return true;
+    }
+    else if (strcmp(name, "DebugTool") == 0) {
+        debug_tool_active = value == L"true";
+        return true;
+    }
+    return false;
+}
+bool CWindowsGameRendererInternal::GetPropertyBool(const char* name)
+{
+    if (strcmp(name, "ShowInfoOverlay") == 0) 
+        return ((CWindowsOpenGLView*)View)->ShowInfoOverlay;
+    else if (strcmp(name, "ShowConsole") == 0)
+        return show_console;
+    else if (strcmp(name, "DebugTool") == 0) 
+        return debug_tool_active;
+    return false;
+}
+    
 void CWindowsGameRendererInternal::UpdateConsoleState() {
     ShowWindow(GetConsoleWindow(), show_console ? SW_SHOW : SW_HIDE);
     if (show_console) View->Active();

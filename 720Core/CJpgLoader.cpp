@@ -1,6 +1,7 @@
 #include "CJpgLoader.h"
 #include "CApp.h"
 #include "CStringHlp.h"
+#include "720Core.h"
 
 char jpeg_last_err[JMSG_LENGTH_MAX];
 

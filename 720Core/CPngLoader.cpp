@@ -1,4 +1,5 @@
 #include "CPngLoader.h"
+#include "720Core.h"
 
 glm::vec2 CPngLoader::GetImageSize()
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "720Core.h"
 #include "CCSmartPtr.hpp"
 
 class CCMaterial;

@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "720Core.h"
 #include "CCTexture.h"
 #include "CCModel.h"
 #include "CCShader.h"
@@ -8,18 +9,18 @@
 #include "CCSmartPtr.hpp"
 
 struct ChunkModel {
-    CCModel* model;
-    int chunkX;
-    int chunkY;
-    float chunkXv;
-    float chunkYv;
-    float chunkXvE;
-    float chunkYvE;
-    glm::vec3 pointCenter;
-    glm::vec3 pointA;
-    glm::vec3 pointB;
-    glm::vec3 pointC;
-    glm::vec3 pointD;
+    CCModel* model = nullptr;
+    int chunkX = 0;
+    int chunkY = 0;
+    float chunkXv = 0;
+    float chunkYv = 0;
+    float chunkXvE = 0;
+    float chunkYvE = 0;
+    glm::vec3 pointCenter = glm::vec3(0);
+    glm::vec3 pointA = glm::vec3(0);
+    glm::vec3 pointB = glm::vec3(0);
+    glm::vec3 pointC = glm::vec3(0);
+    glm::vec3 pointD = glm::vec3(0);
     bool loadMarked = false;
 };
 

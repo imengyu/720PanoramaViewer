@@ -1,5 +1,6 @@
 #include "CAppUIWapper.h"
 #include "CWindowsOpenGLView.h"
+#include "720Core.h"
 
 CAppUIWapper::CAppUIWapper(COpenGLView* view)
 {

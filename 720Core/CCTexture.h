@@ -60,6 +60,8 @@ public:
 	 */
 	bool Loaded() const;
 
+	//设置是否加载完成
+	bool loaded = false;
 	//获取是否有透明通道
 	bool alpha = false;
 	//获取贴图宽度

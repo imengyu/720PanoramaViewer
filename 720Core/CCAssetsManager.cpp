@@ -8,6 +8,7 @@
 #include "CCMesh.h"
 #include "CCMeshLoader.h"
 #include "CApp.h"
+#include "720Core.h"
 
 const std::wstring CCAssetsManager::GetResourcePath(const wchar_t* typeName, const wchar_t* name)
 {

@@ -24,7 +24,10 @@
   <imglist name="skin_btn_check"  src="IMGX:btn_check" states="3" />
   <imglist name="skin_btn_check_none"  src="IMGX:btn_check_none" states="3" />
   <imglist name="skin_btn_import"  src="IMGX:btn_import" states="3" />
-
+  <imglist name="skin_btn_back"  src="IMGX:btn_back" states="3" />
+	
+  <imglist name="skin_checkbox" src="IMGX:checkbox" states="8" checkAsPushdown="0"/>
+  <imglist name="skin_checkbox_focus" src="IMGX:checkbox_focus"/>
   <scrollbar name="skin_scrollbar" src="IMGX:scroll_bar" margin="3" hasgripper="0"/>
   
   <imglist name="skin_btn_close"  src="IMGX:btn_close-200" states="3" scale="200" />
@@ -64,23 +67,10 @@
   <imglist name="skin_btn_huge" src="imgx:btn_huge" states="3" />
   <imglist name="skin_btn_small" src="imgx:btn_small" states="3" />
   <imglist name="skin_btn_small_round" src="imgx:btn_small_round" states="3"  margin-x="13" margin-y="13"/>
-  <imglist name="skin_icon_pano_all"  src="IMGX:icon_pano_all" states="6"  />
   <imglist name="skin_btn_open_with_others" src="imgx:btn_open_with_others" states="3" />
   <imglist name="skin_btn_big" src="imgx:btn_big" states="3"  margin-x="2" margin-y="2"/>
-
-  <imglist name="skin_btn_pano_360"  src="IMGX:btn_pano_360-200" states="4"  scale="200" />
-  <imglist name="skin_btn_pano_asteroid"  src="IMGX:btn_pano_asteroid-200" states="4"  scale="200" />
-  <imglist name="skin_btn_pano_cylinder"  src="IMGX:btn_pano_cylinder-200" states="4" scale="200"  />
-  <imglist name="skin_btn_pano_orginal"  src="IMGX:btn_pano_orginal-200" states="4" scale="200"  />
-  <imglist name="skin_btn_pano_outball"  src="IMGX:btn_pano_outball-200" states="4" scale="200"  />
-  <imglist name="skin_btn_pano_sphere"  src="IMGX:btn_pano_sphere-200" states="4" scale="200"  />
-
-  <imglist name="skin_btn_pano_360"  src="IMGX:btn_pano_360" states="4"  />
-  <imglist name="skin_btn_pano_asteroid"  src="IMGX:btn_pano_asteroid" states="4"  />
-  <imglist name="skin_btn_pano_cylinder"  src="IMGX:btn_pano_cylinder" states="4"  />
-  <imglist name="skin_btn_pano_orginal"  src="IMGX:btn_pano_orginal" states="4"  />
-  <imglist name="skin_btn_pano_outball"  src="IMGX:btn_pano_outball" states="4"  />
-  <imglist name="skin_btn_pano_sphere"  src="IMGX:btn_pano_sphere" states="4"  />
+  <imglist name="skin_btn_tool_blank" src="imgx:btn_tool_blank" states="4"/>
+  <imglist name="skin_btn_tool_blank" src="imgx:btn_tool_blank-200" states="4" scale="200" />
 
   <imgframe name="skin_float_bg_small"  src="IMGX:float_bg_small" left="8" right="8" top="8" bottom="14"/>
   <imgframe name="skin_float_bg_big"  src="IMGX:float_bg_big" left="8" right="8" top="8" bottom="14"/>

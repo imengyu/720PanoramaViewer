@@ -3,34 +3,34 @@
 	<user autoScale="true" />
 	<root skin="skin_window_bkgnd" cache="1" width="800" height="600" colorBkgnd="#ffffff">
 		<window name="wnd_con" pos="2,38,-2,-2">
-      <!--欢迎界面-->
-      <window id="1" pos="0,0" size="full,full" show="1">
-        <img pos="|-200dp,|-150dp" skin="skin_big_title" size="400dp,130dp" />
-        <imgbtn pos="|-100dp,|0dp" name="btn_open_main" skin="skin_btn_open_huge" size="200dp,60dp" animate="1" />
-        <imgbtn name="btn_album_big" skin="skin_btn_tools_big" pos="|-38dp,%70" size="76dp,90dp" animate="1" />
-      </window>
-      <!--工具栏-->
-			<window id="2" pos="|-230dp,-52dp,@460dp,@52dp" show="0">
+			<!--欢迎界面-->
+			<window id="1" pos="0,0" size="full,full" show="1">
+				<img pos="|-200dp,|-150dp" skin="skin_big_title" size="400dp,130dp" />
+				<imgbtn pos="|-100dp,|0dp" name="btn_open_main" skin="skin_btn_open_huge" size="200dp,60dp" animate="1" />
+				<imgbtn name="btn_album_big" skin="skin_btn_tools_big" pos="|-38dp,%70" size="76dp,90dp" animate="1" />
+			</window>
+			<!--工具栏-->
+			<window id="2" pos="|-230dp,-52dp,@500dp,@52dp" show="0">
 				<imgbtnhover name="btn_scale_100" skin="skin_btn_scale_100" pos="38dp,4dp" size="38dp,48dp" animate="0" myTip="合适大小 (0)" />
 				<imgbtnhover name="btn_zoom_out" skin="skin_btn_zoom_out" pos="76dp,4dp" size="38dp,48dp" animate="0" myTip="缩小 (-)" />
 				<imgbtnhover name="btn_zoom_in" skin="skin_btn_zoom_in" pos="114dp,4dp" size="38dp,48dp" animate="0" myTip="放大 (+)" />
 				<imgbtnhover name="btn_full_screen" skin="skin_btn_scale_org" pos="152dp,4dp" size="38dp,48dp" animate="0" myTip="全屏 (F11)" />
 				<imgbtnhover name="btn_left_img" skin="skin_btn_left" pos="190dp,4dp" size="38dp,48dp" animate="0" myTip="上一张 (Alt+←)" />
 				<imgbtnhover name="btn_right_img" skin="skin_btn_right" pos="228dp,4dp" size="38dp,48dp" animate="0" myTip="下一张 (Alt+→)" />
-				<imgbtnhover name="btn_info" skin="skin_btn_info" pos="266dp,4dp" size="38dp,48dp" animate="0" myTip="图像信息" />
-				<imgbtnhover name="btn_open_with" skin="skin_btn_open" pos="304dp,4dp" size="38dp,48dp" animate="0" myTip="使用其他软件打开" />
-				<imgbtnhover name="btn_delete" skin="skin_btn_delete" pos="342dp,4dp" size="38dp,48dp" animate="0" myTip="删除图像 (Del)" />
-				<imgbtnhover name="btn_pano_mode" skin="skin_btn_pano_orginal" pos="382dp,4dp" size="38dp,48dp" animate="0" myTip="更改全景模式" />
-				<imgbtnhover name="btn_album" skin="skin_btn_btn_tools" pos="420dp,4dp" size="38dp,48dp" animate="0" myTip="打开图库 (F8)" />
+				<imgbtnhover name="btn_open_with" skin="skin_btn_open" pos="270dp,4dp" size="38dp,48dp" animate="0" myTip="使用其他软件打开" />
+				<imgbtnhover name="btn_delete" skin="skin_btn_delete" pos="308dp,4dp" size="38dp,48dp" animate="0" myTip="删除图像 (Del)" />
+				<imgbtnhover name="btn_info" skin="skin_btn_info" pos="344dp,4dp" size="38dp,48dp" animate="0" myTip="图像信息" />
+				<imgbtnhover name="btn_pano_mode" skin="skin_btn_tool_blank" pos="386dp,4dp" size="80dp,48dp" animate="0" myTip="更改全景模式" />
+				<imgbtnhover name="btn_album" skin="skin_btn_btn_tools" pos="464dp,4dp" size="38dp,48dp" animate="0" myTip="打开图库 (F8)" />
 			</window>
-      <!--错误界面-->
-			<window id="3" pos="0,0,0,-52dp" show="0">
-				<img pos="|-56dp,|-220dp" skin="skin_file_error" size="100dp,100dp" />
-				<text pos="|-200dp,|-80dp" size="400dp,40dp" align="center" font="size:15" colorText="#777777" multiLines="1">抱歉，我们无法打开此图像\n图像可能已经损坏，或是格式不支持</text>
-				<text name="text_file_error" pos="|-200dp,|-60dp" size="400dp,100dp" align="center" colorText="#999999" font="size:14">未知错误</text>
-				<imgbtn name="btn_open_with" skin="skin_btn_open_with_others" pos="|-60dp,|50dp" size="120dp,26dp" colorText="#ffffff" />
+			<!--错误界面-->
+			<window id="3" pos="0,0,%100,-52dp" show="0">
+				<img pos="|-56dp,|-120dp" skin="skin_file_error" size="100dp,100dp" />
+				<text pos="|-200dp,|-0dp" size="400dp,30dp" align="center" font="size:15" colorText="#999999" multiLines="1">无法打开此图像</text>
+				<text name="text_file_error" pos="|-200dp,|-10dp" size="400dp,100dp" align="center" colorText="#777777">未知错误</text>
+				<imgbtn name="btn_open_with" skin="skin_btn_open_with_others" pos="|-60dp,|150dp" size="120dp,26dp" colorText="#ffffff" />
 			</window>
-      <!--图像信息-->
+			<!--图像信息-->
 			<scrollview id="4" pos="0,0,@290dp,-52dp" show="0" font="size:13" viewSize="-2,-1" colorBkgnd="#F2F2F2" sbSkin="skin_scrollbar">
 				<window size="290,-1" layout="vbox" gravity="left" padding="15,15,15,15">
 					<window size="260,40">
@@ -79,53 +79,53 @@
 						<text pos="0,28" size="full,25" font="size:15" name="text_image_info_focal_length">未知</text>
 					</window>
 					<window size="260,65">
-						<link name="link_show_file_info" class="cls_btn_weblink">显示图像文件信息</link>
+						<link pos="0,20" name="link_show_file_info" class="cls_btn_weblink">显示图像文件信息</link>
 					</window>
 				</window>
 			</scrollview>
-    </window>
-    <!--相册界面-->
-    <window name="wnd_album" pos="-325dp,0,@325dp,-0" show="0" colorBkgnd="#FFFFFF">
-      <window name="wnd_album_title" pos="15dp,45dp" size="280dp,40dp" show="1">
-        <text name="text_album_title" pos="0,8" font="bold:1,size:17">图库</text>
-        <imgbtn name="btn_import" skin="skin_btn_import" pos="-70dp,0" size="35dp,35dp" tip="导入图片" animate="1" />
-        <imgbtn name="btn_album_check_mode" skin="skin_btn_check" pos="-35dp,0" size="35dp,35dp" tip="多选图片" animate="1" />
-      </window>
-      <window name="wnd_album_title_select" pos="15dp,45dp" size="280dp,40dp" show="0">
-        <text name="text_album_select_title" pos="0,8" font="bold:1,size:17">请选择图片</text>
-        <imgbtn name="btn_album_check_all" skin="skin_btn_check" pos="-70dp,0" size="35dp,35dp" tip="全选" animate="1" />
-        <imgbtn name="btn_album_check_cancel" skin="skin_btn_cancel" pos="-35dp,0" size="35dp,35dp" tip="取消选择" animate="1" />
-      </window>
-      <listview pos="8dp,100dp,-0,-30dp" name="lv_main" dividerSize="1" sbFadeFrames="30" sbSkin="skin_scrollbar">
-        <template>
-          <itemTitle colorHover="#ffffff" colorSelected="#ffffff">
-            <text pos="0,0,0,0" align="center" maxWidth="500" colorText="#888888" name="text_title">未知时间</text>
-            <check pos="-20,0" name="chk_check" tip="全选" /> 
-          </itemTitle>
-          <itemImage colorHover="#ffffff" colorSelected="#ffffff">
-            <img pos="0,0" size="300dp,150dp" name="img_thumbnail" skin="skin_img_thumbnail_def"></img>
-            <img pos="0,0" size="300dp,150dp" name="img_thumbnail_overlay" skin="skin_img_thumbnail_border_overlay"></img>
-            <text pos="8,-36dp,-8,@30dp" colorText="#ffffff" font="size:12" name="text_title">text</text>
-						<check pos="-40,-40" name="chk_check" tip="选择" />
-          </itemImage>
-        </template>
-      </listview>
-      <window name="wnd_album_select_tools" pos="0,-30dp" size="full,30dp" show="0">
-        <text pos="0,2">选中项目</text>
-        <link name="link_delete_selection" pos="100,2" class="cls_btn_weblink">从列表删除</link>
-      </window>
-      <imgbtn name="btn_close_album" skin="skin_btn_collapse_off" pos="0,|-17dp" size="18dp,34dp" animate="1" />
-    </window>
-    <!--标题栏-->
-    <caption pos="0,0,-0,36" show="1" >
-      <icon pos="10,11" src="ICON_LOGO:16" />
-      <text pos="32,11" font="size:13" name="text_title">@string/title</text>
-      <imgbtn name="btn_close" skin="skin_btn_close" pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1" />
-      <imgbtn name="btn_max" skin="skin_btn_max" pos="-70dp,0" size="35dp,36dp" tip="@string/maximize" animate="1" />
-      <imgbtn name="btn_restore" skin="skin_btn_restore" pos="-70dp,0" size="35dp,36dp" tip="@string/restore" show="0" animate="1" />
-      <imgbtn name="btn_min" skin="skin_btn_min" pos="-105dp,0" size="35dp,36dp" tip="@string/minimize" animate="1" />
-      <imgbtn name="btn_menu" skin="skin_btn_menu" pos="-140dp,0" size="35dp,36dp" animate="0" />
-      <imgbtn name="btn_fullscreen_menu" skin="skin_btn_fullscreen" pos="-175dp,0" size="35dp,36dp" tip="@string/fullscreen" show="0" animate="0" />
-    </caption>
+		</window>
+		<!--相册界面-->
+		<window name="wnd_album" pos="-325dp,0,@325dp,-0" show="0" colorBkgnd="#FFFFFF">
+			<window name="wnd_album_title" pos="15dp,45dp" size="280dp,40dp" show="1">
+				<text name="text_album_title" pos="0,8" font="bold:1,size:17">图库</text>
+				<imgbtn name="btn_import" skin="skin_btn_import" pos="-70dp,0" size="36dp,36dp" tip="导入图片" animate="1" />
+				<imgbtn name="btn_album_check_mode" skin="skin_btn_check" pos="-35dp,0" size="36dp,36dp" tip="多选图片" animate="1" />
+			</window>
+			<window name="wnd_album_title_select" pos="15dp,45dp" size="300dp,40dp" show="0">
+				<text name="text_album_select_title" pos="0,8" font="bold:1,size:17">请选择图片</text>
+				<imgbtn name="btn_album_check_cancel" skin="skin_btn_back" pos="-108dp,0" size="36dp,36dp" tip="取消选择" animate="1" />
+				<imgbtn name="btn_album_check_all" skin="skin_btn_check" pos="-72,0" size="36dp,36dp" tip="全选" animate="1" />
+				<imgbtn name="btn_album_check_delete" skin="skin_btn_cancel" pos="-36dp,0" size="36dp,36dp" tip="删除选中的图像" animate="1" />
+			</window>
+			<window name="wnd_album_empty" pos="8dp,100dp,-0,-0dp" show="0">
+				<text pos="0,|-60dp" width="full" align="center" font="size:12" multiLines="1" colorText="#999999">这里还没有全景图哦\n点击上方 “+” 按扭可以导入全景图</text>
+			</window>
+			<listview pos="8dp,100dp,-0,-0dp" name="lv_main" dividerSize="1" sbFadeFrames="30" sbSkin="skin_scrollbar">
+				<template>
+					<itemTitle colorHover="#ffffff" colorSelected="#ffffff">
+						<text pos="0,0,0,0" align="center" maxWidth="500" colorText="#888888" name="text_title">未知时间</text>
+						<check pos="-20,0" name="chk_check" size="20dp,20dp" tip="全选" skin="skin_checkbox" focusSkin="skin_checkbox_focus" />
+					</itemTitle>
+					<itemImage colorHover="#ffffff" colorSelected="#ffffff">
+						<img pos="0,0" size="300dp,150dp" name="img_thumbnail" skin="skin_img_thumbnail_def" />
+						<img pos="0,0" size="300dp,150dp" name="img_thumbnail_overlay" skin="skin_img_thumbnail_border_overlay" />
+						<text pos="8,-36dp,-8,@30dp" colorText="#ffffff" font="size:12" name="text_title">text</text>
+						<check pos="-60dp,|-15dp" size="30dp,30dp" name="chk_check" skin="skin_checkbox" focusSkin="skin_checkbox_focus" tip="选择" />
+					</itemImage>
+				</template>
+			</listview>
+			<imgbtn name="btn_close_album" skin="skin_btn_collapse_off" pos="0,|-17dp" size="18dp,34dp" animate="1" />
+		</window>
+		<!--标题栏-->
+		<caption pos="0,0,-0,36" show="1">
+			<icon pos="10,11" src="ICON_LOGO:16" />
+			<text pos="32,11" font="size:13" name="text_title">@string/title</text>
+			<imgbtn name="btn_close" skin="skin_btn_close" pos="-35dp,0" size="35dp,36dp" tip="@string/close" animate="1" />
+			<imgbtn name="btn_max" skin="skin_btn_max" pos="-70dp,0" size="35dp,36dp" tip="@string/maximize" animate="1" />
+			<imgbtn name="btn_restore" skin="skin_btn_restore" pos="-70dp,0" size="35dp,36dp" tip="@string/restore" show="0" animate="1" />
+			<imgbtn name="btn_min" skin="skin_btn_min" pos="-105dp,0" size="35dp,36dp" tip="@string/minimize" animate="1" />
+			<imgbtn name="btn_menu" skin="skin_btn_menu" pos="-140dp,0" size="35dp,36dp" animate="0" />
+			<imgbtn name="btn_fullscreen_menu" skin="skin_btn_fullscreen" pos="-175dp,0" size="35dp,36dp" tip="@string/fullscreen" show="0" animate="0" />
+		</caption>
 	</root>
 </SOUI>

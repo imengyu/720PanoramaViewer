@@ -1,4 +1,5 @@
 #include "CBMPLoader.h"
+#include "720Core.h"
 
 glm::vec2 CBMPLoader::GetImageSize()
 {

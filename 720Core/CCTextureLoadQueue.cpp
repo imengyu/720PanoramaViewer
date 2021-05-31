@@ -1,5 +1,6 @@
 #include "CCTextureLoadQueue.h"
 #include "CApp.h"
+#include "720Core.h"
 
 CCTextureLoadQueue::CCTextureLoadQueue()
 {

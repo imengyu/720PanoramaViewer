@@ -90,6 +90,7 @@ private:
 	bool inited = false;
 	char SizeText[250];
 	bool Rendering = false;
+	bool MainThreadRunning = false;
 	bool RenderThreadRunning = false;
 	bool Destroying = false;
 	WNDPROC CustomWndProc = nullptr;

@@ -35,6 +35,16 @@ enum PanoramaMode : int16_t {
 #define GAME_EVENT_LOADING_STATUS 5
 #define GAME_EVENT_IMAGE_INFO_LOADED 6
 #define GAME_EVENT_IMAGE_INFO_LOADED2 7
+#define GAME_EVENT_CAPTURE_FINISH 8
+#define GAME_EVENT_SHADER_FILE_MISSING 9
+
+#define GAME_CUR_CURB 10
+#define GAME_CUR_DEF 11
+#define GAME_KEY_NEXT 12
+#define GAME_KEY_PREV 13
+#define GAME_KEY_DEL 14
+
+#define GAME_EVENT_SHADER_NOT_SUPPORT 20
 
 typedef void(*CGameFileStatusChangedCallback)(void* data, bool isOpen, int status);
 typedef void(*CGameSampleEventCallback)(void* data, int eventCode, void* param);
@@ -45,7 +55,8 @@ public:
 	CWindowsGameRenderer() {}
 	virtual ~CWindowsGameRenderer() {}
 
-	virtual void SetOpenFilePath(const wchar_t* path) {}
+	virtual bool SetStatCapture(const wchar_t* path) { return false; }
+	virtual bool SetOpenFilePath(const wchar_t* path) { return false; }
 	virtual const wchar_t* GetOpenFilePath() { return nullptr; }
 	virtual void DoOpenFile() {}
 	virtual void MarkShouldOpenFile() { }
@@ -66,6 +77,7 @@ public:
 	virtual void ZoomReset() { }
 	virtual void ZoomBest() { }
 
+	virtual void CallSampleEventCallback(int code, void* param) {}
 	virtual void SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void*data) {}
 	virtual void SetSampleEventCallback(CGameSampleEventCallback callback, void* data) {}
 };
@@ -105,7 +117,12 @@ public:
 	CWindowsGameRendererInternal();
 	~CWindowsGameRendererInternal();
 
-	void SetOpenFilePath(const wchar_t* path);
+	bool SetOpenFilePath(const wchar_t* path);
+	bool SetStatCapture(const wchar_t* path) {
+		should_capture = true;
+		nextCaptureSavePath = path;
+		return true;
+	}
 	const wchar_t* GetOpenFilePath();
 	void DoOpenFile();
 	void MarkShouldOpenFile() { should_open_file = true; }
@@ -120,17 +137,22 @@ public:
 	const wchar_t* GetCurrentFileInfoTitle();
 	const wchar_t* GetCurrentFileLoadingPrecent();
 
+	bool SetProperty(const char* name, const wchar_t* val) override;
+	bool GetPropertyBool(const char* name) override;
+
 	bool ZoomIn();
 	bool ZoomOut();
 	void ZoomReset();
 	void ZoomBest();
+
+	void CaptureFromGLSurface();
 
 	void SetFileStatusChangedCallback(CGameFileStatusChangedCallback callback, void* data);
 	void SetSampleEventCallback(CGameSampleEventCallback callback, void* data);
 
 private:
 
-	Logger* logger;
+	Logger* logger = nullptr;
 	std::wstring currentOpenFilePath;
 
 	bool Init() override;
@@ -196,6 +218,8 @@ private:
 	bool render_init_finish = false;
 	bool should_open_file = false;
 	bool should_close_file = false;
+	bool should_capture = false;
+	std::wstring nextCaptureSavePath;
 	bool delete_after_close = false;
 	bool destroying = false;
 	bool needTestImageAndSplit = false;
@@ -236,11 +260,16 @@ private:
 	void LoadSettings();
 	void SaveSettings();
 
-	SampleEventCallbackData sampleEventCallbackData;
-	FileStatusChangedCallbackData fileStatusChangedCallbackData;
+	SampleEventCallbackData sampleEventCallbackData = { 0 };
+	FileStatusChangedCallbackData fileStatusChangedCallbackData = { 0 };
 
-	void CallSampleEventCallback(int code, void* param);
 	void CallFileStatusChangedCallback(bool isOpen, int status);
+	void CallSampleEventCallback(int code, void* param);
+
+	//≈‰÷√
+	bool CheckImageRatio = true;
+	bool ReverseRotation = false;
+
 };
 
 #endif

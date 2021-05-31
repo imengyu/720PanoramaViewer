@@ -7,7 +7,6 @@
   </menuItem>
   <menuItem id="5" icon="6">截取全景图当前可见范围 (F9)</menuItem>
   <menuItem id="11" icon="5">图像信息</menuItem>
-  <menuItem id="12">test</menuItem>
   <sep/>
   <menuItem id="6" icon="4">设置</menuItem>
   <menuItem text="帮助与反馈">

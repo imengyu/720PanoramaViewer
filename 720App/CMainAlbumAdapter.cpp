@@ -118,6 +118,10 @@ void CMainAlbumAdapter::SetCheckMode(bool c)
 	isCheckMode = c;
 	notifyDataSetChanged();
 }
+bool CMainAlbumAdapter::IsCheckMode()
+{
+	return isCheckMode;
+}
 void CMainAlbumAdapter::SetCheckItemChangeCallback(CMainCheckItemChangeCallback callback, void* data)
 {
 	checkItemChangeCallback = callback; 
@@ -218,14 +222,9 @@ DWORD WINAPI CMainAlbumAdapter::LoadThumbnailThread(LPVOID lpParam) {
 	else
 		data->item->ThumbnailLoadFailed = true;
 	data->item->ThumbnailLoadStarted = false;
-	AppGetAppInstance()->GetMessageCenter()->RunOnUIThread(data->_this, LoadThumbnailThreadMainThreadRun);
-	free(data);
+	delete data;
 	return 0;
 }
-void CMainAlbumAdapter::LoadThumbnailThreadMainThreadRun(void* data) {
-	((CMainAlbumAdapter*)data)->notifyDataSetChanged();
-}
-
 CMainAlbumItem::CMainAlbumItem(const wchar_t* filePath, const wchar_t* fileName)
 {
 	FilePath = filePath;
